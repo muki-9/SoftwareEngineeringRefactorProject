@@ -1,23 +1,61 @@
 grammar Grammar;
 
-VB
-    : '|'
+/*
+Parser Rules
+*/
+
+command
+    : pipe  
+    | seq 
+    | call 
+    | NL
     ;
 
-SEMICOL
-    : ';'
+pipe
+    : call '|' call 
+    | pipe '|' call
     ;
 
-BACKQUOT
-    : '`'
+seq
+    : pipe ';' command seq2
+    | call ';' command seq2
     ;
 
-DOUBLEQUOT
-    : '"'
+seq2
+    : ';' command seq2
+    |
+    ; /* epsilon */ 
+
+quoted
+    : SQ
+    | DQ 
+    | BQ
     ;
 
-SINGLEQUOT
-    : '\''
+call
+    :  WS? (redirection WS)* argument (WS atom)* WS?
+    ;
+
+atom
+    : redirection 
+    | argument
+    ;
+
+argument
+    : ( quoted|UQ)+
+    ;
+
+redirection
+    : LT WS? argument
+    | GT WS? argument
+    ;
+
+/* 
+Lexer Rules
+*/
+
+UQ
+    : ~( ' ' | '\t'  | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )
     ;
 
 LT
@@ -28,66 +66,35 @@ GT
     : '>'
     ;
 
-UNQUOTED
-    : [^ \n'"`;|<>]
+DQ
+    : '"' (BackQuote | DQC)* '"'
     ;
 
 WS
-    : [ \n]+
+    : (' ' | '\t' )+
+    ; //whitespace
+
+NKW
+    : ~('\n' | '\'' | '"' | '`' | ';' | '|')
+    ; // non keyword
+
+BQ
+    : '`' ~('\n' | '`' )* '`'
+    ; 
+
+SQ 
+    : '\'' ~('\n'|'\'')* '\''
+    ; 
+
+NL
+    : '\n'
     ;
 
-DQC
-    : [^\n'"`]+
+
+fragment BackQuote
+    : '`' ~('\n' | '`' )* '`'
+    ; 
+
+fragment DQC
+    : ~('\n' | '"'| '`')
     ;
-
-command
-    : pipe
-    | seq
-    | call
-    ;
-
-pipe
-    : call '|' call
-    | pipe '|' call
-    ;
-
-seq
-    : command ';' command
-    ;
-
-/* call
-    : (NONKW | quoted)*
-    ;
-*/
-
-call
-    : WS (redirect WS)* arg (WS atom)* WS
-    ;
-
-atom
-    : redirect | arg
-    ;
-
-arg
-    : (quoted | UNQUOTED)+
-    ;
-
-redirect
-    : LT WS arg | GT WS arg
-    ;
-
-quoted
- 	: single | double | back
- 	;
-
-single
-    : SINGLEQUOT ~('\n')* SINGLEQUOT
- 	;
-
-back
-	: BACKQUOT ~('\n')* BACKQUOT
-    ;
-
-double
- 	: DOUBLEQUOT (back | DQC) DOUBLEQUOT
- 	;
