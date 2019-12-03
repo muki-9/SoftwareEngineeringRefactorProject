@@ -1,6 +1,5 @@
 package uk.ac.ucl.jsh;
 
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -13,47 +12,33 @@ public class JshTest {
     public JshTest() {
     }
 
-    Jsh jshell;
-
-    @Before
-    public void testShell() {
-        jshell = new Jsh();
-    }
-
-    @Test
-    public void testEcho() throws Exception {
-        PipedInputStream in = new PipedInputStream();
-        PipedOutputStream out = new PipedOutputStream(in);
-        jshell.eval("echo foo", out);
-        Scanner scn = new Scanner(in);
-        assertEquals(scn.next(), "foo");
-        scn.close();
-    }
-
-    @Test
-    public void testEchoQuotes() throws Exception {
-        PipedInputStream in = new PipedInputStream();
-        PipedOutputStream out = new PipedOutputStream(in);
-        jshell.eval("echo \"foo\" ", out);
-        Scanner scn = new Scanner(in);
-        assertEquals(scn.next(), "foo");
-        scn.close();
-    }
-
-    @Test
-    public void testPwd() throws IOException {
-        PipedInputStream in = new PipedInputStream();
-        PipedOutputStream out = new PipedOutputStream(in);
-        jshell.eval("pwd", out);
-        Scanner scn = new Scanner(in);
-        assertEquals(scn.next(), "pwd");
-        scn.close();
-    }
-
-    // public void testCd() throws IOException {
+    // @Test
+    // public void testEcho() throws Exception {
+    //     Jsh echoShell = new Jsh();
     //     PipedInputStream in = new PipedInputStream();
     //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("cd", out);
+    //     echoShell.eval("echo foo", out);
+    //     Scanner scn = new Scanner(in);
+    //     assertEquals(scn.next(), "foo");
+    //     scn.close();
+    // }
+
+    // public void testPwd() throws IOException {
+    //     Jsh pwdShell = new Jsh();
+    //     PipedInputStream in = new PipedInputStream();
+    //     PipedOutputStream out = new PipedOutputStream(in);
+    //     pwdShell.eval("pwd", out);
+    //     Scanner scn = new Scanner(in);
+    //     assertEquals(scn.next(), "pwd");
+    //     scn.close();
+    // }
+
+    // public void testCd() throws IOException {
+    //     Jsh cdShell = new Jsh();
+    //     PipedInputStream in = new PipedInputStream();
+    //     PipedOutputStream out = new PipedOutputStream(in);
+    //     cdShell.eval("cd", out);
+
     // }
 
 }
