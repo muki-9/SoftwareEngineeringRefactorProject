@@ -1,8 +1,9 @@
-grammar Grammar;
+grammar AntlrGrammar;
 
 /*
 Parser Rules
 */
+
 
 command
     : pipe  
@@ -33,7 +34,11 @@ quoted
     ;
 
 call
-    :  WS? (redirection WS)* argument (WS atom)* WS?
+    :  (redirection)* commandtoken (atom)*
+    ;
+
+ctoken
+    : CTOKEN
     ;
 
 atom
@@ -42,11 +47,11 @@ atom
     ;
 
 argument
-    : ( quoted|UQ)+
+    : (quoted|UQ)+
     ;
 
 redirection
-    : LT WS? argument
+    : LT WS? argument 
     | GT WS? argument
     ;
 
@@ -54,8 +59,12 @@ redirection
 Lexer Rules
 */
 
+CTOKEN
+	: 'echo' | 'cd' | 'grep' | 'pwd' | 'ls' | 'cat' |'head' | 'tail' | 'sed' | 'wc' | 'find'
+	;
+
 UQ
-    : ~( ' ' | '\t'  | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )
+    : ~( ' ' | '\t'  | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )+
     ;
 
 LT
@@ -71,7 +80,7 @@ DQ
     ;
 
 WS
-    : (' ' | '\t' )+
+    : (' ' | '\t' )+ -> skip
     ; //whitespace
 
 NKW
@@ -82,7 +91,7 @@ BQ
     : '`' ~('\n' | '`' )* '`'
     ; 
 
-SQ 
+SQ
     : '\'' ~('\n'|'\'')* '\''
     ; 
 
