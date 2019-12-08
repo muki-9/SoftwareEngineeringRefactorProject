@@ -2,8 +2,6 @@ package uk.ac.ucl.jsh;
 
 import java.util.ArrayList;
 
-import uk.ac.ucl.jsh.AntlrGrammarParser.ArgumentContext;
-
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
     @Override
@@ -14,8 +12,9 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
     @Override
     public CommandVisitable visitSeq(AntlrGrammarParser.SeqContext ctx) {
-        // System.out.println("came to seq");
-        return visitChildren(ctx);
+        CommandVisitable leftChild = ctx.getChild(0).accept(this);
+        CommandVisitable rightChild = ctx.getChild(1).accept(this);
+        return new Seq(leftChild, rightChild);
     }
 
     @Override

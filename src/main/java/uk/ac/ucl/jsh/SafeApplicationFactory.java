@@ -1,34 +1,36 @@
 package uk.ac.ucl.jsh;
 
+import uk.ac.ucl.applications.*;
+
 public class SafeApplicationFactory {
 
 	public Application mkSafeApplication(String application) {
         Application app;
         switch (application) {
-            // case "cd":
-            //     app = new Cd();
-            //     break;
-            // case "pwd":
-            //     app = new Pwd();
-            //     break;
-            // case "ls":
-            //     app = new Ls();
-            //     break;
-            // case "cat":
-            // app = new Cat();
-            //     break;
+            case "cd":
+                app = new Cd();
+                break;
+            case "pwd":
+                app = new Pwd();
+                break;
+            case "ls":
+                app = new Ls();
+                break;
+            case "cat":
+                app = new Cat();
+                break;
             case "echo":
                 app = new Echo();
                 break;
-            // case "head":
-            //     head(appArgs, writer);
-            //     break;
-            // case "tail":
-            //     tail(appArgs, writer);
-            //     break;
-            // case "grep":
-            //     grep(appArgs, writer);
-            //     break;
+            case "head":
+                app = new Head();
+                break;
+            case "tail":
+                app = new Tail();
+                break;
+            case "grep":
+                app = new Grep();
+                break;
             default:
                 throw new RuntimeException(application + ": unknown application");
             }

@@ -17,8 +17,9 @@ public class Eval implements CommandVisitor {
     }
 
     @Override
-    public void visitSeq(Seq seq) {
-        // TODO Auto-generated method stub
+    public void visitSeq(Seq seq) throws IOException {
+        seq.getSeqChildren().get(0).accept(this);
+        seq.getSeqChildren().get(1).accept(this);
     }
 
     @Override

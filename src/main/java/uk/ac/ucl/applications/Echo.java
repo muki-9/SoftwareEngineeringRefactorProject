@@ -1,4 +1,4 @@
-package uk.ac.ucl.jsh;
+package uk.ac.ucl.applications;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+
+import uk.ac.ucl.jsh.Application;
 
 public class Echo implements Application {
 
