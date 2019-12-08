@@ -14,9 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -26,27 +23,22 @@ public class Jsh {
     private static String currentDirectory = System.getProperty("user.dir");
 
     public void eval(String cmdline, OutputStream output) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        // OutputStreamWriter writer = new OutputStreamWriter(output);
 
         CharStream cs = CharStreams.fromString(cmdline);
         AntlrGrammarLexer lexer = new AntlrGrammarLexer(cs);
         CommonTokenStream cts = new CommonTokenStream(lexer);
         AntlrGrammarParser parser = new AntlrGrammarParser(cts);
-        ParseTree tree = parser.command();
-        MyTreeVisitor v = new MyTreeVisitor();
+        ParseTree tree = parser.start();
+        MyTreeVisitor myVisitor = new MyTreeVisitor();
 
-        v.visit(tree);
-        ArrayList<String> tokens = v.getTokens();
-        if (tokens.size() < 1) {
-            writer.write("Nothing enterred");
-            writer.flush();
-            return;
-        }
-        CommandVisitable command = (CommandVisitable) new Call(tokens);
-        // CommandVisitor cv = (CommandVisitor) new Eval(writer);
+        CommandVisitable command = myVisitor.visit(tree);
+        CommandVisitor commandVisitor = new Eval(output);
+        command.accept(commandVisitor);
     }
     public static void main(String[] args) {
         Jsh newShell = new Jsh();
+        System.out.println("Inside shell");
         if (args.length > 0) {
             if (args.length != 2) {
                 System.out.println("jsh: wrong number of arguments");
@@ -60,7 +52,8 @@ public class Jsh {
             } catch (Exception e) {
                 System.out.println("jsh: " + e.getMessage());
             }
-            } else {
+            } 
+            else {
                 Scanner input = new Scanner(System.in);
                 try {
                     while (true) {

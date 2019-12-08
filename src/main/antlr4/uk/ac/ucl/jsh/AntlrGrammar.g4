@@ -4,7 +4,11 @@ grammar AntlrGrammar;
 Parser Rules
 */
 
-
+start
+    : command
+    | 
+    ;
+    
 command
     : pipe  
     | seq 
@@ -34,11 +38,7 @@ quoted
     ;
 
 call
-    :  (redirection)* ctoken (atom)*
-    ;
-
-ctoken
-    : CTOKEN
+    :   WS? (redirection WS)* argument (WS atom)* WS?
     ;
 
 atom
@@ -58,10 +58,6 @@ redirection
 /* 
 Lexer Rules
 */
-
-CTOKEN
-	: 'echo' | 'cd' | 'grep' | 'pwd' | 'ls' | 'cat' |'head' | 'tail' | 'sed' | 'wc' | 'find'
-	;
 
 UQ
     : ~( ' ' | '\t'  | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )+

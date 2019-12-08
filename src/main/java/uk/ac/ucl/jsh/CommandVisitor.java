@@ -1,7 +1,9 @@
 package uk.ac.ucl.jsh;
 
+import java.io.IOException;
+
 public interface CommandVisitor {
-    public void visit(Pipe pipe);
-    public void visit(Seq seq);
-	public void visit(Call call);
+    public void visitCall(Call call) throws IOException;
+    public void visitPipe(Pipe pipe);
+    public void visitSeq(Seq seq);
 }

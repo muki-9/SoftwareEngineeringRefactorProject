@@ -1,5 +1,6 @@
 package uk.ac.ucl.jsh;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Call extends Command implements CommandVisitable {
@@ -18,9 +19,9 @@ public class Call extends Command implements CommandVisitable {
     public ArrayList<String> getArguments() {
         return arguments;
     }
-    
+
     @Override
-    public void accept(CommandVisitor visitor) {
-        visitor.visit(this);
+    public void accept(CommandVisitor visitor) throws IOException {
+        visitor.visitCall(this);
     }
 }
