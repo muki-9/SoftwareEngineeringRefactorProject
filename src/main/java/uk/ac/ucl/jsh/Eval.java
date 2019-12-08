@@ -13,7 +13,6 @@ public class Eval implements CommandVisitor {
 
     @Override
     public void visitPipe(Pipe pipe) {
-        // TODO Auto-generated method stub
     }
 
     @Override

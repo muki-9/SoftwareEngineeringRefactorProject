@@ -13,7 +13,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     @Override
     public CommandVisitable visitSeq(AntlrGrammarParser.SeqContext ctx) {
         CommandVisitable leftChild = ctx.getChild(0).accept(this);
-        CommandVisitable rightChild = ctx.getChild(1).accept(this);
+        CommandVisitable rightChild = ctx.getChild(2).getChild(0).accept(this);
         return new Seq(leftChild, rightChild);
     }
 
