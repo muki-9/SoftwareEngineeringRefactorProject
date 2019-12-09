@@ -31,6 +31,9 @@ public class SafeApplicationFactory {
             case "grep":
                 app = new Grep();
                 break;
+			case "wc":
+                app = new Wc();
+                break;
             default:
                 throw new RuntimeException(application + ": unknown application");
             }
