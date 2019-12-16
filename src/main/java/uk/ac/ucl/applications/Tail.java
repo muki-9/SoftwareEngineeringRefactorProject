@@ -24,28 +24,17 @@ public class Tail implements Application {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
 
-        if (args.isEmpty()) {
-            throw new RuntimeException("tail: missing arguments");
-        }
-        if (args.size() != 1 && args.size() != 3) {
-            throw new RuntimeException("tail: wrong arguments");
-        }
-        if (args.size() == 3 && !args.get(0).equals("-n")) {
-            throw new RuntimeException("tail: wrong argument " + args.get(0));
-        }
+        validateArguments(args);
+
         int tailLines = 10;
-        String tailArg;
-        if (args.size() == 3) {
-            try {
-                tailLines = Integer.parseInt(args.get(1));
-            } catch (Exception e) {
-                throw new RuntimeException("tail: wrong argument " + args.get(1));
-            }
-            tailArg = args.get(2);
-        } else {
-            tailArg = args.get(0);
-        }
+        String tailArg = getTailArgs(args, tailLines);
+
         File tailFile = new File(currentDirectory + File.separator + tailArg);
+
+        writeOutput(tailArg, tailFile, tailLines, writer, currentDirectory);
+    }
+
+    public void writeOutput(String tailArg, File tailFile, int tailLines, BufferedWriter writer, String currentDirectory) {
         if (tailFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + tailArg);
@@ -64,14 +53,39 @@ public class Tail implements Application {
                 for (int i = index; i < storage.size(); i++) {
                     writer.write(storage.get(i) + System.getProperty("line.separator"));
                     writer.flush();
-                }
+                }            
             } catch (IOException e) {
                 throw new RuntimeException("tail: cannot open " + tailArg);
             }
         } else {
-            // throw new RuntimeException("tail: " + tailArg + " does not exist");
-            writer.write(tailArg);
-            writer.flush();
+            throw new RuntimeException("tail: " + tailArg + " does not exist");
+        }
+    }
+
+    public String getTailArgs(ArrayList<String> args, int tailLines) {
+        String tailArg;
+        if (args.size() == 3) {
+            try {
+                tailLines = Integer.parseInt(args.get(1));
+            } catch (Exception e) {
+                throw new RuntimeException("tail: wrong argument " + args.get(1));
+            }
+            tailArg = args.get(2);
+        } else {
+            tailArg = args.get(0);
+        }
+        return tailArg;
+    }
+
+    public void validateArguments(ArrayList<String> args) {
+        if (args.isEmpty()) {
+            throw new RuntimeException("tail: missing arguments");
+        }
+        if (args.size() != 1 && args.size() != 3) {
+            throw new RuntimeException("tail: wrong arguments");
+        }
+        if (args.size() == 3 && !args.get(0).equals("-n")) {
+            throw new RuntimeException("tail: wrong argument " + args.get(0));
         }
     }
 }

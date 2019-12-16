@@ -18,34 +18,21 @@ import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
 public class Head implements Application {
-
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
 
-        if (args.isEmpty()) {
-            throw new RuntimeException("head: missing arguments");
-        }
-        if (args.size() != 1 && args.size() != 3) {
-            throw new RuntimeException("head: wrong arguments");
-        }
-        if (args.size() == 3 && !args.get(0).equals("-n")) {
-            throw new RuntimeException("head: wrong argument " + args.get(0));
-        }
+        validateArguments(args);
+
         int headLines = 10;
-        String headArg;
-        if (args.size() == 3) {
-            try {
-                headLines = Integer.parseInt(args.get(1));
-            } catch (Exception e) {
-                throw new RuntimeException("head: wrong argument " + args.get(1));
-            }
-            headArg = args.get(2);
-        } else {
-            headArg = args.get(0);
-        }
+        String headArg = getHeadArgs(args, headLines);
         File headFile = new File(currentDirectory + File.separator + headArg);
+        
+        writeOutput(headArg, headFile, headLines, writer, currentDirectory);
+    }
+
+    private void writeOutput(String headArg, File headFile, int headLines, BufferedWriter writer, String currentDirectory) {
         if (headFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + headArg);
@@ -62,10 +49,34 @@ public class Head implements Application {
                 throw new RuntimeException("head: cannot open " + headArg);
             }
         } else {
-            // throw new RuntimeException("head: " + headArg + " does not exist");
-            // should take value from stdin
-            writer.write(headArg);
-            writer.flush();
+            throw new RuntimeException("head: " + headArg + " does not exist");
+        }
+    }
+
+    private String getHeadArgs(ArrayList<String> args, int headLines) {
+        String headArg;
+        if (args.size() == 3) {
+            try {
+                headLines = Integer.parseInt(args.get(1));
+            } catch (Exception e) {
+                throw new RuntimeException("head: wrong argument " + args.get(1));
+            }
+            headArg = args.get(2);
+        } else {
+            headArg = args.get(0);
+        }
+        return headArg;
+    }
+
+    private void validateArguments(ArrayList<String> args) {
+        if (args.isEmpty()) {
+            throw new RuntimeException("head: missing arguments");
+        }
+        if (args.size() != 1 && args.size() != 3) {
+            throw new RuntimeException("head: wrong arguments");
+        }
+        if (args.size() == 3 && !args.get(0).equals("-n")) {
+            throw new RuntimeException("head: wrong argument " + args.get(0));
         }
     }
 }

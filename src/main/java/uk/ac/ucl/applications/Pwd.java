@@ -16,7 +16,6 @@ public class Pwd implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
         writer.write(currentDirectory);
         writer.write(System.getProperty("line.separator"));
         writer.flush();

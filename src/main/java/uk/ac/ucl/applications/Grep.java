@@ -22,17 +22,26 @@ public class Grep implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        validateArguments(args);
+        Pattern grepPattern = Pattern.compile(args.get(0));
+        Path[] filePathArray = getPathArray(args);
+        writeOutput(writer, grepPattern, filePathArray, args);
+    }
 
+    public void validateArguments(ArrayList<String> args) {
         if (args.size() < 2) {
             throw new RuntimeException("grep: wrong number of arguments");
         }
-        Pattern grepPattern = Pattern.compile(args.get(0));
-        int numOfFiles = args.size() - 1;
-        Path filePath;
-        Path[] filePathArray = new Path[numOfFiles];
+    }
+
+    public Path[] getPathArray(ArrayList<String> args) {
+        String currentDirectory = Jsh.getCurrentDirectory();
         Path currentDir = Paths.get(currentDirectory);
+        int numOfFiles = args.size() - 1;
+        Path[] filePathArray = new Path[numOfFiles];
+        Path filePath;
+
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + 1));
             if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath)
@@ -42,7 +51,10 @@ public class Grep implements Application {
                 filePathArray[i] = filePath;
             }
         }
-        
+        return filePathArray;
+    }
+
+    public void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args) {
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
             try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {

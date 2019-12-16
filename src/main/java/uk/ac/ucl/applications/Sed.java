@@ -19,13 +19,29 @@ import uk.ac.ucl.jsh.Jsh;
 
 public class Sed implements Application {
 
+    private Boolean g = false;
+
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output));
         String currentDirectory = Jsh.getCurrentDirectory();
         String file;
-        String[] s;
-        Boolean g = false;
+        String[] s = validateArgs(args);
+        file = args.get(1);
 
+        Path currentDir = Paths.get(currentDirectory);
+        Path filePath = currentDir.resolve(file);
+        if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
+            throw new RuntimeException("sed: wrong file argument");
+        }
+
+        ArrayList<String> lines = new ArrayList<>();
+        lines = performSed(s, file, g);
+        writeOutput(out, lines);
+    }
+
+    public String[] validateArgs(ArrayList<String> args) {
+        String[] s;
         if (args.size() != 2) {
             throw new RuntimeException("sed: wrong number of arguments");
         }
@@ -40,17 +56,14 @@ public class Sed implements Application {
             else {
                 throw new RuntimeException("sed: regex enterred in incorrect format\nyour first argument should look like this s/regex/replacement/ or s/regex/replacement/g");
             }
-            file = args.get(1);
         }
         else {
             throw new RuntimeException("sed: not enough arguments");
         }
+        return s;
+    }
 
-        Path currentDir = Paths.get(currentDirectory);
-        Path filePath = currentDir.resolve(file);
-        if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
-            throw new RuntimeException("sed: wrong file argument");
-        }
+    public ArrayList<String> performSed(String[] s, String file, Boolean g) throws IOException {
         ArrayList<String> fileLines = getLines(file);
         ArrayList<String> lines = new ArrayList<>();
         if (g) {
@@ -59,8 +72,10 @@ public class Sed implements Application {
         else {
             lines = sedFirstInstance(s[1], s[2], fileLines);
         }
+        return lines;
+    }
 
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output));
+    public void writeOutput(BufferedWriter out, ArrayList<String> lines) throws IOException {
         for(String str : lines) {
             out.write(str);
             out.write(System.getProperty("line.separator"));

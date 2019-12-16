@@ -13,7 +13,7 @@ public class Cd implements Application {
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
-
+        
         if (args.isEmpty()) {
             //implement functionality to take you to the home directory if cd is inputted alone
             throw new RuntimeException("cd: missing argument");

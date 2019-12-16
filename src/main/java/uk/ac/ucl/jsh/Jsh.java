@@ -138,38 +138,3 @@ public class Jsh {
 //                     tokens.addAll(globbingResult);
 //                 }
 //             }
-
-//             String appName = tokens.get(0);
-//             ArrayList<String> appArgs = new ArrayList<String>(tokens.subList(1, tokens.size()));
-
-//             switch (appName) {
-//             case "cd":
-//                 cd(appArgs);
-//                 break;
-//             case "pwd":
-//                 pwd(writer);
-//                 break;
-//             case "ls":
-//                 ls(appArgs, writer);
-//                 break;
-//             case "cat":
-//                 cat(appArgs, writer);
-//                 break;
-//             case "echo":
-//                 echo(appArgs, writer);
-//                 break;
-//             case "head":
-//                 head(appArgs, writer);
-//                 break;
-//             case "tail":
-//                 tail(appArgs, writer);
-//                 break;
-//             case "grep":
-//                 grep(appArgs, writer);
-//                 break;
-//             default:
-//                 throw new RuntimeException(appName + ": unknown application");
-//             }
-//         }
-//     }
-// }

@@ -14,12 +14,12 @@ public class JshTest {
     public JshTest() {
     }
 
-    Jsh jshell;
+    // Jsh jshell;
 
-    @Before
-    public void testShell() {
-        jshell = new Jsh();
-    }
+    // @Before
+    // public void testShell() {
+    //     jshell = new Jsh();
+    // }
 
     //** THESE ARE JUST RAGHIBS TESTS WHILST CODING */
 
@@ -32,7 +32,6 @@ public class JshTest {
     //     while (scn.next() != null){
     //         System.out.println(scn.next());
     //     }
-        
     //     assertEquals(scn.next(), "this is some jargon text\nto test a lot of implementation\nrandomname name\nmore text\ntwo of replacedOnce same words, on the same line");
     //     scn.close();
     // }
