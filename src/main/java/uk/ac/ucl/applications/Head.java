@@ -18,21 +18,20 @@ import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
 public class Head implements Application {
+
+    private int headLines = 10;
+
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
         validateArguments(args);
-
-        int headLines = 10;
-        String headArg = getHeadArgs(args, headLines);
+        String headArg = getHeadArgs(args);
         File headFile = new File(currentDirectory + File.separator + headArg);
-        
-        writeOutput(headArg, headFile, headLines, writer, currentDirectory);
+        writeOutput(headArg, headFile, writer, currentDirectory);
     }
 
-    private void writeOutput(String headArg, File headFile, int headLines, BufferedWriter writer, String currentDirectory) {
+    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) {
         if (headFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + headArg);
@@ -53,7 +52,7 @@ public class Head implements Application {
         }
     }
 
-    private String getHeadArgs(ArrayList<String> args, int headLines) {
+    private String getHeadArgs(ArrayList<String> args) {
         String headArg;
         if (args.size() == 3) {
             try {

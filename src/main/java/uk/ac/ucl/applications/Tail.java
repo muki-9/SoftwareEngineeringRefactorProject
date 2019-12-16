@@ -19,22 +19,22 @@ import uk.ac.ucl.jsh.Jsh;
 
 public class Tail implements Application {
 
+    private int tailLines = 10;
+
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
 
         validateArguments(args);
-
-        int tailLines = 10;
-        String tailArg = getTailArgs(args, tailLines);
+        String tailArg = getTailArgs(args);
 
         File tailFile = new File(currentDirectory + File.separator + tailArg);
 
-        writeOutput(tailArg, tailFile, tailLines, writer, currentDirectory);
+        writeOutput(tailArg, tailFile, writer, currentDirectory);
     }
 
-    public void writeOutput(String tailArg, File tailFile, int tailLines, BufferedWriter writer, String currentDirectory) {
+    public void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory) {
         if (tailFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + tailArg);
@@ -62,7 +62,7 @@ public class Tail implements Application {
         }
     }
 
-    public String getTailArgs(ArrayList<String> args, int tailLines) {
+    public String getTailArgs(ArrayList<String> args) {
         String tailArg;
         if (args.size() == 3) {
             try {
