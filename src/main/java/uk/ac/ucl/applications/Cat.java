@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -25,7 +26,25 @@ public class Cat implements Application {
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         if (args.isEmpty()) {
-            throw new RuntimeException("cat: missing arguments");
+            System.out.println("args empty");
+            if (input == null) {
+                System.out.println("null!!!!");
+                throw new RuntimeException("cat: missing arguments");
+            }
+            else {
+                System.out.println("elsed");
+                // BufferedReader br = new BufferedReader(new InputStreamReader(input));
+                // System.out.println("before we read");
+                // int data = br.read();
+                // System.out.println("after we read");
+                // while(data != -1){
+                //     char theChar = (char) data;
+                //     System.out.println(theChar);
+                //     data = br.read();
+                // }
+                // br.close();
+                // System.out.println("left the loop");
+            }
         } else {
             for (String arg : args) {
                 Charset encoding = StandardCharsets.UTF_8;

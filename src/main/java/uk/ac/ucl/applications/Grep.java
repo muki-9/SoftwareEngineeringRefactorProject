@@ -42,6 +42,7 @@ public class Grep implements Application {
                 filePathArray[i] = filePath;
             }
         }
+        
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
             try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {

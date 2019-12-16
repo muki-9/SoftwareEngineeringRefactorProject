@@ -2,9 +2,9 @@ package uk.ac.ucl.jsh;
 
 import uk.ac.ucl.applications.*;
 
-public class SafeApplicationFactory {
+public class ApplicationFactory {
 
-	public Application mkSafeApplication(String application) {
+	public Application mkApplication(String application) {
         Application app;
         switch (application) {
             case "cd":
@@ -33,6 +33,9 @@ public class SafeApplicationFactory {
                 break;
 			case "wc":
                 app = new Wc();
+                break;
+            case "sed":
+                app = new Sed();
                 break;
             default:
                 throw new RuntimeException(application + ": unknown application");

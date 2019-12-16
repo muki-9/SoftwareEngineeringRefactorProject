@@ -10,6 +10,7 @@ import java.io.PipedOutputStream;
 import java.util.Scanner;
 
 public class JshTest {
+    
     public JshTest() {
     }
 
@@ -18,6 +19,26 @@ public class JshTest {
     // @Before
     // public void testShell() {
     //     jshell = new Jsh();
+    // }
+
+    // @Test
+    // public void emptyShell() throws IOException {
+    //     PipedInputStream in = new PipedInputStream();
+    //     PipedOutputStream out = new PipedOutputStream(in);
+    //     jshell.eval("", out);
+    //     Scanner scn = new Scanner(in);
+    //     assertEquals(scn.next(), "");
+    //     scn.close();
+    // }
+
+    // @Test
+    // public void onlySpaces() throws IOException {
+    //     PipedInputStream in = new PipedInputStream();
+    //     PipedOutputStream out = new PipedOutputStream(in);
+    //     jshell.eval("    ", out);
+    //     Scanner scn = new Scanner(in);
+    //     assertEquals(scn.next(), "");
+    //     scn.close();
     // }
 
     // @Test

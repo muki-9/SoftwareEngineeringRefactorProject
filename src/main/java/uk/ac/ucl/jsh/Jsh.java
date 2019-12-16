@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Jsh {
     private static String currentDirectory = System.getProperty("user.dir");
-
+    
     public void eval(String cmdline, OutputStream output) throws IOException {
         CharStream cs = CharStreams.fromString(cmdline);
         AntlrGrammarLexer lexer = new AntlrGrammarLexer(cs);
@@ -32,6 +32,23 @@ public class Jsh {
         Jsh.currentDirectory = dir;
     }
 
+    /**
+     * 
+     * @param s - this is the string the user enters at the command line
+     * @return boolean value- true when enterred text is blank or contains nothing but space (ascii value 32)
+     */
+    public static boolean blankShell(String s) {
+        if (s.length() == 0) {
+            return true;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if ((int) s.charAt(i) != 32) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     public static void main(String[] args) {
         Jsh newShell = new Jsh();
         System.out.println("Inside shell");
@@ -57,6 +74,9 @@ public class Jsh {
                         System.out.print(prompt);
                         try {
                             String cmdline = input.nextLine();
+                            if (blankShell(cmdline)) {
+                                continue;
+                            }
                             newShell.eval(cmdline, System.out);
                         } catch (Exception e) {
                             System.out.println("jsh: " + e.getMessage());
@@ -67,7 +87,6 @@ public class Jsh {
                 }
             }
         }
-
 }
 
 //     public void eval(String cmdline, OutputStream output) throws IOException {
