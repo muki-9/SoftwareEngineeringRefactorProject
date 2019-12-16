@@ -2,7 +2,6 @@ package uk.ac.ucl.applications;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,9 +14,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.print.DocFlavor.STRING;
-
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 

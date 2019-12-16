@@ -14,11 +14,27 @@ public class JshTest {
     public JshTest() {
     }
 
-    // Jsh jshell;
+    Jsh jshell;
 
-    // @Before
-    // public void testShell() {
-    //     jshell = new Jsh();
+    @Before
+    public void testShell() {
+        jshell = new Jsh();
+    }
+
+    //** THESE ARE JUST RAGHIBS TESTS WHILST CODING */
+
+    // @Test
+    // public void sedNoG() throws IOException {
+    //     PipedInputStream in = new PipedInputStream();
+    //     PipedOutputStream out = new PipedOutputStream(in);
+    //     jshell.eval("sed s/the/replacedOnce/ testfile", out);
+    //     Scanner scn = new Scanner(in);
+    //     while (scn.next() != null){
+    //         System.out.println(scn.next());
+    //     }
+        
+    //     assertEquals(scn.next(), "this is some jargon text\nto test a lot of implementation\nrandomname name\nmore text\ntwo of replacedOnce same words, on the same line");
+    //     scn.close();
     // }
 
     // @Test
@@ -42,20 +58,23 @@ public class JshTest {
     // }
 
     // @Test
-    // public void testEcho() throws Exception {
+    // public void testEchoQuotes() throws Exception {
     //     PipedInputStream in = new PipedInputStream();
     //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("echo foo", out);
+    //     jshell.eval("echo \"foo\" ", out);
     //     Scanner scn = new Scanner(in);
     //     assertEquals(scn.next(), "foo");
     //     scn.close();
     // }
 
+
+    //** THIS MARKS THE END OF RAGHIBS TEST TESTS */
+
     // @Test
-    // public void testEchoQuotes() throws Exception {
+    // public void testEcho() throws Exception {
     //     PipedInputStream in = new PipedInputStream();
     //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("echo \"foo\" ", out);
+    //     jshell.eval("echo foo", out);
     //     Scanner scn = new Scanner(in);
     //     assertEquals(scn.next(), "foo");
     //     scn.close();
