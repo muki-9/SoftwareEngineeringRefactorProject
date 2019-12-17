@@ -46,6 +46,9 @@ public class ApplicationFactory {
             case "mkdir":
                 app = new Mkdir();
                 break;
+            case "rmdir":
+                app = new Rmdir();
+                break;
             case "_cd":
                 app = new UnsafeDecorator(new Cd());
                 break;
@@ -84,6 +87,9 @@ public class ApplicationFactory {
                 break;
             case "_mkdir":
                 app = new UnsafeDecorator(new Mkdir());
+                break;
+            case "_rmdir":
+                app = new UnsafeDecorator(new Rmdir());
                 break;
             default:
                 throw new RuntimeException(application + ": unknown application");
