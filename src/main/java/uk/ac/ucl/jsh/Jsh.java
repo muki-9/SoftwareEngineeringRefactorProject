@@ -14,10 +14,6 @@ public class Jsh {
     private static ArrayList<String> commands = new ArrayList<>();
     
     public void eval(String cmdline, OutputStream output) throws IOException {
-        if (cmdline.compareTo("exit") == 1) {
-            System.exit(4);
-        }
-
         Jsh.commands.add(cmdline);
         CharStream cs = CharStreams.fromString(cmdline);
         AntlrGrammarLexer lexer = new AntlrGrammarLexer(cs);

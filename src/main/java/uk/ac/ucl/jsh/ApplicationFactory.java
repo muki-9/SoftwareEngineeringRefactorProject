@@ -43,6 +43,9 @@ public class ApplicationFactory {
             case "exit":
                 app = new Exit();
                 break;
+            case "mkdir":
+                app = new Mkdir();
+                break;
             case "_cd":
                 app = new UnsafeDecorator(new Cd());
                 break;
@@ -78,6 +81,9 @@ public class ApplicationFactory {
                 break;
             case "_exit":
                 app = new UnsafeDecorator(new Exit());
+                break;
+            case "_mkdir":
+                app = new UnsafeDecorator(new Mkdir());
                 break;
             default:
                 throw new RuntimeException(application + ": unknown application");
