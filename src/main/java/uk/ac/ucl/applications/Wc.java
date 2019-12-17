@@ -55,7 +55,7 @@ public class Wc implements Application {
                 { 
                     writer.write(calcChars(path));
                     writer.write("\t");
-                    writer.write(path.toString());
+                    writer.write(getFileName(path.toString()));
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                 }
@@ -65,7 +65,7 @@ public class Wc implements Application {
                 { 
                     writer.write(calcWords(path));
                     writer.write("\t");
-                    writer.write(path.toString());
+                    writer.write(getFileName(path.toString()));
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                 }
@@ -75,7 +75,7 @@ public class Wc implements Application {
                 { 
                     writer.write(calcNewlines(path));
                     writer.write("\t");
-                    writer.write(path.toString());
+                    writer.write(getFileName(path.toString()));
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                 }      
@@ -89,14 +89,18 @@ public class Wc implements Application {
                     writer.write("\t");
                     writer.write(calcNewlines(path));
                     writer.write("\t");
-                    writer.write(path.toString());
+                    writer.write(getFileName(path.toString()));
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                 }
         }
     }
 
-    private String calcBytes(Path path){
+    public String getFileName(String string) {
+        return string.split("/")[((string.split("/").length)-1)];
+    }
+
+    private String calcBytes(Path path) {
         File file = path.toFile();
         long length = file.length();
         return Long.toString(length);
