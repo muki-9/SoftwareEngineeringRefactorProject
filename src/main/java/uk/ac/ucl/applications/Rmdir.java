@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import uk.ac.ucl.jsh.Application;
@@ -21,9 +24,13 @@ public class Rmdir implements Application {
         int numOfFiles = validateArgs(args);
         for (int i=0; i<numOfFiles; i++) {
             String path = currentDirectory + System.getProperty("file.separator") + args.get(i);
+
             File file = new File(path);
             if (!file.exists()) {
-                throw new RuntimeException("mkdir: File does not exist");
+                throw new RuntimeException("rmdir: File does not exist");
+            }
+            else if (!isEmpty(file.toPath())) {
+                throw new RuntimeException("rmdir: Cannot remove non-empty file");
             }
             else {
                 if (file.delete()) {
@@ -31,7 +38,7 @@ public class Rmdir implements Application {
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                 } else {
-                    writer.write("Folder could not be removed, please try again");
+                    writer.write("Deletion failed due to unknown error");
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                 }
@@ -44,6 +51,12 @@ public class Rmdir implements Application {
             throw new RuntimeException("rmdir: no filename given");
         } else {
             return args.size();
+        }
+    }
+
+    public boolean isEmpty(Path path) throws IOException {
+        try(DirectoryStream<Path> dirStream = Files.newDirectoryStream(path)) {
+            return !dirStream.iterator().hasNext();
         }
     }
 }
