@@ -40,6 +40,9 @@ public class ApplicationFactory {
             case "history":
                 app = new History();
                 break;
+            case "exit":
+                app = new Exit();
+                break;
             case "_cd":
                 app = new UnsafeDecorator(new Cd());
                 break;
@@ -72,6 +75,9 @@ public class ApplicationFactory {
                 break;
             case "_history":
                 app = new UnsafeDecorator(new History());
+                break;
+            case "_exit":
+                app = new UnsafeDecorator(new Exit());
                 break;
             default:
                 throw new RuntimeException(application + ": unknown application");
