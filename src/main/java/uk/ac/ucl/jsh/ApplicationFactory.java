@@ -37,6 +37,9 @@ public class ApplicationFactory {
             case "sed":
                 app = new Sed();
                 break;
+            case "history":
+                app = new History();
+                break;
             case "_cd":
                 app = new UnsafeDecorator(new Cd());
                 break;
@@ -66,6 +69,9 @@ public class ApplicationFactory {
                 break;
             case "_sed":
                 app = new UnsafeDecorator(new Sed());
+                break;
+            case "_history":
+                app = new UnsafeDecorator(new History());
                 break;
             default:
                 throw new RuntimeException(application + ": unknown application");

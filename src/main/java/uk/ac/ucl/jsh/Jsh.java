@@ -2,6 +2,7 @@ package uk.ac.ucl.jsh;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -10,8 +11,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Jsh {
     private static String currentDirectory = System.getProperty("user.dir");
+    private static ArrayList<String> commands = new ArrayList<>();
     
     public void eval(String cmdline, OutputStream output) throws IOException {
+        Jsh.commands.add(cmdline);
         CharStream cs = CharStreams.fromString(cmdline);
         AntlrGrammarLexer lexer = new AntlrGrammarLexer(cs);
         CommonTokenStream cts = new CommonTokenStream(lexer);
@@ -23,6 +26,10 @@ public class Jsh {
         CommandVisitor commandVisitor = new Eval(output);
         command.accept(commandVisitor);
     }
+
+    public static ArrayList<String> getCommands() {
+		return commands;
+	}
 
     public static String getCurrentDirectory() {
         return currentDirectory;

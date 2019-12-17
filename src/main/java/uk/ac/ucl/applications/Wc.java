@@ -83,11 +83,11 @@ public class Wc implements Application {
             default:
                 for (Path path : filePathArray) 
                 { 
-                    writer.write(calcBytes(path));
+                    writer.write(calcNewlines(path));
                     writer.write("\t");
                     writer.write(calcWords(path));
                     writer.write("\t");
-                    writer.write(calcNewlines(path));
+                    writer.write(calcBytes(path));
                     writer.write("\t");
                     writer.write(getFileName(path.toString()));
                     writer.write(System.getProperty("line.separator"));
