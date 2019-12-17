@@ -11,9 +11,9 @@ import java.util.Scanner;
 
 public class JshTest {
     
-    public JshTest() {
-    }
-
+    // public JshTest() {
+    // }
+    
     // Jsh jshell;
 
     // @Before

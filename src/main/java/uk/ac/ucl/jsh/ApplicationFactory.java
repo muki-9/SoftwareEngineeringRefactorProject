@@ -37,6 +37,36 @@ public class ApplicationFactory {
             case "sed":
                 app = new Sed();
                 break;
+            case "_cd":
+                app = new UnsafeDecorator(new Cd());
+                break;
+            case "_pwd":
+                app = new UnsafeDecorator(new Pwd());
+                break;
+            case "_ls":
+                app = new UnsafeDecorator(new Ls());
+                break;
+            case "_cat":
+                app = new UnsafeDecorator(new Cat());
+                break;
+            case "_echo":
+                app = new UnsafeDecorator(new Echo());
+                break;
+            case "_head":
+                app = new UnsafeDecorator(new Head());
+                break;
+            case "_tail":
+                app = new UnsafeDecorator(new Tail());
+                break;
+            case "_grep":
+                app = new UnsafeDecorator(new Grep());
+                break;
+			case "_wc":
+                app = new UnsafeDecorator(new Wc());
+                break;
+            case "_sed":
+                app = new UnsafeDecorator(new Sed());
+                break;
             default:
                 throw new RuntimeException(application + ": unknown application");
             }

@@ -25,12 +25,10 @@ public class Tail implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
+        
         validateArguments(args);
         String tailArg = getTailArgs(args);
-
         File tailFile = new File(currentDirectory + File.separator + tailArg);
-
         writeOutput(tailArg, tailFile, writer, currentDirectory);
     }
 
