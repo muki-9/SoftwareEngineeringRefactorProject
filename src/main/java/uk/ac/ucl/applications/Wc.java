@@ -109,8 +109,15 @@ public class Wc implements Application {
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line = null;
             while ((line = reader.readLine()) != null) {
-                String[] words = line.split("\\s+");
-                wordCount += words.length;
+                String[] previsionalWords = line.split("[\\s]+");
+                ArrayList<String> words = new ArrayList<>();
+                
+                for (int i=0; i<previsionalWords.length;i++) {
+                    if (previsionalWords[i].length() > 0) {
+                        words.add(previsionalWords[i]);
+                    }
+                }
+                wordCount += words.size();
             }
         } catch (IOException e) {
             throw new RuntimeException("wc: cannot open " + path.toString());
