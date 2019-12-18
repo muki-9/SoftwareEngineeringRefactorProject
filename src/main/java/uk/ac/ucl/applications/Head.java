@@ -20,11 +20,24 @@ import uk.ac.ucl.jsh.Jsh;
 public class Head implements Application {
 
     private int headLines = 10;
+    private BufferedWriter writer;
+    boolean default_constr = true;
+
+    public Head(){
+
+    }
+
+    public Head(BufferedWriter w){
+        default_constr = false;
+        writer = w;
+    }
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        if(default_constr){
+            writer = new BufferedWriter(new OutputStreamWriter(output));
+        }
         validateArguments(args);
         String headArg = getHeadArgs(args);
         File headFile = new File(currentDirectory + File.separator + headArg);

@@ -21,9 +21,9 @@ public class Cat implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         String currentDirectory = Jsh.getCurrentDirectory();
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         if (args.isEmpty()) {
             System.out.println("args empty");
             if (input == null) {
@@ -45,9 +45,11 @@ public class Cat implements Application {
                 // System.out.println("left the loop");
             }
         } else {
+            
             for (String arg : args) {
                 Charset encoding = StandardCharsets.UTF_8;
                 File currFile = new File(currentDirectory + File.separator + arg);
+                System.out.println(currFile.getName());
                 if (currFile.exists()) {
                     Path filePath = Paths.get(currentDirectory + File.separator + arg);
                     try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
@@ -57,13 +59,22 @@ public class Cat implements Application {
                             writer.write(System.getProperty("line.separator"));
                             writer.flush();
                         }
+                       
                     } catch (IOException e) {
+                    
+        
                         throw new RuntimeException("cat: cannot open " + arg);
+                    }finally{
+
+                  
+
                     }
                 } else {
+       
                     throw new RuntimeException("cat: file does not exist");
                 }
             }
         }
+        writer.close();
     }
 }
