@@ -1,16 +1,13 @@
 package uk.ac.ucl.jsh;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import uk.ac.ucl.jsh.AntlrGrammarParser.ArgumentContext;
 
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
-    // @Override
-    // public CommandVisitable visitRedirect(AntlrGrammarParser.PipeContext ctx) {
-    // return null;
-    // }
+    @Override 
+    public CommandVisitable visitRedirection(AntlrGrammarParser.RedirectionContext ctx) {
+        return visitChildren(ctx);
+    }
 
     @Override
     public CommandVisitable visitPipe(AntlrGrammarParser.PipeContext ctx) {
