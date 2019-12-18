@@ -38,12 +38,7 @@ quoted
     ;
 
 call
-    :   WS? (redirection WS)* argument (WS atom)* WS?
-    ;
-
-atom
-    : redirection 
-    | argument
+    : WS? (redirection WS)* argument (WS (redirection|argument))* WS?
     ;
 
 argument
@@ -60,7 +55,7 @@ Lexer Rules
 */
 
 UQ
-    : ~( ' ' | '\t'  | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )+
+    : ~( ' ' | '\t' | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )+
     ;
 
 LT
@@ -75,9 +70,16 @@ DQ
     : '"' (BackQuote | DQC)* '"'
     ;
 
+/*
 WS
     : (' ' | '\t' )+ -> skip
     ; //whitespace
+*/
+
+WS
+    : (' ' | '\t' )+
+    ; //whitespace
+
 
 NKW
     : ~('\n' | '\'' | '"' | '`' | ';' | '|')

@@ -1,8 +1,16 @@
 package uk.ac.ucl.jsh;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import uk.ac.ucl.jsh.AntlrGrammarParser.ArgumentContext;
 
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
+
+    // @Override
+    // public CommandVisitable visitRedirect(AntlrGrammarParser.PipeContext ctx) {
+    // return null;
+    // }
 
     @Override
     public CommandVisitable visitPipe(AntlrGrammarParser.PipeContext ctx) {
@@ -21,8 +29,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     @Override
     public CommandVisitable visitCall(AntlrGrammarParser.CallContext ctx) {
         ArrayList<String> args = new ArrayList<>();
-        for(int i = 0; i<ctx.getChild(0).getChildCount();i++) {
-            args.add(ctx.getChild(0).getChild(i).getText());
+        for(int i = 0; i<ctx.argument().size();i++) {
+            args.add(ctx.argument(i).getChild(0).getText());
         }
         return new Call(args);
     }
