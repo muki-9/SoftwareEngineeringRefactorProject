@@ -59,21 +59,15 @@ public class CatTest{
     @Test
     public void testCatWithTwoInputs() throws IOException {
  
+        // File file = new File("/workspaces/jsh-team-44/")
+        String tmp1 = createTempFile();
+        String tmp2 = createTempFile();
+  
+        writeToFile(tmp1, "First File");
+        writeToFile(tmp2, "Second File");
 
-        // File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        // temp1.deleteOnExit();
-        // String tmp1 = temp1.getName();
-
-        // File temp2 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        // temp2.deleteOnExit();
-        // String tmp2 = temp2.getName();
-     
-
-        // writeToFile(tmp1, "First File");
-        // writeToFile(tmp2, "Second File");
-
-        testArray.add("input10645093676069325446.txt");
-        testArray.add("input12182684963495256111.txt");
+        testArray.add(tmp1);
+        testArray.add(tmp2);
 
         // ByteArrayOutputStream stream = new ByteArrayOutputStream();
         // BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
@@ -111,15 +105,15 @@ public class CatTest{
         
     }
 
-    // private String createTempFile() throws IOException{
+    private String createTempFile() throws IOException{
 
-    //     File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-    //     //File temp1 = new File("/workspaces/jsh-team-44/temp1.txt");
-    //     temp1.deleteOnExit();
-    //     //temp1.deleteOnExit();
-    //     return temp1.getName();
+        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
+        //File temp1 = new File("/workspaces/jsh-team-44/temp1.txt");
+        temp1.deleteOnExit();
+        //temp1.deleteOnExit();
+        return temp1.getName();
 
-    // }
+    }
 
     private void writeToFile(String filename, String content) throws IOException{
 
