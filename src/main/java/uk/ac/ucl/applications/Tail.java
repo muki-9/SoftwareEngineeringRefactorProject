@@ -20,12 +20,24 @@ import uk.ac.ucl.jsh.Jsh;
 public class Tail implements Application {
 
     private int tailLines = 10;
+    BufferedWriter writer;
+    boolean default_constr = true;
+
+    public Tail(){
+
+    }
+    public Tail(BufferedWriter w){
+        default_constr =false;
+        writer =w;
+    }
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-        
+        if(default_constr){
+             writer = new BufferedWriter(new OutputStreamWriter(output));
+
+        }
         validateArguments(args);
         String tailArg = getTailArgs(args);
         File tailFile = new File(currentDirectory + File.separator + tailArg);
