@@ -37,7 +37,6 @@ public class HeadTest {
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();
-        
     }
 
     @After
@@ -67,12 +66,10 @@ public class HeadTest {
         assertEquals(actual, expected);
         stream.close();
         writer.close();
-
     }
     @Test
 
     public void headWithExtrArgShouldThrowExc() throws IOException{
-
         testHead = new Head();
         testArray.add("-n");
         testArray.add("5");
@@ -101,7 +98,6 @@ public class HeadTest {
     @Test
 
     public void headWithNoLineLimitShouldPrintFirst10LinesifFileIsArg() throws IOException{
-
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
@@ -145,15 +141,12 @@ public class HeadTest {
     //     })
     //     .isInstanceOf(IOException.class)
     //     .hasMessageContaining("head: cannot open input1.txt");
-
-
     // }
     
 
     /* right now the code does now throw error if 3rd arg isnt a file in the dir it would just print out the result*/
     @Test
     public void headShouldOutputAllLinesIfIntegerGivenIsMoreThanLinesOfFileWithoutException() throws IOException {
-
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
@@ -173,12 +166,10 @@ public class HeadTest {
         assertThatCode(() -> { testHead.exec(testArray, null, null); }).doesNotThrowAnyException();
         stream.close();
         writer.close();
-
-
     }
+
     @Test
     public void headWith3ArgShouldThrowExceptionif1stArgisNotCorrectForm() throws IOException {
-
         testArray.add("-s");
         testArray.add("5");
         testArray.add("input1.txt");
@@ -188,26 +179,20 @@ public class HeadTest {
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("head: wrong argument " + "-s");
-
     }
 
     private String createTempFile() throws IOException{
-
         File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
         temp1.deleteOnExit();
         writeToFile(temp1.getName());
         return temp1.getName();
-
     }
     private void writeToFile(String filename) throws IOException{
-
         BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
         for(int i =0; i<15; i++){
             bw.write("Line"+ i);
             bw.write(System.getProperty("line.separator"));
         }
         bw.close();
-
     }
-
 }

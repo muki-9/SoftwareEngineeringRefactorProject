@@ -48,7 +48,6 @@ public class CatTest{
     
     @Test
     public void testCatWithTwoInputs() throws IOException {
- 
         String tmp1 = createTempFile();
         String tmp2 = createTempFile();
         writeToFile(tmp1, "First File");
@@ -76,7 +75,6 @@ public class CatTest{
 
     @Test
     public void testCatWithNoInputs() throws IOException{
-
         assertThatThrownBy(()->{
             testCat.exec(testArray, null, out);
         }).isInstanceOf(RuntimeException.class).hasMessageContaining("cat: missing arguments");
