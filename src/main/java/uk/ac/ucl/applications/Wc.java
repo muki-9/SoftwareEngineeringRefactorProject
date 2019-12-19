@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
@@ -22,8 +23,7 @@ public class Wc implements Application {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
 
-        // coded assuming that args != 0, due to assumption that 'stdin' will be arg[0] if there are no OPTIONS
-        // can be adjusted later if implementation of io-redirection passes 'stdin' in a different manner
+        validateArgs(args);
 
         int numOfFiles = args.size();
         int offset = 0;
@@ -94,7 +94,13 @@ public class Wc implements Application {
         }
     }
 
-    public String getFileName(String string) {
+    private void validateArgs(ArrayList<String> args) {
+        if (args.size()==0) {
+            throw new RuntimeException("wc: wrong number of arguments");
+        }
+    }
+
+    private String getFileName(String string) {
         return string.split("/")[((string.split("/").length)-1)];
     }
 
@@ -127,27 +133,31 @@ public class Wc implements Application {
 
     private String calcNewlines(Path path){
         int newlineCount = 0;
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            while (reader.readLine() != null) {
+        try (Scanner scanner = new Scanner(path)) {
+            while (scanner.hasNextLine()) {
                 newlineCount += 1;
+                scanner.nextLine();
             }
         } catch (IOException e) {
             throw new RuntimeException("wc: cannot open " + path.toString());
         }
-        newlineCount -= 1; // not 100% sure about this, I've -1 because technically the last line wont have '\n' and my implementation counts lines rather than \n count
+        newlineCount -= 1;
         return Integer.toString(newlineCount);
     }
 
     private String calcChars(Path path){
         int charCount = 0;
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
+        try (Scanner scanner = new Scanner(path)) {
             String line = null;
-            while ((line = reader.readLine()) != null) {
+            while (scanner.hasNextLine()) {
+                line = scanner.nextLine();
                 charCount += line.length();
+                if (scanner.hasNextLine()) {
+                    charCount++; //+1 to account for new line character
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("wc: cannot open " + path.toString());
         }
         return Integer.toString(charCount);
     }
-}
