@@ -41,8 +41,12 @@ call
     : WS? (redirection WS)* argument (WS (redirection|argument))* WS?
     ;
 
+unquoted
+    : UQ
+    ;
+
 argument
-    : (quoted|UQ)+
+    : (quoted|unquoted)+
     ;
 
 redirection
@@ -99,9 +103,9 @@ NL
 
 
 fragment BackQuote
-    : '`' ~('\n' | '`' )* '`'
+    : '`' ~('\n'|'`')* '`'
     ; 
 
 fragment DQC
-    : ~('\n' | '"'| '`')
+    : ~('\n'|'"'|'`')
     ;

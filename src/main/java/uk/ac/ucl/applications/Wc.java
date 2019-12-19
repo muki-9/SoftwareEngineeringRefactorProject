@@ -25,15 +25,12 @@ public class Wc implements Application {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         validateArgs(args);
-
         int numOfFiles = args.size();
-
         int offset = 0;
         if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
             offset = 1;
             numOfFiles -= 1;
         }
-        
         if (numOfFiles > 1) {
             totalNeeded = true;
         }
@@ -59,7 +56,6 @@ public class Wc implements Application {
         int totalLineCount = 0;
         int totalWordCount = 0;
         Long totalByteCount = (long) 0;
-
         for (int i = 0; i < lineArray.size(); i++) {
             totalByteCount += byteArray.get(i);
             totalWordCount += wordArray.get(i);
@@ -209,7 +205,7 @@ public class Wc implements Application {
         } catch (IOException e) {
             throw new RuntimeException("wc: cannot open " + path.toString());
         }
-        newlineCount -= 1;
+        // newlineCount -= 1;
         return newlineCount;
     }
 
