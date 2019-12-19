@@ -49,17 +49,14 @@ public class Sed implements Application {
             char delimiter = args.get(0).charAt(args.get(0).indexOf("s")+1);
             s = args.get(0).split(Character.toString(delimiter));
 
-            if ((args.get(0).lastIndexOf("/") < args.get(0).length()-1)) {
-                if (args.get(0).charAt(args.get(0).lastIndexOf("/")+1) == 'g') {
+            if ((args.get(0).lastIndexOf(Character.toString(delimiter)) < args.get(0).length()-1)) {
+                if (args.get(0).charAt(args.get(0).lastIndexOf(Character.toString(delimiter))+1) == 'g') {
                     g = true;
                 }
                 else {
                     g = false;
                 }
             }
-            // else {
-            //     throw new RuntimeException("sed: regex enterred in incorrect format\nyour first argument should look like this s/regex/replacement/ or s/regex/replacement/g");
-            // }
         }
         else {
             throw new RuntimeException("sed: not enough arguments");
