@@ -46,16 +46,20 @@ public class Sed implements Application {
             throw new RuntimeException("sed: wrong number of arguments");
         }
         if ((args.get(0) != null) && (args.get(1) != null)) {
-            s = args.get(0).split("/");
-            if (s.length == 4) {
-                g = true;
+            char delimiter = args.get(0).charAt(args.get(0).indexOf("s")+1);
+            s = args.get(0).split(Character.toString(delimiter));
+
+            if ((args.get(0).lastIndexOf("/") < args.get(0).length()-1)) {
+                if (args.get(0).charAt(args.get(0).lastIndexOf("/")+1) == 'g') {
+                    g = true;
+                }
+                else {
+                    g = false;
+                }
             }
-            else if (s.length == 3) {
-                g = false;
-            }
-            else {
-                throw new RuntimeException("sed: regex enterred in incorrect format\nyour first argument should look like this s/regex/replacement/ or s/regex/replacement/g");
-            }
+            // else {
+            //     throw new RuntimeException("sed: regex enterred in incorrect format\nyour first argument should look like this s/regex/replacement/ or s/regex/replacement/g");
+            // }
         }
         else {
             throw new RuntimeException("sed: not enough arguments");
@@ -118,12 +122,10 @@ public class Sed implements Application {
     public ArrayList<String> sedFirstInstance(String regex, String replacement, ArrayList<String> fileLines) {
         ArrayList<String> changedlines = new ArrayList<>();
         Pattern sedPattern = Pattern.compile(regex);
-        Boolean first = true;
         for(String line: fileLines) {
             Matcher matcher = sedPattern.matcher(line);
-            if (matcher.find() && first==true) {
+            if (matcher.find()) {
                 line = line.replaceFirst(regex, replacement);
-                first = false;
             }
             changedlines.add(line);
         }
