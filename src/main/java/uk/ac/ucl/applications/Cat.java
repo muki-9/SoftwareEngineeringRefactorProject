@@ -30,19 +30,8 @@ public class Cat implements Application {
                 throw new RuntimeException("cat: missing arguments");
             }
             else {
-                BufferedReader br = new BufferedReader(new InputStreamReader(input));
-                int data = br.read();
-                String s = "";
-                while(data != -1){
-                    char theChar = (char) data;
-                    if (((int) theChar) == 10) {
-                        break;
-                    }
-                    s = s.concat(Character.toString(theChar));
-                    data = br.read();
-                }
-                writer.write(s);
-                writer.write(System.getProperty("line.separator"));
+                String line = new String(input.readAllBytes());
+                writer.write(line);
                 writer.flush();
             }
         } else {

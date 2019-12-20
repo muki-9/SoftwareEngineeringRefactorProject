@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 // import java.util.ArrayList;
@@ -12,29 +11,23 @@ import java.util.ArrayList;
 
 public class Eval implements CommandVisitor {
     private ApplicationFactory safeFactory = new ApplicationFactory();
-    private InputStream input = null;
-    private OutputStream writer;
-    private int pipeList = 0;
-
+    private ArrayList<OutputStream> osList = new ArrayList<>();
+    private ArrayList<InputStream> isList = new ArrayList<>();
+    
     public Eval(OutputStream writer) {
-        this.writer = writer;
+        this.osList.add(writer);
+        this.isList.add(null);
     }
 
     @Override
     public void visitPipe(Pipe pipe) throws IOException {
-        input = new PipedInputStream();
-        writer = new PipedOutputStream((PipedInputStream) input);
-        pipeList++;
+        InputStream input = new PipedInputStream(90000);
+        OutputStream pipeWriter = new PipedOutputStream((PipedInputStream) input);
+        osList.add(pipeWriter);
         pipe.getPipeChildren().get(0).accept(this);
-        OutputStreamWriter os = new OutputStreamWriter(writer);
-        // os.write((char) 0);
-        BufferedWriter bf = new BufferedWriter(os);
-        bf.flush();
-        if (pipeList == 1) {
-            writer = System.out;
-        }
+        pipeWriter.close();
+        isList.add(input);
         pipe.getPipeChildren().get(1).accept(this);
-        pipeList--;
     }
 
     @Override
@@ -45,7 +38,11 @@ public class Eval implements CommandVisitor {
 
     @Override
     public void visitCall(Call call) throws IOException {
+        InputStream is = isList.get(isList.size()-1);
+        OutputStream os = osList.get(osList.size()-1);
+        isList.remove(isList.size()-1);
+        osList.remove(osList.size()-1);
         Application application = safeFactory.mkApplication(call.getApplication());
-        application.exec(call.getArguments(), input, writer);
+        application.exec(call.getArguments(), is, os);
     }
 }

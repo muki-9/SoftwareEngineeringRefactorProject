@@ -28,41 +28,33 @@ public class Grep implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         if (args.size() < 2) {
-            if (input == null) {
-                throw new RuntimeException("grep: wrong number of arguments");
-            }
-            else {
-                Pattern grepPattern = Pattern.compile(args.get(0));
-                String s = buildArg(input);
-                String[] lines = s.split(System.getProperty("line.separator"));
-                
-                for(int i=0; i<lines.length; i++) {
-                    Matcher matcher = grepPattern.matcher(lines[i]);
-                    if (matcher.find()) {
-                        writer.write(lines[i]);
-                        writer.write(System.getProperty("line.separator"));
-                        writer.flush();
+            if (args.size() == 1) {
+                if (input == null) {
+                    throw new RuntimeException("grep: wrong number of arguments");
+                }
+                else {
+                    Pattern grepPattern = Pattern.compile(args.get(0));
+                    String s = new String(input.readAllBytes());
+                    String[] lines = s.split(System.getProperty("line.separator"));
+                    
+                    for(int i=0; i<lines.length; i++) {
+                        Matcher matcher = grepPattern.matcher(lines[i]);
+                        if (matcher.find()) {
+                            writer.write(lines[i]);
+                            writer.write(System.getProperty("line.separator"));
+                            writer.flush();
+                        }
                     }
                 }
             }
+            else {
+                throw new RuntimeException("grep: wrong number of arguments");
+            }
+            
         }
         Pattern grepPattern = Pattern.compile(args.get(0));
         Path[] filePathArray = getPathArray(args);
         writeOutput(writer, grepPattern, filePathArray, args);
-    }
-
-    private String buildArg(InputStream input) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(input));
-        ArrayList<String> lines = new ArrayList<>();
-
-        int count = input.available()-1;
-        StringBuilder textBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, Charset.forName(StandardCharsets.UTF_8.name())))) {
-            while (count-- != 0) {
-                textBuilder.append((char) reader.read());
-            }
-        }
-        return textBuilder.toString();
     }
 
     public Path[] getPathArray(ArrayList<String> args) {

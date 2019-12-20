@@ -1,17 +1,28 @@
 package uk.ac.ucl.jsh;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
 import java.util.ArrayList;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
-    @Override
-    public CommandVisitable visitBackquoted(AntlrGrammarParser.BackquotedContext ctx) {
-        String s = ctx.getChild(0).getText();
-        String newS = s.substring(1, s.length()-1);
+    // @Override
+    // public CommandVisitable visitBackquoted(AntlrGrammarParser.BackquotedContext ctx) {
+    //     InputStream input = new PipedInputStream();
+    //     OutputStream writer = new PipedOutputStream((PipedInputStream) input);
+
+    //     Jsh j = new Jsh();
+    //     try {
+    //         j.eval(ctx.getChild(0).getText(), output);
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
         
-        return new Call(newS);
-    }
+    //     return new Call();
+    // }
 
     @Override
     public CommandVisitable visitQuoted(AntlrGrammarParser.QuotedContext ctx) {
@@ -47,7 +58,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
     @Override
     public CommandVisitable visitPipe(AntlrGrammarParser.PipeContext ctx) {
-        // return new Pipe(ctx.call().get(0).accept(this), ctx.call().get(1).accept(this));
         return new Pipe(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
     }
 
