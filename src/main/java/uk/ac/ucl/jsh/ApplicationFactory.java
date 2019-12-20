@@ -58,6 +58,9 @@ public class ApplicationFactory {
             case "_pwd":
                 app = new UnsafeDecorator(new Pwd());
                 break;
+            case "_find":
+                app = new UnsafeDecorator(new Find());
+                break;
             case "_ls":
                 app = new UnsafeDecorator(new Ls());
                 break;

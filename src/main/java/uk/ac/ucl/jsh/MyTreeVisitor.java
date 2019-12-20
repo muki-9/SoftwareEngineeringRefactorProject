@@ -47,9 +47,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
     @Override
     public CommandVisitable visitPipe(AntlrGrammarParser.PipeContext ctx) {
-        CommandVisitable leftChild = ctx.getChild(0).accept(this);
-        CommandVisitable rightChild = ctx.getChild(2).accept(this);
-        return new Pipe(leftChild, rightChild);
+        // return new Pipe(ctx.call().get(0).accept(this), ctx.call().get(1).accept(this));
+        return new Pipe(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
     }
 
     @Override

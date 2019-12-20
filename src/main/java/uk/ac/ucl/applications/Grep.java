@@ -2,16 +2,20 @@ package uk.ac.ucl.applications;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,16 +27,42 @@ public class Grep implements Application {
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-        validateArguments(args);
+        if (args.size() < 2) {
+            if (input == null) {
+                throw new RuntimeException("grep: wrong number of arguments");
+            }
+            else {
+                Pattern grepPattern = Pattern.compile(args.get(0));
+                String s = buildArg(input);
+                String[] lines = s.split(System.getProperty("line.separator"));
+                
+                for(int i=0; i<lines.length; i++) {
+                    Matcher matcher = grepPattern.matcher(lines[i]);
+                    if (matcher.find()) {
+                        writer.write(lines[i]);
+                        writer.write(System.getProperty("line.separator"));
+                        writer.flush();
+                    }
+                }
+            }
+        }
         Pattern grepPattern = Pattern.compile(args.get(0));
         Path[] filePathArray = getPathArray(args);
         writeOutput(writer, grepPattern, filePathArray, args);
     }
 
-    public void validateArguments(ArrayList<String> args) {
-        if (args.size() < 2) {
-            throw new RuntimeException("grep: wrong number of arguments");
+    private String buildArg(InputStream input) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(input));
+        ArrayList<String> lines = new ArrayList<>();
+
+        int count = input.available()-1;
+        StringBuilder textBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, Charset.forName(StandardCharsets.UTF_8.name())))) {
+            while (count-- != 0) {
+                textBuilder.append((char) reader.read());
+            }
         }
+        return textBuilder.toString();
     }
 
     public Path[] getPathArray(ArrayList<String> args) {

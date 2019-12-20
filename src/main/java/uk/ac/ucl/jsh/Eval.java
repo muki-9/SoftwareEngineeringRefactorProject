@@ -7,11 +7,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+// import java.util.ArrayList;
+import java.util.ArrayList;
 
 public class Eval implements CommandVisitor {
     private ApplicationFactory safeFactory = new ApplicationFactory();
     private InputStream input = null;
     private OutputStream writer;
+    private int pipeList = 0;
 
     public Eval(OutputStream writer) {
         this.writer = writer;
@@ -21,13 +24,17 @@ public class Eval implements CommandVisitor {
     public void visitPipe(Pipe pipe) throws IOException {
         input = new PipedInputStream();
         writer = new PipedOutputStream((PipedInputStream) input);
+        pipeList++;
         pipe.getPipeChildren().get(0).accept(this);
-        BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(writer));
+        OutputStreamWriter os = new OutputStreamWriter(writer);
+        // os.write((char) 0);
+        BufferedWriter bf = new BufferedWriter(os);
         bf.flush();
-        bf.close();
-        writer = System.out;
+        if (pipeList == 1) {
+            writer = System.out;
+        }
         pipe.getPipeChildren().get(1).accept(this);
-        input = null;
+        pipeList--;
     }
 
     @Override
