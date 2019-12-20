@@ -19,20 +19,21 @@ import uk.ac.ucl.jsh.Jsh;
 
 
 public class Find implements Application{
+    
 
 	@Override
 	public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
 
-        final String SECOND_ARG = args.get(args.size()-2);
-        final String PATTERN = args.get(args.size()-1);
-
         if(args.size() > 3 || args.size() <1){
-            throw new RuntimeException("find: wrong number of args");
+            throw new RuntimeException("find: wrong number of arguments");
 
         }else{
 
-            if(SECOND_ARG.equals("-name") == false){
-                throw new RuntimeException("find: arg " + SECOND_ARG + " not correct");
+            final String NAME = args.get(args.size()-2);
+            final String PATTERN = args.get(args.size()-1);
+
+            if(NAME.equals("-name") == false){
+                throw new RuntimeException("find: arg " + NAME + " not correct");
             }
             String pattern = PATTERN; 
             String updatedPatt = pattern.replace("*", "(.*)");
