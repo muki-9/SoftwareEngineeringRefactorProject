@@ -13,6 +13,9 @@ public class ApplicationFactory {
             case "pwd":
                 app = new Pwd();
                 break;
+            case "find":
+                app = new Find();
+                break;
             case "ls":
                 app = new Ls();
                 break;
