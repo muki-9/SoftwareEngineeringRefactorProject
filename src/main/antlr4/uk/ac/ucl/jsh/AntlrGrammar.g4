@@ -33,8 +33,7 @@ seq2
 
 quoted
     : SQ
-    | DQ 
-    | BQ
+    | DQ
     ;
 
 call
@@ -45,8 +44,12 @@ unquoted
     : UQ
     ;
 
+backquoted
+    : BQ
+    ;
+
 argument
-    : (quoted|unquoted)+
+    : (quoted|unquoted|backquoted)+
     ;
 
 redirection

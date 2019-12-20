@@ -5,6 +5,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
+    @Override
+    public CommandVisitable visitBackquoted(AntlrGrammarParser.BackquotedContext ctx) {
+        String s = ctx.getChild(0).getText();
+        String newS = s.substring(1, s.length()-1);
+        
+        return new Call(newS);
+    }
 
     @Override
     public CommandVisitable visitQuoted(AntlrGrammarParser.QuotedContext ctx) {
@@ -33,11 +40,10 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         return new Call(string);
     }
 
-
-    // @Override 
-    // public CommandVisitable visitRedirection(AntlrGrammarParser.RedirectionContext ctx) {
-    //     return visitChildren(ctx);
-    // }
+    @Override 
+    public CommandVisitable visitRedirection(AntlrGrammarParser.RedirectionContext ctx) {
+        return visitChildren(ctx);
+    }
 
     @Override
     public CommandVisitable visitPipe(AntlrGrammarParser.PipeContext ctx) {
@@ -60,8 +66,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             Call c = (Call) ctx.argument().get(i).accept(this);
             args.add(c.getCurrArgs());
         }
-
-        // System.out.println(args);
         return new Call(args);
     }
 }
