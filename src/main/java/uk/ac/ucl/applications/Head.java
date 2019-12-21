@@ -22,6 +22,7 @@ public class Head implements Application {
     private int headLines = 10;
     private BufferedWriter writer;
     boolean default_constr = true;
+    private boolean useIS = false;
 
     public Head(){
 
@@ -38,10 +39,24 @@ public class Head implements Application {
         if(default_constr){
             writer = new BufferedWriter(new OutputStreamWriter(output));
         }
-        validateArguments(args);
+        validateArguments(args, input);
         String headArg = getHeadArgs(args);
-        File headFile = new File(currentDirectory + File.separator + headArg);
-        writeOutput(headArg, headFile, writer, currentDirectory);
+        if (useIS) {
+            String line = new String(input.readAllBytes());
+            String[] lines = line.split(System.getProperty("line.separator"));
+            for(int i=0;i<headLines;i++) {
+                if (i>=lines.length) {
+                    break;
+                }
+                writer.write(lines[i]);
+                writer.write(System.getProperty("line.separator"));
+                writer.flush();
+            }
+        }
+        else {
+            File headFile = new File(currentDirectory + File.separator + headArg);
+            writeOutput(headArg, headFile, writer, currentDirectory);
+        }
     }
 
     private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) {
@@ -67,6 +82,18 @@ public class Head implements Application {
 
     private String getHeadArgs(ArrayList<String> args) {
         String headArg;
+        if (useIS) {
+            if (args.size()==0) {
+                return null;
+            }
+            else if (args.size()==2) {
+                headLines = Integer.parseInt(args.get(1));
+                return null;
+            }
+            else {
+                throw new RuntimeException("head: wrong argument " + args.get(0));
+            }
+        }
         if (args.size() == 3) {
             try {
                 headLines = Integer.parseInt(args.get(1));
@@ -80,9 +107,19 @@ public class Head implements Application {
         return headArg;
     }
 
-    private void validateArguments(ArrayList<String> args) {
+    private void validateArguments(ArrayList<String> args, InputStream input) {
         if (args.isEmpty()) {
-            throw new RuntimeException("head: missing arguments");
+            if (input == null) {
+                throw new RuntimeException("head: missing arguments");
+            }
+            else {
+                useIS = true;
+                return;
+            }
+        }
+        if (args.size()==2 && input != null) {
+            useIS = true;
+            return;
         }
         if (args.size() != 1 && args.size() != 3) {
             throw new RuntimeException("head: wrong arguments");

@@ -1,7 +1,6 @@
 package uk.ac.ucl.jsh;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public class Call implements CommandVisitable {

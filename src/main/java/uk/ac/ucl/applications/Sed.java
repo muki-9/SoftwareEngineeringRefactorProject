@@ -19,38 +19,54 @@ import uk.ac.ucl.jsh.Jsh;
 
 public class Sed implements Application {
 
-    private Boolean g = false;
+    private boolean g = false;
+    private boolean useIS = false;
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output));
         String currentDirectory = Jsh.getCurrentDirectory();
         String file;
-        String[] s = validateArgs(args);
-        file = args.get(1);
-
-        Path currentDir = Paths.get(currentDirectory);
-        Path filePath = currentDir.resolve(file);
-        if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
-            throw new RuntimeException("sed: wrong file argument");
+        String[] s = validateArgs(args, input);
+        if (useIS) {
+            ArrayList<String> lines = new ArrayList<>();
+            lines = performSed(s, input, g);
+            writeOutput(out, lines);
         }
-
-        ArrayList<String> lines = new ArrayList<>();
-        lines = performSed(s, file, g);
-        writeOutput(out, lines);
+        else {
+            file = args.get(1);
+            Path currentDir = Paths.get(currentDirectory);
+            Path filePath = currentDir.resolve(file);
+            if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
+                throw new RuntimeException("sed: wrong file argument");
+            }
+            ArrayList<String> lines = new ArrayList<>();
+            lines = performSed(s, file, g);
+            writeOutput(out, lines);
+        }
     }
 
-    public String[] validateArgs(ArrayList<String> args) {
+    public String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
         if (args.size() != 2) {
-            throw new RuntimeException("sed: wrong number of arguments");
+            if ((args.size() == 1) && (input != null)) {
+                useIS = true;
+            }
+            else {
+                throw new RuntimeException("sed: wrong number of arguments");
+            }
         }
-        if ((args.get(0) != null) && (args.get(1) != null)) {
-            char delimiter = args.get(0).charAt(args.get(0).indexOf("s")+1);
-            s = args.get(0).split(Character.toString(delimiter));
-
-            if ((args.get(0).lastIndexOf(Character.toString(delimiter)) < args.get(0).length()-1)) {
-                if (args.get(0).charAt(args.get(0).lastIndexOf(Character.toString(delimiter))+1) == 'g') {
+        if ((args.get(0) != null) && ((args.get(1) != null) || useIS)) {
+            String delimiter = Character.toString(args.get(0).charAt(1));
+            if (delimiter.matches("\\|")) {
+                delimiter = "\\|";
+            }
+            s = args.get(0).split(delimiter);
+            if (!s[0].matches("s")) {
+                throw new RuntimeException("sed: regex in incorrect form");
+            }
+            if ((args.get(0).lastIndexOf(delimiter) < args.get(0).length()-1)) {
+                if (args.get(0).charAt(args.get(0).lastIndexOf(delimiter)+1) == 'g') {
                     g = true;
                 }
                 else {
@@ -72,6 +88,24 @@ public class Sed implements Application {
         }
         else {
             lines = sedFirstInstance(s[1], s[2], fileLines);
+        }
+        return lines;
+    }
+
+    public ArrayList<String> performSed(String[] s, InputStream input, Boolean g) throws IOException {
+        String line = new String(input.readAllBytes());
+        String[] splitLine = line.split(System.getProperty("line.separator"));
+        ArrayList<String> argLines = new ArrayList<>();
+        ArrayList<String> lines = new ArrayList<>();
+        for(String string:splitLine) {
+            argLines.add(string);
+        }
+
+        if (g) {
+            lines = sedForAll(s[1], s[2], argLines);
+        }
+        else {
+            lines = sedFirstInstance(s[1], s[2], argLines);
         }
         return lines;
     }

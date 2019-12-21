@@ -15,7 +15,7 @@ public class Jsh {
     
     public void eval(String cmdline, OutputStream output) throws IOException {
         Jsh.commands.add(cmdline);
-        CharStream cs = CharStreams.fromString(cmdline);
+        CharStream cs = CharStreams.fromString("sed 's|A|D|' dir1/file1.txt");
         AntlrGrammarLexer lexer = new AntlrGrammarLexer(cs);
         CommonTokenStream cts = new CommonTokenStream(lexer);
         AntlrGrammarParser parser = new AntlrGrammarParser(cts);

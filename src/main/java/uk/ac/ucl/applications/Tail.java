@@ -24,11 +24,11 @@ public class Tail implements Application {
     boolean default_constr = true;
 
     public Tail(){
-
     }
+
     public Tail(BufferedWriter w){
         default_constr =false;
-        writer =w;
+        writer = w;
     }
 
     @Override
@@ -36,7 +36,6 @@ public class Tail implements Application {
         String currentDirectory = Jsh.getCurrentDirectory();
         if(default_constr){
              writer = new BufferedWriter(new OutputStreamWriter(output));
-
         }
         validateArguments(args);
         String tailArg = getTailArgs(args);
