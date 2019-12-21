@@ -31,9 +31,12 @@ seq2
     |
     ; /* epsilon */ 
 
-quoted
+singlequoted
     : SQ
-    | DQ
+    ;
+
+doublequoted
+    : '"' (backquoted | ~('\n'|'"'|'`'))* '"'
     ;
 
 call
@@ -49,7 +52,7 @@ backquoted
     ;
 
 argument
-    : (quoted|unquoted|backquoted)+
+    : (unquoted|singlequoted|doublequoted|backquoted)+
     ;
 
 redirection
@@ -73,16 +76,6 @@ GT
     : '>'
     ;
 
-DQ
-    : '"' (BackQuote | DQC)* '"'
-    ;
-
-/*
-WS
-    : (' ' | '\t' )+ -> skip
-    ; //whitespace
-*/
-
 WS
     : (' ' | '\t' )+
     ; //whitespace
@@ -102,13 +95,4 @@ SQ
 
 NL
     : '\n'
-    ;
-
-
-fragment BackQuote
-    : '`' ~('\n'|'`')* '`'
-    ; 
-
-fragment DQC
-    : ~('\n'|'"'|'`')
     ;

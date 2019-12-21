@@ -6,7 +6,13 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import uk.ac.ucl.jsh.AntlrGrammarParser.BackquotedContext;
+import uk.ac.ucl.jsh.AntlrGrammarParser.DoublequotedContext;
+import uk.ac.ucl.jsh.AntlrGrammarParser.SinglequotedContext;
 
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
@@ -18,8 +24,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             Jsh j = new Jsh();
             InputStream input = new PipedInputStream(90000);
             writer = new PipedOutputStream((PipedInputStream) input);
-            String temp = ctx.getChild(0).getText();
-            j.eval(temp.substring(1, temp.length()-1), writer);
+            String temp = ctx.getText();
+            j.eval(temp.substring(1, temp.length() - 1), writer);
             writer.close();
             s = new String(input.readAllBytes());
             s = s.replaceAll(System.getProperty("line.separator"), " ");
@@ -30,8 +36,27 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     }
 
     @Override
-    public CommandVisitable visitQuoted(AntlrGrammarParser.QuotedContext ctx) {
-        String s = ctx.getChild(0).getText();
+    public CommandVisitable visitDoublequoted(DoublequotedContext ctx) {
+        String s = "";
+        for(int i=0;i<ctx.getChildCount();i++) {
+            if (ctx.getChild(i).getText().contains("`")) {
+                Call c = (Call) ctx.getChild(i).accept(this);
+                for(String args:c.getBqArray()) {
+                    s = s.concat(args);
+                }
+                c.getBqArray();
+            }
+            else {
+                s = s.concat(ctx.getChild(i).getText());
+            }
+        }
+        String newS = s.substring(1, s.length()-1);
+        return new Call(newS);
+    }
+
+    @Override
+    public CommandVisitable visitSinglequoted(SinglequotedContext ctx) {
+        String s = ctx.getText();
         String newS = s.substring(1, s.length()-1);
         return new Call(newS);
     }
@@ -55,7 +80,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         for(int i=0;i<s.size();i++) {
             Call c = (Call) s.get(i).accept(this);
             if (c.getSplit()) {
-                //work into an array of args
                 bqArgs = c.getBqArray();
                 arg = true;
             }
