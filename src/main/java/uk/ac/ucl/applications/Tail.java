@@ -20,6 +20,7 @@ import uk.ac.ucl.jsh.Jsh;
 public class Tail implements Application {
 
     private int tailLines = 10;
+    private boolean useIS = false;
     BufferedWriter writer;
     boolean default_constr = true;
 
@@ -37,10 +38,26 @@ public class Tail implements Application {
         if(default_constr){
              writer = new BufferedWriter(new OutputStreamWriter(output));
         }
-        validateArguments(args);
+        validateArguments(args, input);
         String tailArg = getTailArgs(args);
-        File tailFile = new File(currentDirectory + File.separator + tailArg);
-        writeOutput(tailArg, tailFile, writer, currentDirectory);
+        if (useIS) {
+            String line = new String(input.readAllBytes());
+            String[] lines = line.split(System.getProperty("line.separator"));
+            int index = 0;
+            if (tailLines > lines.length) {
+                index = 0;
+            } else {
+                index = lines.length - tailLines;
+            }
+            for (int i = index; i < lines.length; i++) {
+                writer.write(lines[i] + System.getProperty("line.separator"));
+                writer.flush();
+            }
+        }
+        else {
+            File tailFile = new File(currentDirectory + File.separator + tailArg);
+            writeOutput(tailArg, tailFile, writer, currentDirectory);
+        }
     }
 
     public void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory) {
@@ -73,6 +90,18 @@ public class Tail implements Application {
 
     public String getTailArgs(ArrayList<String> args) {
         String tailArg;
+        if (useIS) {
+            if (args.size()==0) {
+                return null;
+            }
+            else if (args.size()==2) {
+                tailLines = Integer.parseInt(args.get(1));
+                return null;
+            }
+            else {
+                throw new RuntimeException("tail: wrong argument " + args.get(0));
+            }
+        }
         if (args.size() == 3) {
             try {
                 tailLines = Integer.parseInt(args.get(1));
@@ -86,9 +115,19 @@ public class Tail implements Application {
         return tailArg;
     }
 
-    public void validateArguments(ArrayList<String> args) {
+    public void validateArguments(ArrayList<String> args, InputStream input) {
         if (args.isEmpty()) {
-            throw new RuntimeException("tail: missing arguments");
+            if (input != null) {
+                useIS = true;
+                return;
+            }
+            else {
+                throw new RuntimeException("tail: missing arguments");
+            }
+        }
+        if (args.size()==2 && input != null) {
+            useIS = true;
+            return;
         }
         if (args.size() != 1 && args.size() != 3) {
             throw new RuntimeException("tail: wrong arguments");

@@ -2,72 +2,157 @@ package uk.ac.ucl.applications;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
 public class Wc implements Application {
 
-    private Boolean totalNeeded = false;
+    private boolean totalNeeded = false;
+    private boolean useIS = false;
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-        validateArgs(args);
-        int numOfFiles = args.size();
-        int offset = 0;
-        
-        if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
-            offset = 1;
-            numOfFiles -= 1;
-        }
-        if (numOfFiles > 1) {
-            totalNeeded = true;
-        }
+        validateArgs(args, input);
+        int numOfFiles;
 
-
-        Path[] filePathArray = getFilePathArray(currentDirectory, numOfFiles, offset, args);
-        switch (args.get(0)) {
-            case "-m":
-                wcWrite(getCharArray(filePathArray), getFileNameArray(filePathArray), writer);
-                break;
-            case "-w":
-                wcWrite(getWordArray(filePathArray), getFileNameArray(filePathArray), writer);
-                break;
-            case "-l":
-                wcWrite(getLineArray(filePathArray), getFileNameArray(filePathArray), writer);
-                break;
-            default:
-                writeAll(getLineArray(filePathArray), getWordArray(filePathArray), getByteArray(filePathArray), getFileNameArray(filePathArray), writer);
+        if (useIS) {
+            String s = new String(input.readAllBytes());
+            String[] lines = s.split(System.getProperty("line.separator"));
+            ArrayList<String> tempArray = new ArrayList<>();
+            ArrayList<ArrayList<String>> lineArray = new ArrayList<>();
+            for(String temp:lines) {
+                tempArray.add(temp);
+            }
+            lineArray.add(tempArray);
+            if (args.size()==0) {
+                writeAll(getLineArray(lineArray), getWordArray(lineArray), getCharArray(lineArray), null, writer);
+            }
+            else if (args.size() == 1) {
+                performWc(args.get(0), lineArray, null, writer);
+            }
+            else {
+                throw new RuntimeException("wc: wrong arguments");
+            }
+        }
+        else {
+            numOfFiles = args.size();
+            int offset = 0;
+            
+            if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
+                offset = 1;
+                numOfFiles -= 1;
+            }
+            if (numOfFiles > 1) {
+                totalNeeded = true;
+            }
+            Path[] filePathArray = getFilePathArray(currentDirectory, numOfFiles, offset, args);
+            ArrayList<ArrayList<String>> fileLines = getLines(filePathArray);
+            performWc(args.get(0), fileLines, filePathArray, writer);
         }
     }
 
-    private void writeAll(ArrayList<Integer> lineArray, ArrayList<Integer> wordArray, ArrayList<Long> byteArray, ArrayList<String> fileNameArray, BufferedWriter writer) throws IOException {
+
+    private void performWc(String string, ArrayList<ArrayList<String>> fileLines, Path[] filePathArray,
+            BufferedWriter writer) throws IOException {
+                ArrayList<String> pathArray;
+        if (filePathArray == null) {
+            pathArray = null;
+        }
+        else {
+            pathArray = getFileNameArray(filePathArray);
+        }
+        switch (string) {
+            case "-m":
+                wcWrite(getCharArray(fileLines), pathArray, writer);
+                break;
+            case "-w":
+                wcWrite(getWordArray(fileLines), pathArray, writer);
+                break;
+            case "-l":
+                wcWrite(getLineArray(fileLines), pathArray, writer);
+                break;
+            default:
+                writeAll(getLineArray(fileLines), getWordArray(fileLines), getCharArray(fileLines), pathArray, writer);
+        }
+    }
+
+    private ArrayList<ArrayList<String>> getLines(Path[] filePathArray) throws IOException {
+        Charset encoding = StandardCharsets.UTF_8;
+        String line;
+        ArrayList<ArrayList<String>> multipleFileLineArray = new ArrayList<>();
+        for(Path filePath:filePathArray) {
+            ArrayList<String> lines = new ArrayList<>();
+            try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+                while ((line = reader.readLine()) != null) {
+                    lines.add(line);
+                }
+                reader.close();
+            } catch (IOException e) {
+                throw new RuntimeException("wc: cannot open " + filePathArray.toString());
+            }
+            multipleFileLineArray.add(lines);
+        }
+        return multipleFileLineArray;
+    }
+
+    
+    private void validateArgs(ArrayList<String> args, InputStream input) {
+        if (args.size()==0) {
+            if (input == null) {
+                throw new RuntimeException("wc: wrong number of arguments");
+            }
+            else {
+                useIS = true;
+                return;
+            }
+        }
+        else if (args.size()==1) {
+            if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
+                if (input != null) {
+                    useIS = true;
+                    return;
+                }
+                else {
+                    throw new RuntimeException("wc: wrong number of arguments"); 
+                }
+            }
+        }
+    }
+
+    private void writeAll(ArrayList<Long> arrayList, ArrayList<Long> arrayList2, ArrayList<Long> arrayList3,
+            ArrayList<String> fileNameArray, BufferedWriter writer) throws IOException {
+        boolean piping = false;
+        if (fileNameArray == null) {
+            piping = true;
+        }
         int totalLineCount = 0;
         int totalWordCount = 0;
         Long totalByteCount = (long) 0;
-        for (int i = 0; i < lineArray.size(); i++) {
-            totalByteCount += byteArray.get(i);
-            totalWordCount += wordArray.get(i);
-            totalLineCount += lineArray.get(i);
-            writer.write(Integer.toString(lineArray.get(i)));
+        for (int i = 0; i < arrayList.size(); i++) {
+            totalByteCount += arrayList3.get(i);
+            totalWordCount += arrayList2.get(i);
+            totalLineCount += arrayList.get(i);
+            writer.write(Long.toString(arrayList.get(i)));
             writer.write("\t");
-            writer.write(Integer.toString(wordArray.get(i)));
+            writer.write(Long.toString(arrayList2.get(i)));
             writer.write("\t");
-            writer.write(Long.toString(byteArray.get(i)));
+            writer.write(Long.toString(arrayList3.get(i)));
             writer.write("\t");
-            writer.write(fileNameArray.get(i));
+            if (!piping) {
+                writer.write(fileNameArray.get(i));
+            }
             writer.write(System.getProperty("line.separator"));
             writer.flush();
         }
@@ -84,18 +169,25 @@ public class Wc implements Application {
         }
     }
 
-    private void wcWrite(ArrayList<Integer> arrayList, ArrayList<String> fileNames, BufferedWriter writer) throws IOException {
+    private void wcWrite(ArrayList<Long> arrayList, ArrayList<String> fileNames, BufferedWriter writer)
+            throws IOException {
+        boolean piping = false;
+        if (fileNames == null) {
+            piping = true;
+        }
         int totalCount = 0;
         for (int i = 0; i < arrayList.size(); i++) {
             totalCount += arrayList.get(i);
-            writer.write(Integer.toString(arrayList.get(i)));
+            writer.write(Long.toString(arrayList.get(i)));
             writer.write("\t");
-            writer.write(fileNames.get(i));
+            if (!piping) {
+                writer.write(fileNames.get(i));
+            }
             writer.write(System.getProperty("line.separator"));
             writer.flush();
         }
         if (totalNeeded) {
-            writer.write(Integer.toString(totalCount));
+            writer.write(Long.toString(totalCount));
             writer.write("\t");
             writer.write("total ");
             writer.write(System.getProperty("line.separator"));
@@ -111,34 +203,26 @@ public class Wc implements Application {
         return fileNames;
     }
 
-    private ArrayList<Integer> getLineArray(Path[] filePathArray) {
-        ArrayList<Integer> vals = new ArrayList<>();
-        for (Path path : filePathArray) {
-            vals.add(calcNewlines(path));
-        }
-        return vals;
-    }
-
-    private ArrayList<Integer> getWordArray(Path[] filePathArray) {
-        ArrayList<Integer> vals = new ArrayList<>();
-        for (Path path : filePathArray) {
-            vals.add(calcWords(path));
-        }
-        return vals;
-    }
-
-    private ArrayList<Integer> getCharArray(Path[] filePathArray) {
-        ArrayList<Integer> vals = new ArrayList<>();
-        for (Path path : filePathArray) {
-            vals.add(calcChars(path));
-        }
-        return vals;
-    }
-
-    private ArrayList<Long> getByteArray(Path[] filePathArray) {
+    private ArrayList<Long> getLineArray(ArrayList<ArrayList<String>> fileLines) {
         ArrayList<Long> vals = new ArrayList<>();
-        for (Path path : filePathArray) {
-            vals.add(calcBytes(path));
+        for (ArrayList<String> lines : fileLines) {
+            vals.add(calcNewlines(lines));
+        }
+        return vals;
+    }
+
+    private ArrayList<Long> getWordArray(ArrayList<ArrayList<String>> fileLines) {
+        ArrayList<Long> vals = new ArrayList<>();
+        for (ArrayList<String> lines : fileLines) {
+            vals.add(calcWords(lines));
+        }
+        return vals;
+    }
+
+    private ArrayList<Long> getCharArray(ArrayList<ArrayList<String>> fileLines) {
+        ArrayList<Long> vals = new ArrayList<>();
+        for (ArrayList<String> lines : fileLines) {
+            vals.add(calcChars(lines));
         }
         return vals;
     }
@@ -159,71 +243,39 @@ public class Wc implements Application {
         return filePathArray;
     }
 
-    private void validateArgs(ArrayList<String> args) {
-        if (args.size()==0) {
-            throw new RuntimeException("wc: wrong number of arguments");
-        }
-    }
-
     private String getFileName(String string) {
         return string.split("/")[((string.split("/").length)-1)];
     }
 
-    private Long calcBytes(Path path) {
-        File file = path.toFile();
-        long length = file.length();
-        return length;
-    }
-
-    private int calcWords(Path path){
+    private Long calcWords(ArrayList<String> lines){
         int wordCount = 0;
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                String[] previsionalWords = line.split("[\\s]+");
-                ArrayList<String> words = new ArrayList<>();
-                
-                for (int i=0; i<previsionalWords.length;i++) {
-                    if (previsionalWords[i].length() > 0) {
-                        words.add(previsionalWords[i]);
-                    }
+        for(String s:lines) {
+            String[] previsionalWords = s.split("[\\s]+");
+            ArrayList<String> words = new ArrayList<>();
+            for (int i=0; i<previsionalWords.length;i++) {
+                if (previsionalWords[i].length() > 0) {
+                    words.add(previsionalWords[i]);
                 }
-                wordCount += words.size();
             }
-        } catch (IOException e) {
-            throw new RuntimeException("wc: cannot open " + path.toString());
+            wordCount += words.size(); 
         }
-        return wordCount;
+        return (long) wordCount;
     }
 
-    private int calcNewlines(Path path){
-        int newlineCount = 0;
-        try (Scanner scanner = new Scanner(path)) {
-            while (scanner.hasNextLine()) {
-                newlineCount += 1;
-                scanner.nextLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("wc: cannot open " + path.toString());
-        }
-        // newlineCount -= 1;
-        return newlineCount;
+    private Long calcNewlines(ArrayList<String> lines){
+        return (long) (lines.size() - 1);
     }
 
-    private int calcChars(Path path){
+    private Long calcChars(ArrayList<String> lines) {
         int charCount = 0;
-        try (Scanner scanner = new Scanner(path)) {
-            String line = null;
-            while (scanner.hasNextLine()) {
-                line = scanner.nextLine();
-                charCount += line.length();
-                if (scanner.hasNextLine()) {
-                    charCount++; //+1 to account for new line character
-                }
+        int count = 0;
+        for (String line:lines) {
+            count++;
+            charCount+= line.length();
+            if (count < (lines.size())) {
+                charCount++;
             }
-        } catch (IOException e) {
-            throw new RuntimeException("wc: cannot open " + path.toString());
         }
-        return charCount;
+        return (long) charCount;
     }
 }

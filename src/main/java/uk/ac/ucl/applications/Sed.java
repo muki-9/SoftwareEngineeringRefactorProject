@@ -56,7 +56,7 @@ public class Sed implements Application {
                 throw new RuntimeException("sed: wrong number of arguments");
             }
         }
-        if ((args.get(0) != null) && ((args.get(1) != null) || useIS)) {
+        if ((args.get(0) != null) && (useIS || (args.get(1) != null))) {
             String delimiter = Character.toString(args.get(0).charAt(1));
             if (delimiter.matches("\\|")) {
                 delimiter = "\\|";
