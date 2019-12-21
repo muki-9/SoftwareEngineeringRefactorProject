@@ -1,12 +1,10 @@
 package uk.ac.ucl.jsh;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-// import java.util.ArrayList;
 import java.util.ArrayList;
 
 public class Eval implements CommandVisitor {
@@ -32,6 +30,8 @@ public class Eval implements CommandVisitor {
 
     @Override
     public void visitSeq(Seq seq) throws IOException {
+        osList.add(osList.get(osList.size()-1));
+        isList.add(isList.get(isList.size()-1));
         seq.getSeqChildren().get(0).accept(this);
         seq.getSeqChildren().get(1).accept(this);
     }

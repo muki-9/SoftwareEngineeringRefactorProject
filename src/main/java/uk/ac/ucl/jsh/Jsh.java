@@ -21,7 +21,6 @@ public class Jsh {
         AntlrGrammarParser parser = new AntlrGrammarParser(cts);
         ParseTree tree = parser.start();
         MyTreeVisitor myVisitor = new MyTreeVisitor();
-
         CommandVisitable command = myVisitor.visit(tree);
         CommandVisitor commandVisitor = new Eval(output);
         command.accept(commandVisitor);

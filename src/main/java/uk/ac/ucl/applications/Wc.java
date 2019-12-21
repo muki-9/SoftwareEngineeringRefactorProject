@@ -27,6 +27,7 @@ public class Wc implements Application {
         validateArgs(args);
         int numOfFiles = args.size();
         int offset = 0;
+        
         if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
             offset = 1;
             numOfFiles -= 1;

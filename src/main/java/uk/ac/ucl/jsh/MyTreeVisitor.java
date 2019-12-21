@@ -4,25 +4,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
-    // @Override
-    // public CommandVisitable visitBackquoted(AntlrGrammarParser.BackquotedContext ctx) {
-    //     InputStream input = new PipedInputStream();
-    //     OutputStream writer = new PipedOutputStream((PipedInputStream) input);
-
-    //     Jsh j = new Jsh();
-    //     try {
-    //         j.eval(ctx.getChild(0).getText(), output);
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-        
-    //     return new Call();
-    // }
+    @Override
+    public CommandVisitable visitBackquoted(AntlrGrammarParser.BackquotedContext ctx) {
+        OutputStream writer;
+        String s = null;
+        try {
+            Jsh j = new Jsh();
+            InputStream input = new PipedInputStream(90000);
+            writer = new PipedOutputStream((PipedInputStream) input);
+            String temp = ctx.getChild(0).getText();
+            j.eval(temp.substring(1, temp.length()-1), writer);
+            writer.close();
+            s = new String(input.readAllBytes());
+            s = s.replaceAll(System.getProperty("line.separator"), " ");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Call(s.split(" "));
+    }
 
     @Override
     public CommandVisitable visitQuoted(AntlrGrammarParser.QuotedContext ctx) {
@@ -40,13 +45,26 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     public CommandVisitable visitArgument(AntlrGrammarParser.ArgumentContext ctx) {
         ArrayList<ParseTree> s = new ArrayList<>();
         String string = "";
+        ArrayList<String> bqArgs = new ArrayList<>();
+        boolean arg = false;
 
         for(int f=0;f<ctx.getChildCount();f++) {
             s.add(ctx.getChild(f));
         }
+
         for(int i=0;i<s.size();i++) {
             Call c = (Call) s.get(i).accept(this);
-            string = string.concat(c.getCurrArgs());
+            if (c.getSplit()) {
+                //work into an array of args
+                bqArgs = c.getBqArray();
+                arg = true;
+            }
+            else {
+                string = string.concat(c.getCurrArgs());
+            }
+        }
+        if (arg) {
+            return new Call(bqArgs);
         }
         return new Call(string);
     }
@@ -73,8 +91,17 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         ArrayList<String> args = new ArrayList<>();
         for(int i = 0; i<ctx.argument().size();i++) {
             Call c = (Call) ctx.argument().get(i).accept(this);
-            args.add(c.getCurrArgs());
+            if (c.getCurrArgs() != null) {
+                args.add(c.getCurrArgs());
+            }
+            if (c.getSplit()) {
+                for(String s:c.getBqArray()) {
+                    args.add(s);
+                }
+            }
         }
-        return new Call(args);
+        String app = args.get(0);
+        args.remove(0);
+        return new Call(app, args);
     }
 }
