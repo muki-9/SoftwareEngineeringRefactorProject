@@ -6,5 +6,5 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 public interface Application {
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException;
+    void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException;
 }

@@ -32,11 +32,11 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             throw new RuntimeException("antlr: too many arguments given to IO redirection symbol");
         }
         if (ctx.getChild(0).getText().matches(">")) {
-            Call c = (Call) ctx.getChild(2).accept(this);
+            Call c = (Call) ctx.argument().accept(this);
             return new Call(c.getCurrArgs(), ">");
 
         } else if (ctx.getChild(0).getText().matches("<")) {
-            Call c = (Call) ctx.getChild(2).accept(this);
+            Call c = (Call) ctx.argument().accept(this);
             return new Call(c.getCurrArgs(), "<");
         } else {
             throw new RuntimeException("antlr: invalid redirection arguments");
@@ -98,19 +98,33 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         String string = "";
         ArrayList<String> bqArgs = new ArrayList<>();
         boolean arg = false;
+        boolean integrate = false;
+        
+        if (ctx.unquoted().size()>0 && ctx.backquoted().size()>0) {
+            integrate = true;
+        }
 
         for (int f = 0; f < ctx.getChildCount(); f++) {
             s.add(ctx.getChild(f));
         }
-
         for (int i = 0; i < s.size(); i++) {
             Call c = (Call) s.get(i).accept(this);
             if (c.getSplit()) {
-                bqArgs = c.getBqArray();
-                arg = true;
+                if (!integrate) {
+                    bqArgs = c.getBqArray();
+                    arg = true;
+                }
+                else {
+                    for (String vals : c.getBqArray()) {
+                        string = string.concat(vals);
+                    }
+                }
             } else {
                 string = string.concat(c.getCurrArgs());
             }
+        }
+        if (integrate) {
+            return new Call(string);
         }
         if (arg) {
             return new Call(bqArgs);
@@ -132,6 +146,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
     @Override
     public CommandVisitable visitCall(AntlrGrammarParser.CallContext ctx) {
+        // System.out.println(ctx.argument().get(0).getText());
+        // System.out.println(ctx.argument().get(1).getText());
         List<RedirectionContext> redirections = ctx.redirection();
         if (redirections.size() == 0) {
             ArrayList<String> args = new ArrayList<>();
@@ -149,21 +165,20 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             String app = args.get(0);
             args.remove(0);
             return new Call(app, args);
+
         } else {
-            for (int i = 0; i < redirections.size(); i++) {
+            for (int i = 0; i < redirections.size();) {
                 Call c = (Call) redirections.get(i).accept(this);
                 String filePath = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs();
                 File file = new File(filePath);
                 OutputStream os;
                 if (c.getSymbol().matches(">")) {
-                    if (!file.exists()) {
-                        try {
-                            if (!file.createNewFile()) {
-                                throw new RuntimeException("redirection: file could not be created");
-                            }
-                        } catch (IOException e) {
-                            throw new RuntimeException("redirection: file could not be created exception");
+                    try {
+                        if (file.createNewFile()){
+                            System.out.println("redirection: file created successfully");
                         }
+                        } catch (IOException e) {
+                            throw new RuntimeException("redirection: file could not be created");
                     }
                     try {
                         os = new FileOutputStream(file);
@@ -186,11 +201,10 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                     String app = args.get(0);
                     args.remove(0);
                     return new Call(app, args, os);
-
                 }
                 else if (c.getSymbol().matches("<")) {
                     if (!file.exists()) {
-                        throw new RuntimeException("redirection: file could not found");
+                        throw new RuntimeException("redirection: file could not be found");
                     }
                     Charset encoding = StandardCharsets.UTF_8;
                     Path path = Paths.get(filePath);
@@ -228,25 +242,9 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                     return new Call(app, args, is);
                 }
                 else {
-                    throw new RuntimeException("antlr: parsing error- invalid character: "+c.getSymbol());
+                    throw new RuntimeException("antlr: parsing error- invalid character: " + c.getSymbol());
                 }
             }
-
-            // ArrayList<String> args = new ArrayList<>();
-            // for(int i = 0; i<ctx.argument().size();i++) {
-            //     Call c = (Call) ctx.argument().get(i).accept(this);
-            //     if (c.getCurrArgs() != null) {
-            //         args.add(c.getCurrArgs());
-            //     }
-            //     if (c.getSplit()) {
-            //         for(String s:c.getBqArray()) {
-            //             args.add(s);
-            //         }
-            //     }
-            // }
-            // String app = args.get(0);
-            // args.remove(0);
-            // return new Call(app, args);
         }
         return null;
     }

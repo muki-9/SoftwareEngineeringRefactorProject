@@ -33,7 +33,6 @@ public class HeadTest {
 
     @Before
     public void init() throws IOException {
-
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();

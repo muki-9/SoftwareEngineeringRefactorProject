@@ -119,14 +119,12 @@ public class Wc implements Application {
             }
         }
         else if (args.size()==1) {
-            if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
-                if (input != null) {
-                    useIS = true;
-                    return;
-                }
-                else {
+            if ((args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) && input != null) {
+                useIS = true;
+                return;
+            }
+            else {
                     throw new RuntimeException("wc: wrong number of arguments"); 
-                }
             }
         }
     }
@@ -244,7 +242,7 @@ public class Wc implements Application {
     }
 
     private String getFileName(String string) {
-        return string.split("/")[((string.split("/").length)-1)];
+        return string.split("/")[string.split("/").length-1];
     }
 
     private Long calcWords(ArrayList<String> lines){
@@ -263,7 +261,7 @@ public class Wc implements Application {
     }
 
     private Long calcNewlines(ArrayList<String> lines){
-        return (long) (lines.size() - 1);
+        return (long) (lines.size());
     }
 
     private Long calcChars(ArrayList<String> lines) {
@@ -272,7 +270,7 @@ public class Wc implements Application {
         for (String line:lines) {
             count++;
             charCount+= line.length();
-            if (count < (lines.size())) {
+            if (count <= (lines.size())) {
                 charCount++;
             }
         }

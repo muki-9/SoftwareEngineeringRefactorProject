@@ -15,11 +15,15 @@ public class Echo implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         boolean atLeastOnePrinted = false;
+        int count = 0;
         for (String arg : args) {
             writer.write(arg);
-            writer.write(" ");
+            if (count<args.size()-1) {
+                writer.write(" ");
+            }
             writer.flush();
             atLeastOnePrinted = true;
+            count++;
         }
         if (atLeastOnePrinted) {
             writer.write(System.getProperty("line.separator"));

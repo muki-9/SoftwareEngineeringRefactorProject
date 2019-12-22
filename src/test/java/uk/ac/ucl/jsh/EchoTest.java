@@ -58,11 +58,9 @@ public class EchoTest {
         testArray.add("foo");
         testEcho.exec(testArray, null, out);
         Scanner scn = new Scanner(in);
-        assertEquals(scn.nextLine(), "foo foo ");
+        assertEquals(scn.nextLine(), "foo foo");
         scn.close();
 
     }
     //test for echo quotes should not include the quotes in stdout
-
-
 }

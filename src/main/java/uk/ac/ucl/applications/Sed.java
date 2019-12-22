@@ -49,14 +49,14 @@ public class Sed implements Application {
     public String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
         if (args.size() != 2) {
-            if ((args.size() == 1) && (input != null)) {
+            if (args.size() == 1 && input != null) {
                 useIS = true;
             }
             else {
                 throw new RuntimeException("sed: wrong number of arguments");
             }
         }
-        if ((args.get(0) != null) && (useIS || (args.get(1) != null))) {
+        if (args.get(0) != null && useIS || args.get(1) != null) {
             String delimiter = Character.toString(args.get(0).charAt(1));
             if (delimiter.matches("\\|")) {
                 delimiter = "\\|";
@@ -65,7 +65,7 @@ public class Sed implements Application {
             if (!s[0].matches("s")) {
                 throw new RuntimeException("sed: regex in incorrect form");
             }
-            if ((args.get(0).lastIndexOf(delimiter) < args.get(0).length()-1)) {
+            if (args.get(0).lastIndexOf(delimiter) < args.get(0).length()-1) {
                 if (args.get(0).charAt(args.get(0).lastIndexOf(delimiter)+1) == 'g') {
                     g = true;
                 }
@@ -143,7 +143,7 @@ public class Sed implements Application {
         for(String line: fileLines) {
             Matcher matcher = sedPattern.matcher(line);
             if (matcher.find()) {
-                line = line.replace(regex, replacement);
+                line = line.replaceAll(regex, replacement);
             }
             changedlines.add(line);
         }
