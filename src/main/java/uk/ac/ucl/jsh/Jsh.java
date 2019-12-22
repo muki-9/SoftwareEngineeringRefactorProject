@@ -57,7 +57,6 @@ public class Jsh {
     
     public static void main(String[] args) {
         Jsh newShell = new Jsh();
-        System.out.println("Inside shell");
         if (args.length > 0) {
             if (args.length != 2) {
                 System.out.println("jsh: wrong number of arguments");
