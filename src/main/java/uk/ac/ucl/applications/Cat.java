@@ -49,7 +49,6 @@ public class Cat implements Application {
                         }
                     } catch (IOException e) {
                         throw new RuntimeException("cat: cannot open " + arg);
-                    }finally{
                     }
                 } else {
                     throw new RuntimeException("cat: file does not exist");

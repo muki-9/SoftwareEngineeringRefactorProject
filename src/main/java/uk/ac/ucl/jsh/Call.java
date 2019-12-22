@@ -1,6 +1,8 @@
 package uk.ac.ucl.jsh;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class Call implements CommandVisitable {
@@ -9,6 +11,11 @@ public class Call implements CommandVisitable {
     private ArrayList<String> bqArray = new ArrayList<>();
     private String currArg; //this var is required to concatenate the different strings together after removal of quotations
     private boolean split = false;
+    private String symbol;
+    private boolean isRequired = false;
+    private InputStream is;
+    private boolean osRequired = false;
+    private OutputStream os;
 
     public Call(String app, ArrayList<String> args) {
         this.application = app;
@@ -29,7 +36,30 @@ public class Call implements CommandVisitable {
     public Call(ArrayList<String> bqArgs) {
         this.bqArray = bqArgs;
         this.split = true;
+    }
+    
+    public Call(String currArgs, String symbol) {
+        this.symbol = symbol;
+        this.currArg = currArgs;
 	}
+
+	public Call(String app, ArrayList<String> args, InputStream is) {
+        this.application = app;
+        this.arguments = args;
+        isRequired = true;
+        this.is = is;
+	}
+
+	public Call(String app, ArrayList<String> args, OutputStream os) {
+        this.application = app;
+        this.arguments = args;
+        osRequired = true;
+        this.os = os;
+	}
+
+	public String getSymbol() {
+        return symbol;
+    }
 
 	public ArrayList<String> getBqArray() {
         return bqArray;
@@ -55,4 +85,19 @@ public class Call implements CommandVisitable {
     public void accept(CommandVisitor visitor) throws IOException {
         visitor.visitCall(this);
     }
+
+	public boolean getISRequired() {
+		return isRequired;
+	}
+
+	public InputStream getIS() {
+		return is;
+    }
+    public boolean getOSRequired() {
+		return osRequired;
+	}
+
+	public OutputStream getOS() {
+		return os;
+	}
 }

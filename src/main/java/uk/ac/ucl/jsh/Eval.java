@@ -38,6 +38,12 @@ public class Eval implements CommandVisitor {
 
     @Override
     public void visitCall(Call call) throws IOException {
+        if (call.getISRequired()) {
+            isList.add(call.getIS());
+        }
+        if (call.getOSRequired()) {
+            osList.add(call.getOS());
+        }
         InputStream is = isList.get(isList.size()-1);
         OutputStream os = osList.get(osList.size()-1);
         isList.remove(isList.size()-1);
