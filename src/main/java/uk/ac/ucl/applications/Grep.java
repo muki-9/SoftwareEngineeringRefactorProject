@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import uk.ac.ucl.jsh.Application;
+import uk.ac.ucl.jsh.Globbing;
 import uk.ac.ucl.jsh.Jsh;
 
 public class Grep implements Application {
@@ -23,13 +24,16 @@ public class Grep implements Application {
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-        if (args.size() < 2) {
-            if (args.size() == 1) {
+        Globbing g = new Globbing();
+        ArrayList<String> updatedArgs = g.globbing(args);
+
+        if (updatedArgs.size() < 2) {
+            if (updatedArgs.size() == 1) {
                 if (input == null) {
                     throw new RuntimeException("grep: wrong number of arguments");
                 }
                 else {
-                    Pattern grepPattern = Pattern.compile(args.get(0));
+                    Pattern grepPattern = Pattern.compile(updatedArgs.get(0));
                     String s = new String(input.readAllBytes());
                     String[] lines = s.split(System.getProperty("line.separator"));
                     
@@ -48,9 +52,9 @@ public class Grep implements Application {
             }
             
         }
-        Pattern grepPattern = Pattern.compile(args.get(0));
-        Path[] filePathArray = getPathArray(args);
-        writeOutput(writer, grepPattern, filePathArray, args);
+        Pattern grepPattern = Pattern.compile(updatedArgs.get(0));
+        Path[] filePathArray = getPathArray(updatedArgs);
+        writeOutput(writer, grepPattern, filePathArray, updatedArgs);
     }
 
     public Path[] getPathArray(ArrayList<String> args) {
