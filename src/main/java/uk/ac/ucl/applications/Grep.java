@@ -76,7 +76,8 @@ public class Grep implements Application {
         return filePathArray;
     }
 
-    public void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args) {
+    public void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args)
+            throws IOException {
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
             try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {
@@ -89,9 +90,7 @@ public class Grep implements Application {
                         writer.flush();
                     }
                 }
-            } catch (IOException e) {
-                throw new RuntimeException("grep: cannot open " + args.get(j + 1));
-            }
+            } 
         }
     }
 }
