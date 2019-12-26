@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import javax.management.RuntimeErrorException;
+
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
@@ -146,9 +149,16 @@ public class Wc implements Application {
             }
         }
         else if (args.size()==1) {
-            if ((args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) && input != null) {
-                useInputStream = true;
+            
+            if (args.get(0).equals("-m")|| args.get(0).equals("-w") || args.get(0).equals("-l")) {
+
+                if(input!=null){
+                    useInputStream = true; 
+                } else{
+                    throw new RuntimeException("wc: wrong number of arguments");
+                }
             }
+  
         }
     }
 
