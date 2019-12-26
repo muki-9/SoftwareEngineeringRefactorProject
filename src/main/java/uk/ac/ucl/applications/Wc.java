@@ -19,13 +19,12 @@ public class Wc implements Application {
 
     private boolean totalNeeded = false;
     private boolean useInputStream = false;
+    private int newlineCount = 0;
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         validateArgs(args, input); // ensures that stdin is being used if required instead of command line arguments
-
-        
 
         if (useInputStream) {
             // Below performs wc application using stdin
@@ -42,8 +41,8 @@ public class Wc implements Application {
             fileLines.add(lineArray);
 
             if (args.size()==0) {
-                // performs all functions of wc when no option is specified
-                writeAll(getNewlineArray(fileLines), getWordArray(fileLines), getCharArray(fileLines), null, writer);
+                // performs all functions of wc when no option is specified using IS methods
+                writeAll(getNewlineArrayIS(fileLines), getWordArray(fileLines), getCharArrayIS(fileLines), null, writer);
             }
             else if (args.size() == 1) {
                 // performs function specified by option
@@ -89,16 +88,29 @@ public class Wc implements Application {
 
         switch (optionType) {
             case "-m":
-                wcWrite(getCharArray(fileLines), pathArray, writer);
+                // uses different methods depending on whether IS is used or not
+                if(useInputStream){
+                    ArrayList<Long> tempNewLineArray = getNewlineArrayIS(fileLines); // ensures global Newline Count is accurate
+                    wcWrite(getCharArrayIS(fileLines), pathArray, writer);
+                }
+                else{
+                    wcWrite(getCharArray(fileLines, getNewlineArray(filePathArray)), pathArray, writer);
+                }
                 break;
             case "-w":
                 wcWrite(getWordArray(fileLines), pathArray, writer);
                 break;
             case "-l":
-                wcWrite(getNewlineArray(fileLines), pathArray, writer);
+                // uses different methods depending on whether IS is used or not
+                if(useInputStream){
+                    wcWrite(getNewlineArrayIS(fileLines), pathArray, writer);
+                }
+                else{
+                    wcWrite(getNewlineArray(filePathArray), pathArray, writer);
+                }
                 break;
             default:
-                writeAll(getNewlineArray(fileLines), getWordArray(fileLines), getCharArray(fileLines), pathArray, writer);
+                writeAll(getNewlineArray(filePathArray), getWordArray(fileLines), getCharArray(fileLines, getNewlineArray(filePathArray)), pathArray, writer);
         }
     }
 
@@ -118,12 +130,11 @@ public class Wc implements Application {
             } catch (IOException e) {
                 throw new RuntimeException("wc: cannot open " + getFileName(filePathArray.toString()));
             }
-            multipleFileLineArray.add(lines);
+            multipleFileLineArray.add(lines);           
         }
         return multipleFileLineArray;
     }
 
-    
     private void validateArgs(ArrayList<String> args, InputStream input) {
         if (args.size()==0) {
             if (input == null) {
@@ -228,10 +239,35 @@ public class Wc implements Application {
         return fileNames;
     }
 
-    private ArrayList<Long> getNewlineArray(ArrayList<ArrayList<String>> fileLines) {
+    private ArrayList<Long> getNewlineArray(Path[] filePathArray) throws IOException {
+        Charset encoding = StandardCharsets.UTF_8;
+        ArrayList<Long> newlineArray = new ArrayList<>();
+        int value;
+
+        // reads in each file char by char to count the number of newline characters seen
+        for(Path filePath : filePathArray) {
+            long newlineTempCount = 0;
+            try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+                while((value = reader.read()) != -1) {
+                    char c = (char) value;
+                    if (c == '\n'){
+                        newlineTempCount += 1;
+                    }
+                }
+                reader.close();
+            } catch (IOException e) {
+                throw new RuntimeException("wc: cannot open " + getFileName(filePathArray.toString()));
+            }    
+            newlineArray.add(newlineTempCount);           
+        }
+        return newlineArray;
+        
+    }
+
+    private ArrayList<Long> getNewlineArrayIS(ArrayList<ArrayList<String>> fileLines) {
         ArrayList<Long> vals = new ArrayList<>();
         for (ArrayList<String> lines : fileLines) {
-            vals.add(calcNewlines(lines));
+            vals.add(calcNewlinesIS(lines));
         }
         return vals;
     }
@@ -244,10 +280,20 @@ public class Wc implements Application {
         return vals;
     }
 
-    private ArrayList<Long> getCharArray(ArrayList<ArrayList<String>> fileLines) {
+    private ArrayList<Long> getCharArray(ArrayList<ArrayList<String>> fileLines, ArrayList<Long> newlineArray) {
+        ArrayList<Long> vals = new ArrayList<>();
+        int count = 0;
+        for (ArrayList<String> lines : fileLines) {
+            vals.add(calcChars(lines, newlineArray.get(count)));
+            count++;
+        }
+        return vals;
+    }
+
+    private ArrayList<Long> getCharArrayIS(ArrayList<ArrayList<String>> fileLines) {
         ArrayList<Long> vals = new ArrayList<>();
         for (ArrayList<String> lines : fileLines) {
-            vals.add(calcChars(lines));
+            vals.add(calcCharsIS(lines));
         }
         return vals;
     }
@@ -290,23 +336,26 @@ public class Wc implements Application {
         return (long) wordCount;
     }
 
-    private Long calcNewlines(ArrayList<String> lines){
-        // returns array size as number of newlines is the size of the array
-        return (long) (lines.size());
+    private Long calcNewlinesIS(ArrayList<String> lines){
+        // returns array size as number of newlines if IS is used
+        newlineCount = lines.size();
+        return (long) (newlineCount);
     }
 
-    private Long calcChars(ArrayList<String> lines) {
-        // counts number of chars in each line, taking into account '\n' ????
-        int charCount = 0;
-        int count = 0;
-
+    private Long calcChars(ArrayList<String> lines, Long newlineCountArg) {
+        // calculates number of chars in each line and accounts for number of newline characters
+        long charCount = newlineCountArg;
         for (String line : lines) {
-            count++;
             charCount += line.length();
+        }
+        return (long) charCount;
+    }
 
-            if (count <= (lines.size())) {
-                charCount++;
-            }
+    private Long calcCharsIS(ArrayList<String> lines) {
+        // calculates number of chars in each line and accounts for number of newline characters
+        int charCount = newlineCount;
+        for (String line : lines) {
+            charCount += line.length();
         }
         return (long) charCount;
     }
