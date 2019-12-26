@@ -60,7 +60,8 @@ public class Tail implements Application {
         }
     }
 
-    public void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory) {
+    public void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory)
+            throws IOException {
         if (tailFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + tailArg);
@@ -80,8 +81,6 @@ public class Tail implements Application {
                     writer.write(storage.get(i) + System.getProperty("line.separator"));
                     writer.flush();
                 }            
-            } catch (IOException e) {
-                throw new RuntimeException("tail: cannot open " + tailArg);
             }
         } else {
             throw new RuntimeException("tail: " + tailArg + " does not exist");

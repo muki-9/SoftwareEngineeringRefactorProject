@@ -4,9 +4,12 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -38,19 +41,105 @@ public class SedTest{
         testArray = new ArrayList<>();
 
     }
+    @Test
+    public void sedShouldProduceCorrectOutputwithInput() throws IOException {
+        
+        String originalString = "test line absolute\n2nd line!\nabsent\n"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+        testArray.add("s/t/b");
+
+        testSed.exec(testArray, inputStream, out);
+
+        Scanner scn = new Scanner(in);
+        String line1 = scn.nextLine();
+        String line2 = scn.nextLine();
+        String line3 = scn.nextLine();
+
+        assertThat(line1).isEqualTo("best line absolute");
+        assertThat(line2).isEqualTo("2nd line!");
+        assertThat(line3).isEqualTo("absenb");
+
+        scn.close();
+
+    }
+    @Test
+    public void sedShouldProduceCorrectOutputwithInputAndG() throws IOException {
+        
+        String originalString = "test line absolute\n2nd line!\nabsent\n"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+        testArray.add("s/t/b/g");
+
+        testSed.exec(testArray, inputStream, out);
+
+        Scanner scn = new Scanner(in);
+        String line1 = scn.nextLine();
+        String line2 = scn.nextLine();
+        String line3 = scn.nextLine();
+
+        assertThat(line1).isEqualTo("besb line absolube");
+        assertThat(line2).isEqualTo("2nd line!");
+        assertThat(line3).isEqualTo("absenb");
+
+        scn.close();
+
+    }
+
+    // @Test
+
+    // public void anySymbolCanBeUsedAsDelimeterShouldNotThrowExceptionUnlessInArgs(){
+
+    //     testArray.add("s[a[b");
+    //     testArray.add(e)
+    // }
+
+
+    @Test
+
+    public void sedShouldProduceCorrectOutputWithoutInput() throws IOException {
+
+        testArray.add("s/L[a-z]+/b");
+        String tmp1 = createTempFile();
+        writeToFile(tmp1);
+        testArray.add(tmp1);
+        
+        testSed.exec(testArray, null, out);
+        Scanner scn = new Scanner(in);
+        String line = "";
+        for(int i=0; i<3; i++){
+            line+=scn.nextLine()+'\n';
+
+        }
+        assertThat(line).isEqualTo("b0\nb1\nb2\n");
+        scn.close();
+
+    }
+
 
     @Test
     public void ifSedArgsis1AndInputNotNullThenNoException(){
+
+        String originalString = "test line absolute\n2nd line!\nabsent\n"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
         testArray.add("s/a/b");
 
         assertThatCode(() -> {
-            testSed.validateArgs(testArray, in);
+            testSed.exec(testArray, inputStream, out);
         }).doesNotThrowAnyException();
+        
+        testArray.add("s/a/b");
+        testArray.add("src");
+
+        assertThatThrownBy(() -> {
+            testSed.exec(testArray, inputStream, out);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("sed: wrong number of arguments");
 
     }
 
     @Test
-    public void ifSedArgs1AndInputNullThenThrowException(){
+    public void ifSedArgs1OrMoreAndInputNullThenThrowException(){
 
         testArray.add("s/a/b");
 
@@ -59,6 +148,7 @@ public class SedTest{
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: wrong number of arguments");
+
 
     }
     @Test
@@ -74,26 +164,30 @@ public class SedTest{
         .hasMessageContaining("sed: regex in incorrect form");
 
     }
-    @Test
-    public void testSedWithGGivesCorrectOutput(){
+    // @Test
+    // public void testSedWithGGivesCorrectOutput() throws IOException {
+    //     String tmp1 = createTempFile();
+    //     BufferedWriter wr = new BufferedWriter(new FileWriter(tmp1));
 
-        testArray.add("This is a test file");
-        testArray.add("!Should replace some chars?");
-        ArrayList<String> actual = testSed.sedForAll("a", "b", testArray);
-        assertThat(actual.get(0)).isEqualTo("This is b test file");
-        assertThat(actual.get(1)).isEqualTo("!Should replbce some chbrs?");
+    //     wr.write("This is a test file");
+    //     wr.write(System.getProperty("line.separator"));
+    //     wr.write("!Should replace some chars?");
 
-    }
-    @Test
-    public void testSedWithoutGGivesCorrectOutput(){
+    //     ArrayList<String> actual = testSed.sedForAll("a", "b", testArray);
+    //     assertThat(actual.get(0)).isEqualTo("This is b test file");
+    //     assertThat(actual.get(1)).isEqualTo("!Should replbce some chbrs?");
 
-        testArray.add("This is a test file but a should still be here");
-        testArray.add("!Should replace some chars but not a?");
-        ArrayList<String> actual = testSed.sedFirstInstance("a", "b", testArray);
-        assertThat(actual.get(0)).isEqualTo("This is b test file but a should still be here");
-        assertThat(actual.get(1)).isEqualTo("!Should replbce some chars but not a?");
+    // }
+    // @Test
+    // public void testSedWithoutGGivesCorrectOutput(){
 
-    }
+    //     testArray.add("This is a test file but a should still be here");
+    //     testArray.add("!Should replace some chars but not a?");
+    //     ArrayList<String> actual = testSed.sedFirstInstance("a", "b", testArray);
+    //     assertThat(actual.get(0)).isEqualTo("This is b test file but a should still be here");
+    //     assertThat(actual.get(1)).isEqualTo("!Should replbce some chars but not a?");
+
+    // }
     @Test
     public void sedThrowsExceptionIfFileCantOpen(){
 
@@ -111,7 +205,7 @@ public class SedTest{
     public void sedThrowsExceptionIfWrongFile(){
 
         testArray.add("s/a/b");
-        testArray.add("doesntexist.txt");
+        testArray.add("src");
 
         assertThatThrownBy(() -> {
             testSed.exec(testArray, null, out);
@@ -121,39 +215,45 @@ public class SedTest{
     
 
     }
-    @Test
+    // @Test
 
-    public void sedReturnsCorrectLinesFromFileRead() throws IOException {
+    // public void sedReturnsCorrectLinesFromFileRead() throws IOException {
 
-        ArrayList<String> actual = testSed.getLines("test.txt");
-        assertThat(contentOf(new File("test.txt"))).isEqualTo(actual.get(0)+'\n'+actual.get(1)+'\n'+actual.get(2));
+    //     String tmp = createTempFile();
+    //     ArrayList<String> actual = testSed.getLines(tmp);
+    //     assertThat(contentOf(new File(tmp))).isEqualTo(actual.get(0)+'\n'+actual.get(1)+'\n'+actual.get(2)+'\n');
 
-    }
-    @Test
-    public void outputCorrectResult() throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
+    // }
+    // @Test
+    // public void outputCorrectResult() throws IOException {
+    //     ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    //     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
 
-        testArray.add("this is what is getting outputed");
-        testArray.add("!@?^");
+    //     testArray.add("this is what is getting outputed");
+    //     testArray.add("!@?^");
         
-        testSed.writeOutput(writer, testArray);
-        byte[] actualResult = stream.toByteArray();
-        String expected = "this is what is getting outputed\n!@?^\n";
-        byte[] expectedResult = expected.getBytes();
+    //     testSed.writeOutput(writer, testArray);
+    //     byte[] actualResult = stream.toByteArray();
+    //     String expected = "this is what is getting outputed\n!@?^\n";
+    //     byte[] expectedResult = expected.getBytes();
 
-        assertArrayEquals(actualResult, expectedResult);
+    //     assertArrayEquals(actualResult, expectedResult);
 
 
+    // }
+
+    private String createTempFile() throws IOException{
+        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
+        temp1.deleteOnExit();
+        return temp1.getName();
     }
-
-
-
-
-
-    
-
-    
-
+    private void writeToFile(String filename) throws IOException{
+        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+        for(int i =0; i<3; i++){
+            bw.write("Line"+ i);
+            bw.write(System.getProperty("line.separator"));
+        }
+        bw.close();
+    }
 
 }

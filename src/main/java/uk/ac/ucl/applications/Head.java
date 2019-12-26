@@ -59,7 +59,8 @@ public class Head implements Application {
         }
     }
 
-    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) {
+    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory)
+            throws IOException {
         if (headFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + headArg);
@@ -72,8 +73,6 @@ public class Head implements Application {
                         writer.flush();
                     }
                 }
-            } catch (IOException e) {
-                throw new RuntimeException("head: cannot open " + headArg);
             }
         } else {
             throw new RuntimeException("head: " + headArg + " does not exist");

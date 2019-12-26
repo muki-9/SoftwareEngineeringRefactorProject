@@ -1,17 +1,20 @@
 package uk.ac.ucl.jsh;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import static org.assertj.core.api.Assertions.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,6 +81,39 @@ public class CatTest{
         assertThatThrownBy(()->{
             testCat.exec(testArray, null, out);
         }).isInstanceOf(RuntimeException.class).hasMessageContaining("cat: missing arguments");
+
+    }
+
+    @Test
+
+    public void testCatWithNoArgsButInputShouldOutput() throws IOException {
+
+        String originalString = "test line absolute\n2nd line!\nabsent\n"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
+        testCat.exec(testArray, inputStream, out);
+
+        Scanner scn = new Scanner(in);
+        String line  = scn.nextLine()+'\n';
+        line  += scn.nextLine()+'\n';
+        line  += scn.nextLine()+'\n';
+        assertThat(line).isEqualTo(originalString);
+        scn.close();
+    }
+
+    @Test
+
+    public void ifFileisDirShouldOutputToConsoleAndNoExceptionThrown() throws IOException {
+
+        testArray.add("src");
+        testCat.exec(testArray, null, out);
+
+        Scanner scn = new Scanner(in);
+        byte[] line  = scn.nextLine().getBytes();
+        byte[] expected = "cat: src is a directory".getBytes();
+
+        assertArrayEquals(line,expected);
+        scn.close();
 
     }
 

@@ -54,7 +54,7 @@ public class Cat implements Application {
                 //     continue;
                 // }
                 if(currFile.isDirectory()){
-                    writer.write("cat:" + currFile + " is a directory");
+                    writer.write("cat: " + currFile.getName() + " is a directory");
                     writer.write(System.getProperty("line.separator"));
                     writer.flush();
                     continue;
@@ -70,8 +70,6 @@ public class Cat implements Application {
                             writer.write(System.getProperty("line.separator"));
                             writer.flush();
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException("cat: cannot open " + arg);
                     }
                 } else {
                     throw new RuntimeException("cat: file does not exist");

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.assertj.core.api.Assertions.*;
 
 import uk.ac.ucl.applications.Cd;
 
@@ -50,5 +51,42 @@ public class CdTest{
         assertThat(currentDir).contains("src");
 
     }
+
+    @Test
+
+    public void cdShouldThrowExceptionifNoArgsOrMoreThan1Arg(){
+
+        assertThatThrownBy(() -> {
+            testCd.exec(testArray, null, out);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("cd: missing argument");
+
+        testArray.add("jsh");
+        testArray.add("jsh");
+
+        assertThatThrownBy(() -> {
+            testCd.exec(testArray, null, out);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("cd: too many arguments");
+
+    }
+
+    @Test
+
+    public void throwExceptionifArgisNotCorrectDir(){
+        testArray.add("index.txt");
+
+        assertThatThrownBy(() -> {
+            testCd.exec(testArray, null, out);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("cd: index.txt is not an existing directory");
+
+    }
+
+
+
 }
 

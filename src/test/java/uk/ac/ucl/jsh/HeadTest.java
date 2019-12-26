@@ -1,18 +1,21 @@
 package uk.ac.ucl.jsh;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.Scanner;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -66,6 +69,43 @@ public class HeadTest {
         stream.close();
         writer.close();
     }
+
+    @Test
+
+    public void headWithInputShouldOutput() throws IOException {
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
+
+        String originalString = "test line absolute\n2nd line!\nabsent"; //if only print new lie counts then 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
+        testHead= new Head(writer);
+
+        testArray.add("-n");
+        testArray.add("2");
+        testHead.exec(testArray, inputStream, null);
+
+        String actual = stream.toString();
+        assertThat(actual).isEqualTo("test line absolute\n2nd line!\n");
+
+        writer.close();
+        stream.close();
+
+    }
+
+    // @Test
+    // public void testHeadWithNoArgsButInputShouldNotThrowException(){
+
+    //     String originalString = "test line absolute\n2nd line!\nabsent"; 
+    //     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
+    //     assertThatCode(() ->{
+
+    //         testHead.exec(testArray, inputStream, out);
+    //     }).doesNotThrowAnyException();
+    // }
+
     @Test
 
     public void headWithExtrArgShouldThrowExc() throws IOException{
@@ -84,7 +124,7 @@ public class HeadTest {
 
     @Test
 
-    public void headWithNoArgShouldThrowException() throws IOException{
+    public void headWithNoArgShouldThrowExceptionNoInput() throws IOException{
         testHead  = new Head();
         assertThatThrownBy(() -> {
             testHead.exec(testArray, null, out);
@@ -93,6 +133,25 @@ public class HeadTest {
         .hasMessageContaining("head: missing arguments");
 
     }
+    //need to change code to allow this test
+    // @Test
+
+    // public void headWithInputShouldThrowExceptionWithMoreThan2Args(){
+
+    //     String originalString = "test line absolute\n2nd line!\nabsent"; 
+    //     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
+    //     testArray.add("-n");
+    //     testArray.add("15");
+    //     testArray.add("file.txt");
+
+    //     assertThatThrownBy(() -> {
+    //         testHead.exec(testArray, inputStream, out);
+    //     })
+    //     .isInstanceOf(RuntimeException.class)
+    //     .hasMessageContaining("head: wrong arguments file.txt");
+        
+    // }
 
     @Test
 
@@ -128,19 +187,19 @@ public class HeadTest {
 
     }
 
-    // @Test
-    // public void headShouldThrowExceptionIf3rdArgIsNotAFileInCurrDir(){
+    @Test
+    public void headShouldThrowExceptionIf3rdArgIsNotAFileInCurrDir(){
 
-    //     testArray.add("-n");
-    //     testArray.add("5");
-    //     testArray.add("input1.txt");
-    //     testHead  = new Head();
-    //     assertThatThrownBy(() -> {
-    //         testHead.exec(testArray, null, out);
-    //     })
-    //     .isInstanceOf(IOException.class)
-    //     .hasMessageContaining("head: cannot open input1.txt");
-    // }
+        testArray.add("-n");
+        testArray.add("5");
+        testArray.add("input1.txt");
+        testHead  = new Head();
+        assertThatThrownBy(() -> {
+            testHead.exec(testArray, null, out);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("head: input1.txt does not exist");
+    }
     
 
     /* right now the code does now throw error if 3rd arg isnt a file in the dir it would just print out the result*/
