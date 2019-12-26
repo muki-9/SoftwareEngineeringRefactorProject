@@ -3,7 +3,6 @@ package uk.ac.ucl.applications;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,8 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Globbing;
@@ -25,12 +22,12 @@ public class Cat implements Application {
     
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-        String currentDirectory = Jsh.getCurrentDirectory();
-        
         Globbing g = new Globbing();
         ArrayList<String> updatedArgs = g.globbing(args);
 
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+
+        // decides whether stdin must be used when no args provided
         if (args.isEmpty()) {
             if (input == null) {
                 throw new RuntimeException("cat: missing arguments");
@@ -40,40 +37,39 @@ public class Cat implements Application {
                 writer.write(line);
                 writer.flush();
             }
-        }else {
-            for (String arg : updatedArgs) {
-                Charset encoding = StandardCharsets.UTF_8;
-                File currFile = new File(currentDirectory + File.separator + arg);
+        }
+        else {
+            performCat(updatedArgs, writer);
+        }
+    }
 
-                // try{
-                //     if(currFile.isDirectory()){
-                //         throw new RuntimeException("cat:" + currFile + " is a directory");
-                //     }
-                // }catch(RuntimeException r){
+    private void performCat(ArrayList<String> args, BufferedWriter writer) throws IOException {
+        String currentDirectory = Jsh.getCurrentDirectory();
+        Charset encoding = StandardCharsets.UTF_8;
 
-                //     continue;
-                // }
-                if(currFile.isDirectory()){
-                    writer.write("cat: " + currFile.getName() + " is a directory");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                    continue;
-                }
-        
-                System.out.println(currFile.getName());
-                if (currFile.exists()) {
-                    Path filePath = Paths.get(currentDirectory + File.separator + arg);
-                    try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
-                        String line = null;
-                        while ((line = reader.readLine()) != null) {
-                            writer.write(String.valueOf(line));
-                            writer.write(System.getProperty("line.separator"));
-                            writer.flush();
-                        }
+        // each file in args is verified and consequently written to outputstream file by file in order to concatenate
+        for (String arg : args) {
+            File currFile = new File(currentDirectory + File.separator + arg);
+
+            if(currFile.isDirectory()){
+                writer.write("cat: " + currFile.getName() + " is a directory");
+                writer.write(System.getProperty("line.separator"));
+                writer.flush();
+                continue;
+            }
+    
+            if (currFile.exists()) {
+                Path filePath = Paths.get(currentDirectory + File.separator + arg);
+                try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        writer.write(String.valueOf(line));
+                        writer.write(System.getProperty("line.separator"));
+                        writer.flush();
                     }
-                } else {
-                    throw new RuntimeException("cat: file does not exist");
                 }
+            } else {
+                throw new RuntimeException("cat: file does not exist");
             }
         }
     }
