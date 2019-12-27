@@ -14,17 +14,20 @@ public class Echo implements Application {
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-        boolean atLeastOnePrinted = false;
+        boolean atLeastOnePrinted = !args.isEmpty();
+
+        // arguments printed with space between them, ensuring no space printed after last element
         int count = 0;
         for (String arg : args) {
             writer.write(arg);
-            if (count<args.size()-1) {
+            if (count < args.size() - 1) {
                 writer.write(" ");
             }
             writer.flush();
-            atLeastOnePrinted = true;
             count++;
         }
+
+        // newline only printed if there are arguments called on echo
         if (atLeastOnePrinted) {
             writer.write(System.getProperty("line.separator"));
             writer.flush();
