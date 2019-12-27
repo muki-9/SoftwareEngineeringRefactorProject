@@ -11,21 +11,26 @@ import uk.ac.ucl.jsh.Jsh;
 
 public class Cd implements Application {
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        String currentDirectory = Jsh.getCurrentDirectory();
-        
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException { 
         if (args.isEmpty()) {
-            //implement functionality to take you to the home directory if cd is inputted alone
-            throw new RuntimeException("cd: missing argument");
-        } else if (args.size() > 1) {
+            // takes user to home directory when 'cd' is called alone
+            Jsh.setCurrentDirectory(System.getProperty("user.home"));
+        }
+        else if (args.size() > 1) {
             throw new RuntimeException("cd: too many arguments");
         }
-        String dirString = args.get(0);
-        File dir = new File(currentDirectory, dirString);
-        if (!dir.exists() || !dir.isDirectory()) {
-            throw new RuntimeException("cd: " + dirString + " is not an existing directory");
+        else {
+            // takes user to directory specified in arg
+            String currentDirectory = Jsh.getCurrentDirectory();
+            String dirString = args.get(0);
+            File dir = new File(currentDirectory, dirString);
+            
+            if (!dir.exists() || !dir.isDirectory()) {
+                throw new RuntimeException("cd: " + dirString + " is not an existing directory");
+            }
+    
+            currentDirectory = dir.getCanonicalPath();
+            Jsh.setCurrentDirectory(currentDirectory);
         }
-        currentDirectory = dir.getCanonicalPath();
-        Jsh.setCurrentDirectory(currentDirectory);
     }
 }

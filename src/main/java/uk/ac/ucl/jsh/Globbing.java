@@ -1,7 +1,6 @@
 package uk.ac.ucl.jsh;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 
 public class Globbing {

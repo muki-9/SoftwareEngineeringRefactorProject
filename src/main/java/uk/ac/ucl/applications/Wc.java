@@ -13,8 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import javax.management.RuntimeErrorException;
-
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
