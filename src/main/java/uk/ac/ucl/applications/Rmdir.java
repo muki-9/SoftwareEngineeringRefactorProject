@@ -46,7 +46,7 @@ public class Rmdir implements Application {
         }
     }
 
-    public int validateArgs(ArrayList<String> args) {
+    private int validateArgs(ArrayList<String> args) {
         if (args.size()==0) {
             throw new RuntimeException("rmdir: no filename given");
         } else {
@@ -54,7 +54,7 @@ public class Rmdir implements Application {
         }
     }
 
-    public boolean isEmpty(Path path) throws IOException {
+    private boolean isEmpty(Path path) throws IOException {
         try(DirectoryStream<Path> dirStream = Files.newDirectoryStream(path)) {
             return !dirStream.iterator().hasNext();
         }

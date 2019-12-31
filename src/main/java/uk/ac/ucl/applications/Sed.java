@@ -46,7 +46,7 @@ public class Sed implements Application {
         }
     }
 
-    public String[] validateArgs(ArrayList<String> args, InputStream input) {
+    private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
         if (args.size() != 2) {
             if (args.size() == 1 && input != null) {
@@ -80,7 +80,7 @@ public class Sed implements Application {
         return s;
     }
 
-    public ArrayList<String> performSed(String[] s, String file, Boolean g) throws IOException {
+    private ArrayList<String> performSed(String[] s, String file, Boolean g) throws IOException {
         ArrayList<String> fileLines = getLines(file);
         ArrayList<String> lines = new ArrayList<>();
         if (g) {
@@ -92,7 +92,7 @@ public class Sed implements Application {
         return lines;
     }
 
-    public ArrayList<String> performSed(String[] s, InputStream input, Boolean g) throws IOException {
+    private ArrayList<String> performSed(String[] s, InputStream input, Boolean g) throws IOException {
         String line = new String(input.readAllBytes());
         String[] splitLine = line.split(System.getProperty("line.separator"));
         ArrayList<String> argLines = new ArrayList<>();
@@ -110,7 +110,7 @@ public class Sed implements Application {
         return lines;
     }
 
-    public void writeOutput(BufferedWriter out, ArrayList<String> lines) throws IOException {
+    private void writeOutput(BufferedWriter out, ArrayList<String> lines) throws IOException {
         for(String str : lines) {
             out.write(str);
             out.write(System.getProperty("line.separator"));
@@ -136,7 +136,7 @@ public class Sed implements Application {
         return lines;
     }
 
-    public ArrayList<String> sedForAll(String regex, String replacement, ArrayList<String> fileLines) {
+    private ArrayList<String> sedForAll(String regex, String replacement, ArrayList<String> fileLines) {
         ArrayList<String> changedlines = new ArrayList<>();
         Pattern sedPattern = Pattern.compile(regex);
 
@@ -150,7 +150,7 @@ public class Sed implements Application {
         return changedlines;
     }
 
-    public ArrayList<String> sedFirstInstance(String regex, String replacement, ArrayList<String> fileLines) {
+    private ArrayList<String> sedFirstInstance(String regex, String replacement, ArrayList<String> fileLines) {
         ArrayList<String> changedlines = new ArrayList<>();
         Pattern sedPattern = Pattern.compile(regex);
         for(String line: fileLines) {

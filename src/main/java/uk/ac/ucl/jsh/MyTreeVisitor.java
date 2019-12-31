@@ -24,6 +24,10 @@ import uk.ac.ucl.jsh.AntlrGrammarParser.DoublequotedContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.RedirectionContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.SinglequotedContext;
 
+/**
+ * most methods in this class return an instance of the Call() object, for this reason,
+ * the class 'Call' has many overloaded contructors that change the class' instance variables accordingly.
+ */
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
     @Override
@@ -144,10 +148,13 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         return new Seq(leftChild, rightChild);
     }
 
+    /**
+     * This is admittedly a very long method, but all the functionality is required to figure out 
+     * whether or not input/output redirection is required. In hindsight, it may be possible to optimise it,
+     * but we were under a time constraint so we saw best to get it working before implementing a complex, neat solution.
+     */
     @Override
     public CommandVisitable visitCall(AntlrGrammarParser.CallContext ctx) {
-        // System.out.println(ctx.argument().get(0).getText());
-        // System.out.println(ctx.argument().get(1).getText());
         List<RedirectionContext> redirections = ctx.redirection();
         if (redirections.size() == 0) {
             ArrayList<String> args = new ArrayList<>();
@@ -172,6 +179,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                 String filePath = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs();
                 File file = new File(filePath);
                 OutputStream os;
+
                 if (c.getSymbol().matches(">")) {
                     try {
                         if (file.createNewFile()){

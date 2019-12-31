@@ -60,7 +60,7 @@ public class Tail implements Application {
         }
     }
 
-    public void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory)
+    private void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory)
             throws IOException {
         if (tailFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
@@ -87,7 +87,7 @@ public class Tail implements Application {
         }
     }
 
-    public String getTailArgs(ArrayList<String> args) {
+    private String getTailArgs(ArrayList<String> args) {
         String tailArg;
         if (useIS) {
             if (args.size()==0) {
@@ -114,7 +114,7 @@ public class Tail implements Application {
         return tailArg;
     }
 
-    public void validateArguments(ArrayList<String> args, InputStream input) {
+    private void validateArguments(ArrayList<String> args, InputStream input) {
         if (args.isEmpty()) {
             if (input != null) {
                 useIS = true;

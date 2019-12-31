@@ -39,7 +39,7 @@ public class Mkdir implements Application {
         }
     }
 
-    public int validateArgs(ArrayList<String> args) {
+    private int validateArgs(ArrayList<String> args) {
         if (args.size()==0) {
             throw new RuntimeException("mkdir: no filename given");
         } else {

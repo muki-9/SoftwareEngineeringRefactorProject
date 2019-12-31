@@ -20,7 +20,7 @@ public class Ls implements Application {
         writeOutput(currDir, writer);
     }
 
-    public void writeOutput(File currDir, BufferedWriter writer) throws IOException {
+    private void writeOutput(File currDir, BufferedWriter writer) throws IOException {
         try {
             File[] listOfFiles = currDir.listFiles();
             boolean atLeastOnePrinted = false;
@@ -41,7 +41,7 @@ public class Ls implements Application {
         }
     }
 
-    public File validateArgs(ArrayList<String> args, String currentDirectory) {
+    private File validateArgs(ArrayList<String> args, String currentDirectory) {
         File currDir;
         if (args.isEmpty()) {
             currDir = new File(currentDirectory);

@@ -31,7 +31,7 @@ public class History implements Application {
         
     }
 
-    public void validateArgs(ArrayList<String> args) {
+    private void validateArgs(ArrayList<String> args) {
         if (args.size()!=0) {
             throw new RuntimeException("history: wrong number of arguments");
         }
