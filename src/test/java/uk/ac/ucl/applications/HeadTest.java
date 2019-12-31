@@ -15,7 +15,6 @@ import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

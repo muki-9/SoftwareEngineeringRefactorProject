@@ -1,11 +1,7 @@
 package uk.ac.ucl.jsh;
-
 import org.junit.Test;
 import uk.ac.ucl.jsh.TestToken;
-
-
 import java.util.*;
-
 import static org.assertj.core.api.Assertions.*;
 
 public class ParserTest extends ParserT{

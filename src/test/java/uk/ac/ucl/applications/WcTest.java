@@ -1,24 +1,17 @@
 package uk.ac.ucl.applications;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 

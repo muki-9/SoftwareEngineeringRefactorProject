@@ -3,23 +3,13 @@ package uk.ac.ucl.applications;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ucl.applications.Ls;
-
 import static org.assertj.core.api.Assertions.*;
-
-
 import java.io.File;
-
 import java.io.IOException;
-
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-
 import java.util.ArrayList;
-
 import java.util.Scanner;
-    //when ls inputted with no arguments then should output contents of current directory. 
-    //if ls inputted with argument, should output contents of that directory. 
-    //find out what the files in current directory is and files in another directory and store to compare.
 
 public class LsTest{
 

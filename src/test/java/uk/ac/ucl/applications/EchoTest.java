@@ -1,12 +1,10 @@
 package uk.ac.ucl.applications;
 import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import org.junit.Before;
 import org.junit.Test;
 

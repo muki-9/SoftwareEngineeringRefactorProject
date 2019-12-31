@@ -1,26 +1,14 @@
 package uk.ac.ucl.applications;
-
 import org.junit.After;
 import org.junit.Before;
-
 import org.junit.Test;
-
-
 import uk.ac.ucl.applications.Find;
-
-
 import static org.assertj.core.api.Assertions.*;
-
-
 import java.io.File;
-
 import java.io.IOException;
-
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-
 import java.util.ArrayList;
-
 import java.util.Scanner;
 
 

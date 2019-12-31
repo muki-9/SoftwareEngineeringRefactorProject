@@ -2,17 +2,13 @@ package uk.ac.ucl.applications;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import uk.ac.ucl.applications.Tail;
-
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
-
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;

@@ -2,9 +2,7 @@ package uk.ac.ucl.applications;
 
 
 import uk.ac.ucl.jsh.Jsh;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;

@@ -1,5 +1,4 @@
 grammar AntlrGrammar;
-
 /*
 Parser Rules
 */

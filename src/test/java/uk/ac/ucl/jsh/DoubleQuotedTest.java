@@ -1,15 +1,8 @@
 package uk.ac.ucl.jsh;
-
 import java.util.ArrayList;
-
-
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-
 import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.*;
-
-
 import uk.ac.ucl.jsh.AntlrGrammarParser.DoublequotedContext;
 
 public class DoubleQuotedTest extends ParserT{
