@@ -1,5 +1,4 @@
-package uk.ac.ucl.jsh;
-
+package uk.ac.ucl.applications;
 
 import org.junit.After;
 import org.junit.Before;

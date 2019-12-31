@@ -1,4 +1,4 @@
-package uk.ac.ucl.jsh;
+package uk.ac.ucl.applications;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertArrayEquals;
@@ -27,6 +27,8 @@ import uk.ac.ucl.applications.Grep;
 
 
 public class GrepTest{
+
+    private boolean test =false;
 
     public GrepTest(){
     }

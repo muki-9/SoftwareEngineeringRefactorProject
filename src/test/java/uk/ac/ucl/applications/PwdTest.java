@@ -1,4 +1,4 @@
-package uk.ac.ucl.jsh;
+package uk.ac.ucl.applications;
 
 import org.junit.Before;
 import org.junit.Test;

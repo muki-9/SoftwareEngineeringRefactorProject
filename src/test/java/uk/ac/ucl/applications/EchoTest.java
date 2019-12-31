@@ -1,5 +1,4 @@
-package uk.ac.ucl.jsh;
-
+package uk.ac.ucl.applications;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;

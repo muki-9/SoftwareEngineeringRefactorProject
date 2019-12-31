@@ -1,4 +1,7 @@
-package uk.ac.ucl.jsh;
+package uk.ac.ucl.applications;
+
+
+import uk.ac.ucl.jsh.Jsh;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
