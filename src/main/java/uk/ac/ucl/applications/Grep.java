@@ -60,7 +60,7 @@ public class Grep implements Application {
     }
 
     /* Method returns an array containing the paths of all the files provided in command line. */
-    public Path[] getPathArray(ArrayList<String> args) {
+    private Path[] getPathArray(ArrayList<String> args) {
         Path currentDir = Paths.get(Jsh.getCurrentDirectory());
         int numOfFiles = args.size() - 1;
         Path[] filePathArray = new Path[numOfFiles];
@@ -79,7 +79,7 @@ public class Grep implements Application {
     }
 
     /* Method writes the result of grep to the outputstream. */
-    public void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args) throws IOException {
+    private void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args) throws IOException {
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
             try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {

@@ -20,9 +20,10 @@ import uk.ac.ucl.jsh.Jsh;
 public class Head implements Application {
 
     private int headLines = 10;
+    private boolean useIS = false;
+
     private BufferedWriter writer;
     boolean default_constr = true;
-    private boolean useIS = false;
 
     public Head(){
 
@@ -44,8 +45,8 @@ public class Head implements Application {
         if (useIS) {
             String line = new String(input.readAllBytes());
             String[] lines = line.split(System.getProperty("line.separator"));
-            for(int i=0;i<headLines;i++) {
-                if (i>=lines.length) {
+            for(int i = 0; i < headLines; i++) {
+                if (i >= lines.length) {
                     break;
                 }
                 writer.write(lines[i]);
@@ -59,8 +60,8 @@ public class Head implements Application {
         }
     }
 
-    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory)
-            throws IOException {
+    /* Method performs head function after command line arguments have been mostly verified. */
+    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) throws IOException {
         if (headFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + headArg);
@@ -79,13 +80,14 @@ public class Head implements Application {
         }
     }
 
+    /* Method returns name of the file provided in command line. */
     private String getHeadArgs(ArrayList<String> args) {
         String headArg;
         if (useIS) {
-            if (args.size()==0) {
+            if (args.size() == 0) {
                 return null;
             }
-            else if (args.size()==2) {
+            else if (args.size() == 2) {
                 headLines = Integer.parseInt(args.get(1));
                 return null;
             }
@@ -100,12 +102,14 @@ public class Head implements Application {
                 throw new RuntimeException("head: wrong argument " + args.get(1));
             }
             headArg = args.get(2);
-        } else {
+        }
+        else {
             headArg = args.get(0);
         }
         return headArg;
     }
 
+    /* Method takes in command line arguments and adjusts class state or throws exception depending on arguments. */
     private void validateArguments(ArrayList<String> args, InputStream input) {
         if (args.isEmpty()) {
             if (input == null) {
@@ -116,7 +120,7 @@ public class Head implements Application {
                 return;
             }
         }
-        if (args.size()==2 && input != null) {
+        if (args.size() == 2 && input != null) {
             useIS = true;
             return;
         }

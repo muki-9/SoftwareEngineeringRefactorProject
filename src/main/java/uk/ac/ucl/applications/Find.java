@@ -52,6 +52,7 @@ public class Find implements Application{
         }
     }
 
+    /* Method performs the find command given the directory to look in and the pattern to match */
     private void filterPaths(String currDir, String pattern, BufferedWriter writer){
         // adjusts currDir path to allow for relative path to be found later
         String appendedCurrDir = currDir + '/';

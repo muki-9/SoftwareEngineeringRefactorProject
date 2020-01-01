@@ -43,6 +43,7 @@ public class Cat implements Application {
         }
     }
 
+    /* Method performs Cat command on the files provided in array that is passed through */
     private void performCat(ArrayList<String> args, BufferedWriter writer) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         Charset encoding = StandardCharsets.UTF_8;
