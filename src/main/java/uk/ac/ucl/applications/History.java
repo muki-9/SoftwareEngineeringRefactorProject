@@ -13,6 +13,11 @@ import uk.ac.ucl.jsh.Jsh;
 
 public class History implements Application {
 
+    /*
+
+        Method loops through the list of commands retrieved from the Jsh class using a for loop and prints out each command.
+
+    */
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         validateArgs(args);
@@ -32,7 +37,11 @@ public class History implements Application {
         }
     }
 
-    /* Method checks that some argument is passed to the application. */
+    /*
+    
+        Method checks that some argument is passed to the application.
+    
+    */
     private void validateArgs(ArrayList<String> args) {
         if (args.size() != 0) {
             throw new RuntimeException("history: wrong number of arguments");

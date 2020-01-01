@@ -53,13 +53,17 @@ public class Find implements Application{
         }
     }
 
-    /* Method performs the find command given the directory to look in and the pattern to match */
+    /*
+    
+        A List of filenames is built by adding the names of files whose name matches the specified pattern.
+        The relative path of these files is then created and written to the OutputStream.
+    
+    */
     private void filterPaths(String currDir, String pattern, BufferedWriter writer){
         // adjusts currDir path to allow for relative path to be found later
         String appendedCurrDir = currDir + '/';
         Path currDirPath = Paths.get(appendedCurrDir);
 
-        // scans through directory and builds array of files matching the pattern
         try (Stream<Path> walk = Files.walk(Paths.get(currDir))) {
 
             List<Path> fileNames  = walk.filter(f -> f.getFileName().toString().matches(pattern))

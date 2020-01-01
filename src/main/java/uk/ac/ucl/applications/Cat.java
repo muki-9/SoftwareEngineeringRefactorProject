@@ -43,12 +43,17 @@ public class Cat implements Application {
         }
     }
 
-    /* Method performs Cat command on the files provided in array that is passed through */
+    /*
+
+        The command line arguments are passed into the method and a for-each loop is used to loop through the contents of the array.
+        A file is created using the filename passed through the command line, and if the file exists, it writes the contents to the OutputStream.
+        It does this for each file, resulting in a concatenation of each file.
+       
+    */
     private void performCat(ArrayList<String> args, BufferedWriter writer) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         Charset encoding = StandardCharsets.UTF_8;
 
-        // each file in args is verified and consequently written to outputstream file by file in order to concatenate
         for (String arg : args) {
             File currFile = new File(currentDirectory + File.separator + arg);
 

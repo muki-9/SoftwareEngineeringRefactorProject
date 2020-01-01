@@ -60,7 +60,11 @@ public class Head implements Application {
         }
     }
 
-    /* Method performs head function after command line arguments have been mostly verified. */
+    /*
+    
+        Method checks if the file exists, and if it does, using a for loop, it prints out the specified number of lines from the top of the file.
+     
+    */
     private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) throws IOException {
         if (headFile.exists()) {
             Charset encoding = StandardCharsets.UTF_8;
@@ -80,7 +84,11 @@ public class Head implements Application {
         }
     }
 
-    /* Method returns name of the file provided in command line. */
+    /*
+    
+        Method returns name of the file provided in command line by selecting the relevant argument using if statements.
+    
+    */
     private String getHeadArgs(ArrayList<String> args) {
         String headArg;
         if (useIS) {
@@ -109,7 +117,11 @@ public class Head implements Application {
         return headArg;
     }
 
-    /* Method takes in command line arguments and adjusts class state or throws exception depending on arguments. */
+    /*
+        
+        Method takes in command line arguments and adjusts class state or throws exception depending on arguments using if statements.
+
+    */
     private void validateArguments(ArrayList<String> args, InputStream input) {
         if (args.isEmpty()) {
             if (input == null) {
