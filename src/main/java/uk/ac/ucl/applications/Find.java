@@ -1,6 +1,7 @@
 package uk.ac.ucl.applications;
 
 import java.io.BufferedWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public class Find implements Application{
             String pattern = PATTERN; 
             String updatedPatt = pattern.replace("*", "(.*)");
             String currDir = null;
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
 
             // sets currDir depending on whether a path is provided
             if(args.size() == 2){

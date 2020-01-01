@@ -24,7 +24,7 @@ public class Sed implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         String currentDirectory = Jsh.getCurrentDirectory();
         String file;
         String[] s = validateArgs(args, input);

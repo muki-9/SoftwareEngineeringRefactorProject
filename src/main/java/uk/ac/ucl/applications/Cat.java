@@ -25,7 +25,7 @@ public class Cat implements Application {
         Globbing g = new Globbing();
         ArrayList<String> updatedArgs = g.globbing(args);
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
 
         // decides whether stdin must be used when no args provided
         if (args.isEmpty()) {

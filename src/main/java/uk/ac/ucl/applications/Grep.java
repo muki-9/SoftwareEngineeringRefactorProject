@@ -23,7 +23,7 @@ public class Grep implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         Globbing g = new Globbing();
         ArrayList<String> updatedArgs = g.globbing(args);
         int updatedArgsSize = updatedArgs.size();
@@ -60,7 +60,7 @@ public class Grep implements Application {
     }
 
     /* Method returns an array containing the paths of all the files provided in command line. */
-    private Path[] getPathArray(ArrayList<String> args) {
+    public Path[] getPathArray(ArrayList<String> args) {
         Path currentDir = Paths.get(Jsh.getCurrentDirectory());
         int numOfFiles = args.size() - 1;
         Path[] filePathArray = new Path[numOfFiles];
