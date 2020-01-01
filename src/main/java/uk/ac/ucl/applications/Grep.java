@@ -26,9 +26,10 @@ public class Grep implements Application {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         Globbing g = new Globbing();
         ArrayList<String> updatedArgs = g.globbing(args);
+        int updatedArgsSize = updatedArgs.size();
 
-        if (updatedArgs.size() < 2) {
-            if (updatedArgs.size() == 1) {
+        if (updatedArgsSize < 2) {
+            if (updatedArgsSize == 1) {
                 if (input == null) {
                     throw new RuntimeException("grep: wrong number of arguments");
                 }
@@ -37,7 +38,7 @@ public class Grep implements Application {
                     String s = new String(input.readAllBytes());
                     String[] lines = s.split(System.getProperty("line.separator"));
                     
-                    for(int i=0; i<lines.length; i++) {
+                    for(int i = 0; i < lines.length; i++) {
                         Matcher matcher = grepPattern.matcher(lines[i]);
                         if (matcher.find()) {
                             writer.write(lines[i]);
@@ -54,30 +55,31 @@ public class Grep implements Application {
         }
         Pattern grepPattern = Pattern.compile(updatedArgs.get(0));
         Path[] filePathArray = getPathArray(updatedArgs);
+
         writeOutput(writer, grepPattern, filePathArray, updatedArgs);
     }
 
+    /* Method returns an array containing the paths of all the files provided in command line. */
     public Path[] getPathArray(ArrayList<String> args) {
-        String currentDirectory = Jsh.getCurrentDirectory();
-        Path currentDir = Paths.get(currentDirectory);
+        Path currentDir = Paths.get(Jsh.getCurrentDirectory());
         int numOfFiles = args.size() - 1;
         Path[] filePathArray = new Path[numOfFiles];
         Path filePath;
 
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + 1));
-            if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath)
-                    || !Files.isReadable(filePath)) {
+            if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
                 throw new RuntimeException("grep: wrong file argument");
-            } else {
+            }
+            else {
                 filePathArray[i] = filePath;
             }
         }
         return filePathArray;
     }
 
-    public void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args)
-            throws IOException {
+    /* Method writes the result of grep to the outputstream. */
+    public void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args) throws IOException {
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
             try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {

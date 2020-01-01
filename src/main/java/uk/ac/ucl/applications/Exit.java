@@ -15,9 +15,10 @@ public class Exit implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
         
-        if (args.size()!=0) {
+        if (args.size() != 0) {
             throw new RuntimeException("exit: wrong number of arguments");
-        } else {
+        }
+        else {
             writer.write("logging out");
             writer.write(System.getProperty("line.separator"));
             writer.flush();
