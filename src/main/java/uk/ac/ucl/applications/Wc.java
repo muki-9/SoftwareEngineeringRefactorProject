@@ -91,7 +91,6 @@ public class Wc implements Application {
             case "-m":
                 // uses different methods depending on whether IS is used or not
                 if(useInputStream){
-                    ArrayList<Long> tempNewLineArray = getNewlineArrayIS(fileLines); // ensures global Newline Count is accurate
                     wcWrite(getCharArrayIS(fileLines), pathArray, writer);
                 }
                 else{

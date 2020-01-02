@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.management.RuntimeErrorException;
-
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
