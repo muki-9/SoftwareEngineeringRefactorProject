@@ -25,7 +25,7 @@ public class Cat implements Application {
         Globbing g = new Globbing();
         ArrayList<String> updatedArgs = g.globbing(args);
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
 
         // decides whether stdin must be used when no args provided
         if (args.isEmpty()) {
@@ -43,11 +43,17 @@ public class Cat implements Application {
         }
     }
 
+    /*
+
+        Command line arguments passed into method and a for-each loop loops through contents of the array.
+        File is created using the filename passed through command line - if file exists, contents written to the OutputStream.
+        It does this for each file, resulting in a concatenation of each file.
+       
+    */
     private void performCat(ArrayList<String> args, BufferedWriter writer) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         Charset encoding = StandardCharsets.UTF_8;
 
-        // each file in args is verified and consequently written to outputstream file by file in order to concatenate
         for (String arg : args) {
             File currFile = new File(currentDirectory + File.separator + arg);
 

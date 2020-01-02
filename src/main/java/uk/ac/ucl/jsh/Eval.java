@@ -13,10 +13,9 @@ public class Eval implements CommandVisitor {
 
     /*  lists of input and output streams- required primarily for pipe functionality
         so that when multiple pipes are called, the input streams are simply appended
-        to this list and then popped off the beginning when executed */
+        to this list and then popped off the beginning when executed.  */
     private ArrayList<OutputStream> osList = new ArrayList<>();
     private ArrayList<InputStream> isList = new ArrayList<>();
-    
 
     public Eval(OutputStream writer) {
         this.osList.add(writer);

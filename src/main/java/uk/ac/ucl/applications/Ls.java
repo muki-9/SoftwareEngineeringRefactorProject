@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
@@ -15,11 +16,17 @@ public class Ls implements Application {
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         File currDir = validateArgs(args, currentDirectory);
         writeOutput(currDir, writer);
     }
 
+
+    /*
+
+        Method gets array of files in specified directory and writes names of files not beginning with '.' to OutputStream.
+
+    */
     private void writeOutput(File currDir, BufferedWriter writer) throws IOException {
         try {
             File[] listOfFiles = currDir.listFiles();
@@ -41,13 +48,20 @@ public class Ls implements Application {
         }
     }
 
+    /*
+
+        Method returns current directory path if no argument specified or returns specified path using if statements.
+
+    */
     private File validateArgs(ArrayList<String> args, String currentDirectory) {
         File currDir;
         if (args.isEmpty()) {
             currDir = new File(currentDirectory);
-        } else if (args.size() == 1) {
+        }
+        else if (args.size() == 1) {
             currDir = new File(args.get(0));
-        } else {
+        }
+        else {
             throw new RuntimeException("ls: too many arguments");
         }
         return currDir;

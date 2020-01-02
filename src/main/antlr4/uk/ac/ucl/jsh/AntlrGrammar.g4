@@ -1,5 +1,4 @@
 grammar AntlrGrammar;
-
 /*
 Parser Rules
 */
@@ -17,26 +16,26 @@ command
     ;
 
 pipe
-    : call '|' call 
-    | pipe '|' call
+    : call PIPEOP call 
+    | pipe PIPEOP call
     ;
 
 seq
-    : pipe ';' command seq2
-    | call ';' command seq2
+    : pipe SEMICOL command 
+    | call SEMICOL command
     ;
 
-seq2
-    : ';' command seq2
-    |
-    ; /* epsilon */ 
+// seq2
+//     : SEMICOL command seq2
+//     |
+//     ; /* epsilon */ 
 
 singlequoted
     : SQ
     ;
 
 doublequoted
-    : '"' (backquoted | ~('\n'|'"'|'`'))* '"'
+    : DQ (backquoted | ~('\n'|'"'|'`'))* DQ
     ;
 
 call
@@ -64,6 +63,17 @@ redirection
 Lexer Rules
 */
 
+DQ
+    : '"'
+    ;
+
+PIPEOP
+    : '|'
+    ;
+SEMICOL
+    : ';'
+    ;
+
 UQ
     : ~( ' ' | '\t' | '"' | '\'' | '`' | '\n' | ';' | '|' | '<' | '>' )+
     ;
@@ -77,7 +87,7 @@ GT
     ;
 
 WS
-    : (' ' | '\t' )+
+    : (' ' | '\t' )+  
     ; //whitespace
 
 

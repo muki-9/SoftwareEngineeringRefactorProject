@@ -24,7 +24,7 @@ public class Wc implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         validateArgs(args, input); // ensures that stdin is being used if required instead of command line arguments
 
         if (useInputStream) {

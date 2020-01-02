@@ -14,6 +14,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.management.RuntimeErrorException;
+
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Jsh;
 
@@ -24,7 +27,7 @@ public class Sed implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         String currentDirectory = Jsh.getCurrentDirectory();
         String file;
         String[] s = validateArgs(args, input);
@@ -69,8 +72,11 @@ public class Sed implements Application {
                 if (args.get(0).charAt(args.get(0).lastIndexOf(delimiter)+1) == 'g') {
                     g = true;
                 }
-                else {
+                else if (args.get(0).lastIndexOf(delimiter) == args.get(0).length()-1) {
                     g = false;
+                }
+                else {
+                    throw new RuntimeException("sed: regex must end in either a delimiter or 'g'");
                 }
             }
         }

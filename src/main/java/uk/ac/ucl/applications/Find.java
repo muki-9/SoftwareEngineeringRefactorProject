@@ -1,6 +1,7 @@
 package uk.ac.ucl.applications;
 
 import java.io.BufferedWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public class Find implements Application{
             String pattern = PATTERN; 
             String updatedPatt = pattern.replace("*", "(.*)");
             String currDir = null;
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
 
             // sets currDir depending on whether a path is provided
             if(args.size() == 2){
@@ -52,12 +53,17 @@ public class Find implements Application{
         }
     }
 
+    /*
+    
+        List of filenames is built by adding names of files whose name matches the specified pattern.
+        Relative path of these files is created and written to the OutputStream.
+    
+    */
     private void filterPaths(String currDir, String pattern, BufferedWriter writer){
         // adjusts currDir path to allow for relative path to be found later
         String appendedCurrDir = currDir + '/';
         Path currDirPath = Paths.get(appendedCurrDir);
 
-        // scans through directory and builds array of files matching the pattern
         try (Stream<Path> walk = Files.walk(Paths.get(currDir))) {
 
             List<Path> fileNames  = walk.filter(f -> f.getFileName().toString().matches(pattern))

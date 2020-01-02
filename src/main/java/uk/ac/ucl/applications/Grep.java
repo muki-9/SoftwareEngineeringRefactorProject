@@ -23,7 +23,7 @@ public class Grep implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         Globbing g = new Globbing();
         ArrayList<String> updatedArgs = g.globbing(args);
         int updatedArgsSize = updatedArgs.size();
@@ -56,10 +56,15 @@ public class Grep implements Application {
         Pattern grepPattern = Pattern.compile(updatedArgs.get(0));
         Path[] filePathArray = getPathArray(updatedArgs);
 
-        writeOutput(writer, grepPattern, filePathArray, updatedArgs);
+        writeOutput(writer, grepPattern, filePathArray);
     }
 
-    /* Method returns an array containing the paths of all the files provided in command line. */
+    /* 
+    
+        Method uses a for loop to check if each filename provided in the args array exists.
+        If file exists, it is added to a new array, which is returned by the method.
+    
+    */
     public Path[] getPathArray(ArrayList<String> args) {
         Path currentDir = Paths.get(Jsh.getCurrentDirectory());
         int numOfFiles = args.size() - 1;
@@ -78,8 +83,14 @@ public class Grep implements Application {
         return filePathArray;
     }
 
-    /* Method writes the result of grep to the outputstream. */
-    private void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray, ArrayList<String> args) throws IOException {
+    /* 
+    
+        Method takes in the pattern and array of filepaths.
+        For loop goes through files, and checks if lines within the files match the pattern.
+        Lines which match pattern are written to OutputStream.
+    
+    */
+    private void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray) throws IOException {
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
             try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {

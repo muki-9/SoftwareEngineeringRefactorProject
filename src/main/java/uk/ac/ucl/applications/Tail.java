@@ -36,7 +36,7 @@ public class Tail implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         if(default_constr){
-             writer = new BufferedWriter(new OutputStreamWriter(output));
+             writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         }
         validateArguments(args, input);
         String tailArg = getTailArgs(args);
