@@ -62,7 +62,7 @@ public class Grep implements Application {
     /* 
     
         Method uses a for loop to check if each filename provided in the args array exists.
-        If the file exists, it is added to a new array, which is returned by the method.
+        If file exists, it is added to a new array, which is returned by the method.
     
     */
     public Path[] getPathArray(ArrayList<String> args) {
@@ -86,8 +86,8 @@ public class Grep implements Application {
     /* 
     
         Method takes in the pattern and array of filepaths.
-        A for loop goes through each file using the filepath array, and checks to see if the lines within the files match the pattern.
-        Any lines which match the pattern are printed onto the OutputStream.
+        For loop goes through files, and checks if lines within the files match the pattern.
+        Lines which match pattern are written to OutputStream.
     
     */
     private void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray) throws IOException {

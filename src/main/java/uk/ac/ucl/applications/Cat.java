@@ -45,8 +45,8 @@ public class Cat implements Application {
 
     /*
 
-        The command line arguments are passed into the method and a for-each loop is used to loop through the contents of the array.
-        A file is created using the filename passed through the command line, and if the file exists, it writes the contents to the OutputStream.
+        Command line arguments passed into method and a for-each loop loops through contents of the array.
+        File is created using the filename passed through command line - if file exists, contents written to the OutputStream.
         It does this for each file, resulting in a concatenation of each file.
        
     */

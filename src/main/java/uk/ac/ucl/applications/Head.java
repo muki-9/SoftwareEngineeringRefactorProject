@@ -62,7 +62,7 @@ public class Head implements Application {
 
     /*
     
-        Method checks if the file exists, and if it does, using a for loop, it prints out the specified number of lines from the top of the file.
+        Method checks if file exists - if it does, for loop prints out specified number of lines from top of file.
      
     */
     private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) throws IOException {
@@ -86,7 +86,7 @@ public class Head implements Application {
 
     /*
     
-        Method returns name of the file provided in command line by selecting the relevant argument using if statements.
+        Method returns name of file provided in command line by selecting relevant argument using if statements.
     
     */
     private String getHeadArgs(ArrayList<String> args) {

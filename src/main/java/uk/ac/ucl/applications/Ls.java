@@ -21,7 +21,13 @@ public class Ls implements Application {
         writeOutput(currDir, writer);
     }
 
-    public void writeOutput(File currDir, BufferedWriter writer) throws IOException {
+
+    /*
+
+        Method gets array of files in specified directory and writes names of files not beginning with '.' to OutputStream.
+
+    */
+    private void writeOutput(File currDir, BufferedWriter writer) throws IOException {
         try {
             File[] listOfFiles = currDir.listFiles();
             boolean atLeastOnePrinted = false;
@@ -42,13 +48,20 @@ public class Ls implements Application {
         }
     }
 
-    public File validateArgs(ArrayList<String> args, String currentDirectory) {
+    /*
+
+        Method returns current directory path if no argument specified or returns specified path using if statements.
+
+    */
+    private File validateArgs(ArrayList<String> args, String currentDirectory) {
         File currDir;
         if (args.isEmpty()) {
             currDir = new File(currentDirectory);
-        } else if (args.size() == 1) {
+        }
+        else if (args.size() == 1) {
             currDir = new File(args.get(0));
-        } else {
+        }
+        else {
             throw new RuntimeException("ls: too many arguments");
         }
         return currDir;

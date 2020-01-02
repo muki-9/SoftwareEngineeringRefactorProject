@@ -55,8 +55,8 @@ public class Find implements Application{
 
     /*
     
-        A List of filenames is built by adding the names of files whose name matches the specified pattern.
-        The relative path of these files is then created and written to the OutputStream.
+        List of filenames is built by adding names of files whose name matches the specified pattern.
+        Relative path of these files is created and written to the OutputStream.
     
     */
     private void filterPaths(String currDir, String pattern, BufferedWriter writer){

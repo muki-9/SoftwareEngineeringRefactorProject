@@ -15,7 +15,7 @@ public class History implements Application {
 
     /*
 
-        Method loops through the list of commands retrieved from the Jsh class using a for loop and prints out each command.
+        Method loops through list of commands retrieved from the Jsh class using a for loop and prints out each command.
 
     */
     @Override
