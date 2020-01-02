@@ -20,13 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import uk.ac.ucl.jsh.AntlrGrammarParser.CallContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.DoublequotedContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.RedirectionContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.SinglequotedContext;
 
 /**
- * most methods in this class return an instance of the Call() object, for this reason,
- * the class 'Call' has many overloaded contructors that change the class' instance variables accordingly.
+ * most methods in this class return an instance of the Call() object, for this
+ * reason, the class 'Call' has many overloaded contructors that change the
+ * class' instance variables accordingly.
  */
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
@@ -103,8 +106,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         ArrayList<String> bqArgs = new ArrayList<>();
         boolean arg = false;
         boolean integrate = false;
-        
-        if (ctx.unquoted().size()>0 && ctx.backquoted().size()>0) {
+
+        if (ctx.unquoted().size() > 0 && ctx.backquoted().size() > 0) {
             integrate = true;
         }
 
@@ -117,8 +120,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                 if (!integrate) {
                     bqArgs = c.getBqArray();
                     arg = true;
-                }
-                else {
+                } else {
                     for (String vals : c.getBqArray()) {
                         string = string.concat(vals);
                     }
@@ -149,26 +151,17 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     }
 
     /**
-     * This is admittedly a very long method, but all the functionality is required to figure out 
-     * whether or not input/output redirection is required. In hindsight, it may be possible to optimise it,
-     * but we were under a time constraint so we saw best to get it working before implementing a complex, neat solution.
+     * This is admittedly a very long method, but all the functionality is required
+     * to figure out whether or not input/output redirection is required. In
+     * hindsight, it may be possible to optimise it, but we were under a time
+     * constraint so we saw best to get it working before implementing a complex,
+     * neat solution.
      */
     @Override
     public CommandVisitable visitCall(AntlrGrammarParser.CallContext ctx) {
         List<RedirectionContext> redirections = ctx.redirection();
         if (redirections.size() == 0) {
-            ArrayList<String> args = new ArrayList<>();
-            for (int i = 0; i < ctx.argument().size(); i++) {
-                Call c = (Call) ctx.argument().get(i).accept(this);
-                if (c.getCurrArgs() != null) {
-                    args.add(c.getCurrArgs());
-                }
-                if (c.getSplit()) {
-                    for (String s : c.getBqArray()) {
-                        args.add(s);
-                    }
-                }
-            }
+            ArrayList<String> args = getCallArgs(ctx);
             String app = args.get(0);
             args.remove(0);
             return new Call(app, args);
@@ -182,35 +175,29 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
                 if (c.getSymbol().matches(">")) {
                     try {
-                        if (file.createNewFile()){
+                        if (file.createNewFile()) {
                             System.out.println("redirection: file created successfully");
                         }
-                        } catch (IOException e) {
-                            throw new RuntimeException("redirection: file could not be created");
+                    } catch (IOException e) {
+                        throw new RuntimeException("redirection: file could not be created");
                     }
                     try {
                         os = new FileOutputStream(file);
+                        // os.close();
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException("redirection: file not found exception");
+                        throw new RuntimeException("redirection: error writing to file");
+                    // } catch (IOException e) {
+                    //     throw new RuntimeException("redirection: error closing output stream");
                     }
-
-                    ArrayList<String> args = new ArrayList<>();
-                    for(int n = 0; n<ctx.argument().size();n++) {
-                        Call call = (Call) ctx.argument().get(n).accept(this);
-                        if (call.getCurrArgs() != null) {
-                            args.add(call.getCurrArgs());
-                        }
-                        if (call.getSplit()) {
-                            for(String s:call.getBqArray()) {
-                                args.add(s);
-                            }
-                        }
+                    ArrayList<String> args = getCallArgs(ctx);
+                    String app = null;
+                    if (args.size()>0) {
+                        app = args.get(0);
+                        args.remove(0);
                     }
-                    String app = args.get(0);
-                    args.remove(0);
                     return new Call(app, args, os);
-                }
-                else if (c.getSymbol().matches("<")) {
+
+                } else if (c.getSymbol().matches("<")) {
                     if (!file.exists()) {
                         throw new RuntimeException("redirection: file could not be found");
                     }
@@ -233,27 +220,37 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                         throw new RuntimeException("redirection: error reading input from file");
                     }
 
-                    ArrayList<String> args = new ArrayList<>();
-                    for(int n = 0; n<ctx.argument().size();n++) {
-                        Call call = (Call) ctx.argument().get(n).accept(this);
-                        if (call.getCurrArgs() != null) {
-                            args.add(call.getCurrArgs());
-                        }
-                        if (call.getSplit()) {
-                            for(String s:call.getBqArray()) {
-                                args.add(s);
-                            }
-                        }
+                    ArrayList<String> args = getCallArgs(ctx);
+                    String app = null;
+                    if (args.size()>0) {
+                        app = args.get(0);
+                        args.remove(0);
                     }
-                    String app = args.get(0);
-                    args.remove(0);
                     return new Call(app, args, is);
-                }
-                else {
+                } else {
                     throw new RuntimeException("antlr: parsing error- invalid character: " + c.getSymbol());
                 }
             }
         }
         return null;
+    }
+
+    // auxilliary function for call method
+    //performs visits all the nodes required to get the application and correct arguments
+    //separated from Call() function for reusability.
+    private ArrayList<String> getCallArgs(CallContext ctx) {
+        ArrayList<String> args = new ArrayList<>();
+        for(int n = 0; n<ctx.argument().size();n++) {
+            Call call = (Call) ctx.argument().get(n).accept(this);
+            if (call.getCurrArgs() != null) {
+                args.add(call.getCurrArgs());
+            }
+            if (call.getSplit()) {
+                for(String s:call.getBqArray()) {
+                    args.add(s);
+                }
+            }
+        }
+        return args;
     }
 }

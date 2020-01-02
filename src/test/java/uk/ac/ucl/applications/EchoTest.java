@@ -39,14 +39,15 @@ public class EchoTest {
         scn.close();
     }
 
-    @Test
-    public void testEchoQuotes() throws Exception {
-        testArray.add("\"foo\"");
-        testEcho.exec(testArray, null, out);
-        Scanner scn = new Scanner(in);
-        assertEquals(scn.next(), "\"foo\"");
-        scn.close();
-    }
+    //this shouldnt be like this... if u do echo "foo", the output is foo without the quotes
+    // @Test
+    // public void testEchoQuotes() throws Exception {
+    //     testArray.add("\"foo\"");
+    //     testEcho.exec(testArray, null, out);
+    //     Scanner scn = new Scanner(in);
+    //     assertEquals(scn.next(), "\"foo\"");
+    //     scn.close();
+    // }
 
     @Test
     
@@ -59,5 +60,14 @@ public class EchoTest {
         scn.close();
 
     }
-    //test for echo quotes should not include the quotes in stdout
+
+    //I beg u make this test work aswell pls
+    // @Test
+
+    // public void emptyArgsEcho() throws IOException {
+    //     testEcho.exec(testArray, null, out);
+    //     Scanner scn = new Scanner(in);
+    //     assertEquals(scn.nextLine(), "");
+    //     scn.close();
+    // }s
 }

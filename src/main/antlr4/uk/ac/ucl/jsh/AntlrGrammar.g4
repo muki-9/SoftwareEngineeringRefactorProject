@@ -40,6 +40,7 @@ doublequoted
 
 call
     : WS? (redirection WS)* argument (WS (redirection|argument))* WS?
+    | WS? (redirection WS?)
     ;
 
 unquoted

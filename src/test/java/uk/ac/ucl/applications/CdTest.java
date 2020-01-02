@@ -26,7 +26,6 @@ public class CdTest{
 
     @Before
     public void init() throws IOException {
-
          in = new PipedInputStream();
          out = new PipedOutputStream(in);
          testCd = new Cd();
@@ -45,7 +44,6 @@ public class CdTest{
 
     @Test
     public void testCd() throws IOException {
-
         testArray.add("src");
         testCd.exec(testArray, null, out);
         String currentDir= Jsh.getCurrentDirectory();

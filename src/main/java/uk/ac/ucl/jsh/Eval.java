@@ -53,7 +53,10 @@ public class Eval implements CommandVisitor {
         OutputStream os = osList.get(osList.size()-1);
         isList.remove(isList.size()-1);
         osList.remove(osList.size()-1);
-        Application application = safeFactory.mkApplication(call.getApplication());
-        application.exec(call.getArguments(), is, os);
+        if (call.getApplication() != null) {
+            Application application = safeFactory.mkApplication(call.getApplication());
+            application.exec(call.getArguments(), is, os);
+        }
+        return;
     }
 }
