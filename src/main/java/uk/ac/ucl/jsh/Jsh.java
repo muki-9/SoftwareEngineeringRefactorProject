@@ -12,6 +12,14 @@ import org.antlr.v4.runtime.tree.ParseTree;
 public class Jsh {
     private static String currentDirectory = System.getProperty("user.dir");
     private static ArrayList<String> commands = new ArrayList<>();
+    private static boolean default_constr = true;
+    public Jsh(){
+
+    }
+    public Jsh(boolean bool) {
+        default_constr = bool;
+
+    }
     
     public void eval(String cmdline, OutputStream output) throws IOException {
         Jsh.commands.add(cmdline);
@@ -54,42 +62,83 @@ public class Jsh {
         }
         return true;
     }
+
+    public void takesInput(){
+        Scanner input= new Scanner(System.in);
+        do{
+            String prompt = currentDirectory + "> ";
+            System.out.print(prompt);
+            try{
+                String cmdline = input.nextLine();
+                if(blankShell(cmdline)){
+                    continue;
+                }
+                eval(cmdline, System.out);
+            }catch(Exception e){
+                System.out.println("jsh: "+e.getMessage());
+
+            }
+
+        }while(default_constr);
+        input.close();
+
+
+        // while (true) {
+        //     String prompt = currentDirectory + "> ";
+        //     System.out.print(prompt);
+        //     try {
+        //         String cmdline = input.nextLine();
+        //         if (blankShell(cmdline)) {
+        //             continue;
+        //         }
+        //         eval(cmdline, System.out);
+        //     } catch (Exception e) {
+        //         System.out.println("jsh: here" + e.getMessage());
+        //     }
+        // }
+
+    }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
+
+
         Jsh newShell = new Jsh();
         if (args.length > 0) {
+
             if (args.length != 2) {
-                System.out.println("jsh: wrong number of arguments");
-                return;
+                throw new RuntimeException("jsh: wrong number of arguments");
+
             }
             if (!args[0].equals("-c")) {
-                System.out.println("jsh: " + args[0] + ": unexpected argument");
+                throw new RuntimeException("jsh: " + args[0] + ": unexpected argument");
             }
-            try {
-                newShell.eval(args[1], System.out);
-            } catch (Exception e) {
-                System.out.println("jsh: " + e.getMessage());
-            }
+    
+            newShell.eval(args[1], System.out);
+   
             } 
             else {
-                Scanner input = new Scanner(System.in);
-                try {
-                    while (true) {
-                        String prompt = currentDirectory + "> ";
-                        System.out.print(prompt);
-                        try {
-                            String cmdline = input.nextLine();
-                            if (blankShell(cmdline)) {
-                                continue;
-                            }
-                            newShell.eval(cmdline, System.out);
-                        } catch (Exception e) {
-                            System.out.println("jsh: " + e.getMessage());
-                        }
-                    }
-                } finally {
-                    input.close();
-                }
+                newShell.takesInput();
+                
+                // Scanner input = new Scanner(System.in);
+                // try {
+                //     do {
+                //         String prompt = currentDirectory + "> ";
+                //         System.out.println(prompt);
+              
+                //         try {
+                //             String cmdline = "okay";
+                //             if (blankShell(cmdline)) {
+                //                 continue;
+                //             }
+                //             newShell.eval(cmdline, System.out);
+                //         } catch (Exception e) {
+                //             System.out.println("jsh: " + e.getMessage());
+                //         }
+                //     }while(default_constr);
+                // } finally {
+                //     input.close();
+                // }
+ 
             }
         }
 }
