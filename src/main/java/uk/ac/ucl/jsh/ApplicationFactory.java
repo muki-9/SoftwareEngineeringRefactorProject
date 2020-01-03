@@ -4,6 +4,15 @@ import uk.ac.ucl.applications.*;
 
 public class ApplicationFactory {
 
+    /**
+    * Standard Application Factory.
+    * Uses decorator pattern, if application name is prepended with "_", 
+    * then unsafe decorator is wrapped around instance of application.
+    *
+    * @param application string, containing name of the applications
+    *
+    * @return eturns instance of relevant Application
+    */
 	public Application mkApplication(String application) {
         Application app;
         switch (application) {

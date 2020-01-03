@@ -22,6 +22,16 @@ public class Eval implements CommandVisitor {
         this.isList.add(null);
     }
 
+    /**
+    * To execute a pipe command, the first command is executed with a null input stream and the output stream is piped into
+    * another input stream that is passed into the next command. This next command may well be another pipe, so instead of 
+    * simply passing input/output streams, they are stored in an arraylist, so that if pipes are stacked, so are the streams.
+    *
+    * @param pipe the pipe object whose children contain the commands that need to be executed.
+    *
+    * @throws IOException if input stream could not be piped into the output stream or any other error comes about as a result of 
+    * using the stream, or closing it.
+    */
     @Override
     public void visitPipe(Pipe pipe) throws IOException {
         InputStream input = new PipedInputStream(90000);
@@ -33,6 +43,14 @@ public class Eval implements CommandVisitor {
         pipe.getPipeChildren().get(1).accept(this);
     }
 
+    /**
+    * To execute a seq command, the first command is executed and then the second, in that order. Since the last input and output stream
+    * is always popped off after execution, we duplicate it here as we need it for 2 commands.
+    *
+    * @param seq the seq object whose children contain the commands that need to be executed.
+    *
+    * @throws IOException the '.accept' method throws an unhandled IOException which carries over.
+    */
     @Override
     public void visitSeq(Seq seq) throws IOException {
         osList.add(osList.get(osList.size()-1));
@@ -41,6 +59,15 @@ public class Eval implements CommandVisitor {
         seq.getSeqChildren().get(1).accept(this);
     }
 
+    /**
+    * The call object passed through the parameter will carry its relevant input and output streams if they are required.
+    * The inital two if statements check if they are needed, and if so, they are appended to the end of the list.
+    * They are then popped off after being passed to the Application that is created using the factory.
+    *
+    * @param call the call object which will have instance variables ready with the application and arguments after it has been visited once.
+    *
+    * @throws IOException the '.exec' method throws an unhandled IOException which carries over.
+    */
     @Override
     public void visitCall(Call call) throws IOException {
         if (call.getISRequired()) {
