@@ -36,13 +36,19 @@ public class Head implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        String currentDirectory = Jsh.getCurrentDirectory();
         if(default_constr){
             writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         }
+
         validateArguments(args, input);
         String headArg = getHeadArgs(args);
-        if (useIS) {
+        String currentDirectory = Jsh.getCurrentDirectory();
+
+        if (!useIS) {
+            File headFile = new File(currentDirectory + File.separator + headArg);
+            writeOutput(headArg, headFile, writer, currentDirectory);
+        }
+        else {
             String line = new String(input.readAllBytes());
             String[] lines = line.split(System.getProperty("line.separator"));
             for(int i = 0; i < headLines; i++) {
@@ -54,10 +60,6 @@ public class Head implements Application {
                 writer.flush();
             }
         }
-        else {
-            File headFile = new File(currentDirectory + File.separator + headArg);
-            writeOutput(headArg, headFile, writer, currentDirectory);
-        }
     }
 
     /*
@@ -66,7 +68,10 @@ public class Head implements Application {
      
     */
     private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) throws IOException {
-        if (headFile.exists()) {
+        if (!headFile.exists()) {
+            throw new RuntimeException("head: " + headArg + " does not exist");
+        }
+        else {
             Charset encoding = StandardCharsets.UTF_8;
             Path filePath = Paths.get((String) currentDirectory + File.separator + headArg);
             try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
@@ -79,8 +84,6 @@ public class Head implements Application {
                     }
                 }
             }
-        } else {
-            throw new RuntimeException("head: " + headArg + " does not exist");
         }
     }
 
@@ -106,7 +109,8 @@ public class Head implements Application {
         if (args.size() == 3) {
             try {
                 headLines = Integer.parseInt(args.get(1));
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new RuntimeException("head: wrong argument " + args.get(1));
             }
             headArg = args.get(2);

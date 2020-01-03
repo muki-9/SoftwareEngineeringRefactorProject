@@ -25,14 +25,14 @@ public class Sed implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         String currentDirectory = Jsh.getCurrentDirectory();
         String file;
         String[] s = validateArgs(args, input);
         if (useIS) {
             ArrayList<String> lines = new ArrayList<>();
             lines = performSed(s, input, g);
-            writeOutput(out, lines);
+            writeOutput(writer, lines);
         }
         else {
             file = args.get(1);
@@ -43,12 +43,13 @@ public class Sed implements Application {
             }
             ArrayList<String> lines = new ArrayList<>();
             lines = performSed(s, file, g);
-            writeOutput(out, lines);
+            writeOutput(writer, lines);
         }
     }
 
     private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
+
         if (args.size() != 2) {
             if (args.size() == 1 && input != null) {
                 useIS = true;
@@ -57,20 +58,23 @@ public class Sed implements Application {
                 throw new RuntimeException("sed: wrong number of arguments");
             }
         }
+
         if (args.get(0) != null && useIS || args.get(1) != null) {
             String delimiter = Character.toString(args.get(0).charAt(1));
             if (delimiter.matches("\\|")) {
                 delimiter = "\\|";
             }
             s = args.get(0).split(delimiter);
+
             if (!s[0].matches("s")) {
                 throw new RuntimeException("sed: regex in incorrect form");
             }
-            if (args.get(0).lastIndexOf(delimiter) < args.get(0).length()-1) {
-                if (args.get(0).charAt(args.get(0).lastIndexOf(delimiter)+1) == 'g') {
+
+            if (args.get(0).lastIndexOf(delimiter) < args.get(0).length() - 1) {
+                if (args.get(0).charAt(args.get(0).lastIndexOf(delimiter) + 1) == 'g') {
                     g = true;
                 }
-                else if (args.get(0).lastIndexOf(delimiter) == args.get(0).length()-1) {
+                else if (args.get(0).lastIndexOf(delimiter) == args.get(0).length() - 1) {
                     g = false;
                 }
                 else {
@@ -114,11 +118,11 @@ public class Sed implements Application {
         return lines;
     }
 
-    private void writeOutput(BufferedWriter out, ArrayList<String> lines) throws IOException {
+    private void writeOutput(BufferedWriter writer, ArrayList<String> lines) throws IOException {
         for(String str : lines) {
-            out.write(str);
-            out.write(System.getProperty("line.separator"));
-            out.flush();
+            writer.write(str);
+            writer.write(System.getProperty("line.separator"));
+            writer.flush();
         }
     }
     

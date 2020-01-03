@@ -15,9 +15,8 @@ public class Pwd implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        String currentDirectory = Jsh.getCurrentDirectory();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
-        writer.write(currentDirectory);
+        writer.write(Jsh.getCurrentDirectory());
         writer.write(System.getProperty("line.separator"));
         writer.flush();
     }
