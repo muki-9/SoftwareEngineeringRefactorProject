@@ -13,7 +13,7 @@ import uk.ac.ucl.jsh.Application;
 public class Exit implements Application {
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         
         if (args.size() != 0) {

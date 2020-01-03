@@ -22,7 +22,7 @@ public class Find implements Application{
     private String workingDir = Jsh.getCurrentDirectory();
 
 	@Override
-	public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+	public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
 
         if(args.size() > 3 || args.size() < 2) {
             throw new RuntimeException("find: wrong number of arguments");

@@ -1,98 +1,240 @@
-// package uk.ac.ucl.jsh;
+package uk.ac.ucl.jsh;
 
-// import org.junit.Before;
-// import org.junit.Test;
-// import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-// import java.io.IOException;
-// import java.io.PipedInputStream;
-// import java.io.PipedOutputStream;
-// import java.util.Scanner;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream; 
+import java.util.Scanner;
+import uk.ac.ucl.jsh.Jsh;
+import static org.assertj.core.api.Assertions.*;
 
-// public class JshTest {
+public class JshTest {
     
-    // public JshTest() {
-    // }
+    public JshTest() {
+    }
     
-    // Jsh jshell;
+    PipedInputStream input;
+    PipedOutputStream out;
+    Jsh testJsh;
 
-    // @Before
-    // public void testShell() {
-    //     jshell = new Jsh();
-    // }
+    @Before
+    public void init() throws IOException{
 
-    //** THESE ARE JUST RAGHIBS TESTS WHILST CODING */
+        input = new PipedInputStream();
+        out = new PipedOutputStream(input);
 
-    // @Test
-    // public void sedNoG() throws IOException {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("sed s/the/replacedOnce/ testfile", out);
-    //     Scanner scn = new Scanner(in);
-    //     while (scn.next() != null){
-    //         System.out.println(scn.next());
-    //     }
-    //     assertEquals(scn.next(), "this is some jargon text\nto test a lot of implementation\nrandomname name\nmore text\ntwo of replacedOnce same words, on the same line");
-    //     scn.close();
-    // }
+    }
 
-    // @Test
-    // public void emptyShell() throws IOException {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("", out);
-    //     Scanner scn = new Scanner(in);
-    //     assertEquals(scn.next(), "");
-    //     scn.close();
-    // }
+    @After
 
-    // @Test
-    // public void onlySpaces() throws IOException {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("    ", out);
-    //     Scanner scn = new Scanner(in);
-    //     assertEquals(scn.next(), "");
-    //     scn.close();
-    // }
+    public void tear(){
 
-    // @Test
-    // public void testEchoQuotes() throws Exception {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("echo \"foo\" ", out);
-    //     Scanner scn = new Scanner(in);
-    //     assertEquals(scn.next(), "foo");
-    //     scn.close();
-    // }
+        System.setIn(System.in);
+
+    }
+
+    @Test
+
+    public void jshShouldThrowExceptionIfMoreThan2ArgsGiven() throws IOException {
+        // ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        // PrintStream originalOut = System.out;
+        // System.setOut(new PrintStream(outContent));
+   
+        String[] args=  {"-c", "echo", "foo"};
+        
+        assertThatThrownBy(() -> {
+            Jsh.main(args);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("jsh: wrong number of arguments");
+
+    }
+
+    @Test
+
+    public void jshShouldThrowExceptionIf1stArgNotCorrect() throws IOException {
+        // ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        // PrintStream originalOut = System.out;
+        // System.setOut(new PrintStream(outContent));
+   
+        String[] args=  {"-l", "echo"};
+        
+        assertThatThrownBy(() -> {
+            Jsh.main(args);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("jsh: -l: unexpected argument");
+
+    }
+    @Test
+
+    public void jshShouldNotThrowErrorIf2ArgsAndCorrectFormat(){
+
+        String[] args=  {"-c", "pwd"};
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException();
 
 
-    //** THIS MARKS THE END OF RAGHIBS TEST TESTS */
+    }
 
-    // @Test
-    // public void testEcho() throws Exception {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("echo foo", out);
-    //     Scanner scn = new Scanner(in);
-    //     assertEquals(scn.next(), "foo");
-    //     scn.close();
-    // }
+    @Test
+    public void testJshDirCorrectWithSymbol() throws IOException {
 
-    // @Test
-    // public void testPwd() throws IOException {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("pwd", out);
-    //     Scanner scn = new Scanner(in);
-    //     assertEquals(scn.next(), "pwd");
-    //     scn.close();
-    // }
+        Jsh newshell = new Jsh(false);
 
-    // public void testCd() throws IOException {
-    //     PipedInputStream in = new PipedInputStream();
-    //     PipedOutputStream out = new PipedOutputStream(in);
-    //     jshell.eval("cd", out);
-    // }
+        String input = "\r";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        newshell.takesInput();
 
-//}
+        assertThat(outContent.toString()).isEqualTo("/workspaces/jsh-team-44> ");
+        // scn.close();
+
+    }
+
+    @Test
+    public void testJshDirCorrectWithSpaces() throws IOException {
+
+        testJsh = new Jsh(false);
+
+        String input = "  ";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException();
+        // scn.close();
+
+    }
+
+    @Test
+
+    public void testJshShouldAllowCarriageReturnAsInput(){
+
+        testJsh = new Jsh(false);
+
+        String input = "pwd";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException();
+    }
+
+    @Test
+
+    public void testJshWithPipe(){
+
+        testJsh = new Jsh(false);
+
+        String input = "grep a test2.txt | cat ";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException();
+    }
+
+    @Test
+
+    public void testJshWithSeqAndPipe(){
+
+        testJsh = new Jsh(false);
+
+        String input = "grep a file.txt | cat ; echo foo | cat";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException(); //get output??
+    }
+
+    @Test
+
+    public void testJshWithRedirectionGT(){
+
+        testJsh = new Jsh(false);
+
+        String input = "echo foo > file.txt";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException(); 
+
+
+    }
+
+    @Test
+
+    public void testJshWithRedirectionLT(){
+        testJsh = new Jsh(false);
+
+        String input = "grep class < pom.xml > result.txt";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException(); 
+
+
+    }
+
+
+
+    @Test
+
+    public void testJshFromMain(){
+        String[] args = {};
+
+        String input = "pwd";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException();
+    }
+
+    @Test
+
+    public void jshShouldThrowExceptionIfCannotReadUserInput(){
+
+        testJsh = new Jsh(false);
+
+        String input = "";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        testJsh.takesInput();
+
+
+        assertThat(outContent.toString()).isEqualTo("/workspaces/jsh-team-44> jsh: No line found\n");
+    }
+    private String createTempFile() throws IOException{
+        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
+        temp1.deleteOnExit();
+        return temp1.getName();
+    }
+
+
+}

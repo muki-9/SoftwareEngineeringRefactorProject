@@ -54,7 +54,7 @@ public class GrepTest{
         testArray.add("aba");
 
         assertThatThrownBy(() -> {
-            testGrep.exec(testArray, null, out);
+            testGrep.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("grep: wrong number of arguments");
@@ -65,7 +65,7 @@ public class GrepTest{
     public void testGrepShouldExceptionIfNoArgsGiven(){
 
         assertThatThrownBy(() -> {
-            testGrep.exec(testArray, null, out);
+            testGrep.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("grep: wrong number of arguments");
@@ -100,7 +100,7 @@ public class GrepTest{
 
         testArray.add("ab");
         String line  =null;
-        testGrep.exec(testArray, inputStream, out);
+        testGrep.exec(testArray, inputStream, out, null);
         Scanner scn = new Scanner(in);
         line = scn.nextLine() +'\n';
         line += scn.nextLine()+'\n';
@@ -143,7 +143,7 @@ public class GrepTest{
         testArray.add(tmp1);
         testArray.add(tmp2);
 
-        testGrep.exec(testArray, null, out);
+        testGrep.exec(testArray, null, out, null);
         String line = null;
         Scanner scn = new Scanner(in);
         line = scn.nextLine() +'\n';

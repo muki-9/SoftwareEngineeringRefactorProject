@@ -59,7 +59,7 @@ public class HeadTest {
         testArray.add(filename); //replace with tempfile name
         
         testHead= new Head(writer);
-        testHead.exec(testArray, null, null);
+        testHead.exec(testArray, null, null, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n';
         String actual = stream.toString(); 
@@ -82,7 +82,7 @@ public class HeadTest {
 
         testArray.add("-n");
         testArray.add("2");
-        testHead.exec(testArray, inputStream, null);
+        testHead.exec(testArray, inputStream, null, null);
 
         String actual = stream.toString();
         assertThat(actual).isEqualTo("test line absolute\n2nd line!\n");
@@ -114,7 +114,7 @@ public class HeadTest {
         testArray.add("input1.txt");
         
         assertThatThrownBy(() -> {
-            testHead.exec(testArray, null, out);
+            testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("head: wrong arguments");
@@ -125,7 +125,7 @@ public class HeadTest {
     public void headWithNoArgShouldThrowExceptionNoInput() throws IOException{
         testHead  = new Head();
         assertThatThrownBy(() -> {
-            testHead.exec(testArray, null, out);
+            testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("head: missing arguments");
@@ -161,7 +161,7 @@ public class HeadTest {
         testArray.add(filename); 
         
         testHead= new Head(writer);
-        testHead.exec(testArray, null, null);
+        testHead.exec(testArray, null, null, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n'+"Line5" +'\n';
         expected+="Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n';
@@ -178,7 +178,7 @@ public class HeadTest {
         testArray.add("input1.txt");
         testHead  = new Head();
         assertThatThrownBy(() -> {
-            testHead.exec(testArray, null, out);
+            testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("head: wrong argument " + "s");
@@ -193,7 +193,7 @@ public class HeadTest {
         testArray.add("input1.txt");
         testHead  = new Head();
         assertThatThrownBy(() -> {
-            testHead.exec(testArray, null, out);
+            testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("head: input1.txt does not exist");
@@ -212,14 +212,14 @@ public class HeadTest {
         testArray.add(filename); //replace with tempfile name
         
         testHead= new Head(writer);
-        testHead.exec(testArray, null, null);
+        testHead.exec(testArray, null, null, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n'+"Line5" +'\n';
         expected+="Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10"+'\n'+"Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n';
         expected+= "Line14"+'\n';
         String actual = stream.toString();
         assertEquals(actual, expected);
-        assertThatCode(() -> { testHead.exec(testArray, null, null); }).doesNotThrowAnyException();
+        assertThatCode(() -> { testHead.exec(testArray, null, null, null); }).doesNotThrowAnyException();
         stream.close();
         writer.close();
     }
@@ -231,7 +231,7 @@ public class HeadTest {
         testArray.add("input1.txt");
         testHead  = new Head();
         assertThatThrownBy(() -> {
-            testHead.exec(testArray, null, out);
+            testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("head: wrong argument " + "-s");

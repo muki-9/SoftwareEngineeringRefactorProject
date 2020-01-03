@@ -42,7 +42,7 @@ public class FindTest{
     public void testFindShouldthrowsExceptionWhenWrongNumberofArgs(){
 
         assertThatThrownBy(() -> {
-            testFind.exec(testArray, null, out);
+            testFind.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("find: wrong number of arguments");
@@ -53,7 +53,7 @@ public class FindTest{
         testArray.add("*a");
 
         assertThatThrownBy(() -> {
-            testFind.exec(testArray, null, out);
+            testFind.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("find: wrong number of arguments");
@@ -67,7 +67,7 @@ public class FindTest{
         testArray.add("*a");
 
         assertThatThrownBy(() -> {
-            testFind.exec(testArray, null, out);
+            testFind.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("find: arg -wrong not correct");
@@ -86,7 +86,7 @@ public class FindTest{
         testArray.add("-name");
         testArray.add("in*xt");
 
-        testFind.exec(testArray, null, out);
+        testFind.exec(testArray, null, out, null);
 
         Scanner scn = new Scanner(in);
         String output = scn.nextLine();
@@ -106,7 +106,7 @@ public class FindTest{
         testArray.add("*java");
 
         assertThatThrownBy(() -> {
-            testFind.exec(testArray, null, out);
+            testFind.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("find: randompath/src does not exist");

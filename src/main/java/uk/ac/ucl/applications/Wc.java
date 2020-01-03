@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import uk.ac.ucl.jsh.Application;
+import uk.ac.ucl.jsh.Globbing;
 import uk.ac.ucl.jsh.Jsh;
 
 public class Wc implements Application {
@@ -23,7 +24,9 @@ public class Wc implements Application {
     private int newlineCount = 0;
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
+
+        Globbing globb= new Globbing(globbArray);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         validateArgs(args, input); // ensures that stdin is being used if required instead of command line arguments
 

@@ -8,7 +8,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import static org.assertj.core.api.Assertions.*;
 public class PwdTest {
 
     public PwdTest(){
@@ -33,12 +33,24 @@ public class PwdTest {
     @Test
     public void testPwd() throws IOException {
         String currentDirectory = System.getProperty("user.dir");
-        testPwd.exec(testArray, null, out);
+        testPwd.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         String line = scn.nextLine();
         assertEquals(line, currentDirectory ); 
         scn.close();
 
+    }
+
+    @Test
+
+    public void pwdShouldThrowExceptionIfArgsGiven(){
+
+        testArray.add("src");
+
+        assertThatThrownBy(() ->{
+            testPwd.exec(testArray, null, out, null);
+        }).isInstanceOf(RuntimeException.class)
+        .hasMessage("pwd: too many arguments");
     }
 
 }

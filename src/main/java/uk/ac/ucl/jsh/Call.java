@@ -16,6 +16,8 @@ public class Call implements CommandVisitable {
     private InputStream is;
     private boolean osRequired = false;
     private OutputStream os;
+    private Boolean globb;
+    private ArrayList<Boolean> gArray;
 
     /**
     * Standard constructor required to create instance of an application.
@@ -24,9 +26,10 @@ public class Call implements CommandVisitable {
     * @param args arraylist containing string of all arguments supplied to app.
     *
     */
-    public Call(String app, ArrayList<String> args) {
+    public Call(String app, ArrayList<String> args,ArrayList<Boolean> gArray) {
         this.application = app;
         this.arguments = args;
+        this.gArray = gArray;
     }
 
     /**
@@ -35,8 +38,9 @@ public class Call implements CommandVisitable {
     * @param newS string passed from one method
     *
     */
-    public Call(String newS) {
+    public Call(String newS, Boolean globb) {
         this.currArg = newS;
+        this.globb = globb;
     }
 
     /**
@@ -80,6 +84,7 @@ public class Call implements CommandVisitable {
         this.currArg = redirectionArg;
 	}
 
+	
     /**
     * Special constructor required to pass an input stream to the receiving method. The instance variable "isRequired"
     * is set to true, so in the receiving method a check can be undertaken that lets us know an input stream can be extracted
@@ -90,13 +95,15 @@ public class Call implements CommandVisitable {
     * @param is the input stream, likely containing some output from another command
     *
     */
-	public Call(String app, ArrayList<String> args, InputStream is) {
+	public Call(String app, ArrayList<String> args, InputStream is, ArrayList<Boolean> gArray) {
         this.application = app;
         this.arguments = args;
         isRequired = true;
         this.is = is;
+        this.gArray = gArray;
 	}
 
+	
     /**
     * Special constructor required to pass an output stream to the receiving method. The instance variable "osRequired"
     * is set to true, so in the receiving method a check can be undertaken that lets us know an output stream can be extracted
@@ -107,17 +114,27 @@ public class Call implements CommandVisitable {
     * @param os an output stream, to which to write an input to.
     *
     */
-	public Call(String app, ArrayList<String> args, OutputStream os) {
+	public Call(String app, ArrayList<String> args, OutputStream os, ArrayList<Boolean> gArray) {
         this.application = app;
         this.arguments = args;
         osRequired = true;
         this.os = os;
-	}
-
+        this.gArray = gArray;
+    }
+    
     /**
     * The rest of the methods include getters for all the different instance variables described in the constructors above.
     * There is also the accept method, which visits the specific Call object that the accept command is called on.
     */
+
+    public boolean getGlobb(){
+        return globb;
+    }
+
+    public ArrayList<Boolean> getGlobbArray(){
+        return gArray;
+    }
+
 	public String getSymbol() {
         return symbol;
     }

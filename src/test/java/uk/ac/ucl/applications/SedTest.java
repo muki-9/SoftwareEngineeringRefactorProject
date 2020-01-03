@@ -44,7 +44,7 @@ public class SedTest{
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
         testArray.add("s/t/b/");
 
-        testSed.exec(testArray, inputStream, out);
+        testSed.exec(testArray, inputStream, out, null);
 
         Scanner scn = new Scanner(in);
         String line1 = scn.nextLine();
@@ -65,7 +65,7 @@ public class SedTest{
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
         testArray.add("s/t/b/g");
 
-        testSed.exec(testArray, inputStream, out);
+        testSed.exec(testArray, inputStream, out, null);
 
         Scanner scn = new Scanner(in);
         String line1 = scn.nextLine();
@@ -98,7 +98,7 @@ public class SedTest{
         writeToFile(tmp1);
         testArray.add(tmp1);
         
-        testSed.exec(testArray, null, out);
+        testSed.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         String line = "";
         for(int i=0; i<3; i++){
@@ -120,14 +120,14 @@ public class SedTest{
         testArray.add("s/a/b/");
 
         assertThatCode(() -> {
-            testSed.exec(testArray, inputStream, out);
+            testSed.exec(testArray, inputStream, out, null);
         }).doesNotThrowAnyException();
         
         testArray.add("s/a/b/");
         testArray.add("src");
 
         assertThatThrownBy(() -> {
-            testSed.exec(testArray, inputStream, out);
+            testSed.exec(testArray, inputStream, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: wrong number of arguments");
@@ -140,7 +140,7 @@ public class SedTest{
         testArray.add("s/a/b/");
 
         assertThatThrownBy(() -> {
-            testSed.exec(testArray, null, out);
+            testSed.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: wrong number of arguments");
@@ -152,7 +152,7 @@ public class SedTest{
         testArray.add("filename");
 
         assertThatThrownBy(() -> {
-            testSed.exec(testArray, null, out);
+            testSed.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: regex must end in either a delimiter or 'g'");
@@ -165,7 +165,7 @@ public class SedTest{
         testArray.add("test.txt");
 
         assertThatThrownBy(() -> {
-            testSed.exec(testArray, null, out);
+            testSed.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: regex in incorrect form");
@@ -215,7 +215,7 @@ public class SedTest{
         testArray.add("src");
 
         assertThatThrownBy(() -> {
-            testSed.exec(testArray, null, out);
+            testSed.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: wrong file argument");

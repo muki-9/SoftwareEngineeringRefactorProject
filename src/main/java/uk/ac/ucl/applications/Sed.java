@@ -24,7 +24,7 @@ public class Sed implements Application {
     private boolean useIS = false;
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         String currentDirectory = Jsh.getCurrentDirectory();
         String file;

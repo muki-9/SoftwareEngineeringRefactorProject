@@ -33,7 +33,7 @@ public class Tail implements Application {
     }
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         if(default_constr){
              writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));

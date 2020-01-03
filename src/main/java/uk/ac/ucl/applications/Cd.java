@@ -11,7 +11,7 @@ import uk.ac.ucl.jsh.Jsh;
 
 public class Cd implements Application {
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException { 
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException { 
         if (args.isEmpty()) {
             // takes user to home directory when 'cd' is called alone
             Jsh.setCurrentDirectory(System.getProperty("user.home"));
