@@ -15,6 +15,9 @@ public class Pwd implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
+        if(!args.isEmpty()){
+            throw new RuntimeException("pwd: too many arguments");
+        }
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         writer.write(Jsh.getCurrentDirectory());
         writer.write(System.getProperty("line.separator"));

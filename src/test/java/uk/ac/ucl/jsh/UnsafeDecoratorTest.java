@@ -46,19 +46,20 @@ public class UnsafeDecoratorTest {
 
         ArrayList<String> args = new ArrayList<>();
         args.add("/randompath");
-        ArrayList<Boolean> globb = new ArrayList<>();
-        globb.add(true);
-        globb.add(true);
-        app.exec(args, null, out, globb);
+        args.add("/src");
+        assertThatCode(() ->{
+            app.exec(args, null, out, null);
+        }).doesNotThrowAnyException();
     }
     @Test
 
     public void UnsafeshouldNotCatch() throws IOException {
 
         ArrayList<String> args = new ArrayList<>();
-        ArrayList<Boolean> globb = new ArrayList<>();
-        globb.add(true);
-        app.exec(args, null, out, globb);
+
+        assertThatCode(() ->{
+            app.exec(args, null, out, null);
+        }).doesNotThrowAnyException();
     }
 
 }
