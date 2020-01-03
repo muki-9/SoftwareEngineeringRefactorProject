@@ -22,11 +22,10 @@ public class Mkdir implements Application {
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
-        String currentDirectory = Jsh.getCurrentDirectory();
 
         int numOfFiles = validateArgs(args);
         for (int i = 0; i < numOfFiles; i++) {
-            String path = buildString(currentDirectory, args.get(i));
+            String path = buildString(Jsh.getCurrentDirectory(), args.get(i));
             File file = new File(path);
             if (file.exists()) {
                 throw new RuntimeException("mkdir: File already exists, choose different name");

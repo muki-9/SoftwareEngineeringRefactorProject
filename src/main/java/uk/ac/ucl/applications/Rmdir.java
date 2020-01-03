@@ -27,7 +27,7 @@ public class Rmdir implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
         int numOfFiles = validateArgs(args);
         for (int i = 0; i < numOfFiles; i++) {
-            String path = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + args.get(i);
+            String path = buildString(Jsh.getCurrentDirectory(), args.get(i));
             File file = new File(path);
 
             if (!file.exists()) {
@@ -52,6 +52,19 @@ public class Rmdir implements Application {
         }
     }
 
+    /*
+
+        Method uses StringBuilder to avoid using string concatenation in loop, to prevent excess garbage and array copying.
+        Builds string path using currentdirectory and name of specified directory.
+
+    */
+    private String buildString(String currentDirectory, String arg){
+        StringBuilder sb = new StringBuilder();
+        sb.append(currentDirectory);
+        sb.append(System.getProperty("file.separator"));
+        sb.append(arg);
+        return sb.toString();
+    }
 
     /*
 
