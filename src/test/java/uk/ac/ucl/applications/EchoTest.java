@@ -33,7 +33,7 @@ public class EchoTest {
     @Test
     public void testEcho() throws Exception {
         testArray.add("foo");
-        testEcho.exec(testArray, null, out);
+        testEcho.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         assertEquals(scn.next(), "foo");
         scn.close();
@@ -54,7 +54,7 @@ public class EchoTest {
     public void testEchoWithManySpacesShouldIgnoreAndOnlyHaveOneSpace() throws IOException{
         testArray.add("foo");
         testArray.add("foo");
-        testEcho.exec(testArray, null, out);
+        testEcho.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         assertEquals(scn.nextLine(), "foo foo");
         scn.close();

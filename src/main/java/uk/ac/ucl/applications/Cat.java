@@ -21,8 +21,8 @@ import uk.ac.ucl.jsh.Jsh;
 public class Cat implements Application {
     
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
-        Globbing g = new Globbing();
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
+        Globbing g = new Globbing(globbArray);
         ArrayList<String> updatedArgs = g.globbing(args);
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));

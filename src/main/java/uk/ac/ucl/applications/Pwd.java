@@ -14,7 +14,7 @@ import uk.ac.ucl.jsh.Jsh;
 public class Pwd implements Application {
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         writer.write(Jsh.getCurrentDirectory());
         writer.write(System.getProperty("line.separator"));

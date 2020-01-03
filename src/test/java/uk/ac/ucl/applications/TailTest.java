@@ -49,7 +49,7 @@ public class TailTest{
 
         testArray.add("-n");
         testArray.add("2");
-        testTail.exec(testArray, inputStream, null);
+        testTail.exec(testArray, inputStream, null, null);
         String actual1 = stream.toString();
         assertThat(actual1).isEqualTo("2nd line!\nabsent\n");
 
@@ -69,7 +69,7 @@ public class TailTest{
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
         testTail= new Tail(writer);
-        testTail.exec(testArray, inputStream, null);
+        testTail.exec(testArray, inputStream, null, null);
         String actual1 = stream.toString();
         assertThat(actual1).isEqualTo("test line absolute\n2nd line!\nabsent\n");
 
@@ -91,7 +91,7 @@ public class TailTest{
         testArray.add(filename); //replace with tempfile name
         
         testTail= new Tail(writer);
-        testTail.exec(testArray, null, null);
+        testTail.exec(testArray, null, null, null);
 
         String expected = "Line10" +'\n'+"Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n'+"Line14"+'\n';
         String actual = stream.toString();
@@ -111,7 +111,7 @@ public class TailTest{
         testArray.add("input1.txt");
         
         assertThatThrownBy(() -> {
-            testTail.exec(testArray, null, out);
+            testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: wrong arguments");
@@ -141,7 +141,7 @@ public class TailTest{
     public void tailWithNoArgShouldThrowException() throws IOException{
         testTail  = new Tail();
         assertThatThrownBy(() -> {
-            testTail.exec(testArray, null, out);
+            testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: missing arguments");
@@ -159,7 +159,7 @@ public class TailTest{
         testArray.add(filename); 
         
         testTail= new Tail(writer);
-        testTail.exec(testArray, null, null);
+        testTail.exec(testArray, null, null, null);
 
         String expected = "Line5" +'\n'+"Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10" +'\n';
         expected+="Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n'+"Line14"+'\n';
@@ -176,7 +176,7 @@ public class TailTest{
         testArray.add("input1.txt");
         testTail  = new Tail();
         assertThatThrownBy(() -> {
-            testTail.exec(testArray, null, out);
+            testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: wrong argument " + "s");
@@ -191,7 +191,7 @@ public class TailTest{
         testArray.add("input1.txt");
         testTail  = new Tail();
         assertThatThrownBy(() -> {
-            testTail.exec(testArray, null, out);
+            testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: input1.txt does not exist");
@@ -213,14 +213,14 @@ public class TailTest{
         testArray.add(filename); //replace with tempfile name
         
         testTail= new Tail(writer);
-        testTail.exec(testArray, null, null);
+        testTail.exec(testArray, null, null, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n'+"Line5" +'\n';
         expected+="Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10"+'\n'+"Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n';
         expected+= "Line14"+'\n';
         String actual = stream.toString();
         assertEquals(actual, expected);
-        assertThatCode(() -> { testTail.exec(testArray, null, null); }).doesNotThrowAnyException();
+        assertThatCode(() -> { testTail.exec(testArray, null, null, null); }).doesNotThrowAnyException();
         stream.close();
         writer.close();
 
@@ -234,7 +234,7 @@ public class TailTest{
         testArray.add("input1.txt");
         testTail  = new Tail();
         assertThatThrownBy(() -> {
-            testTail.exec(testArray, null, out);
+            testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: wrong argument " + "-s");

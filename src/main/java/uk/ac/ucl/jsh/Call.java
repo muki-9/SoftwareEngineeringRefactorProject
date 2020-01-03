@@ -16,14 +16,18 @@ public class Call implements CommandVisitable {
     private InputStream is;
     private boolean osRequired = false;
     private OutputStream os;
+    private Boolean globb;
+    private ArrayList<Boolean> gArray;
 
-    public Call(String app, ArrayList<String> args) {
+    public Call(String app, ArrayList<String> args, ArrayList<Boolean> gArray) {
         this.application = app;
         this.arguments = args;
+        this.gArray = gArray;
     }
 
-    public Call(String newS) {
+    public Call(String newS, Boolean globb) {
         this.currArg = newS;
+        this.globb = globb;
     }
 
     public Call(String[] args) {
@@ -43,19 +47,29 @@ public class Call implements CommandVisitable {
         this.currArg = currArgs;
 	}
 
-	public Call(String app, ArrayList<String> args, InputStream is) {
+	public Call(String app, ArrayList<String> args, InputStream is, ArrayList<Boolean> gArray) {
         this.application = app;
         this.arguments = args;
         isRequired = true;
         this.is = is;
+        this.gArray = gArray;
 	}
 
-	public Call(String app, ArrayList<String> args, OutputStream os) {
+	public Call(String app, ArrayList<String> args, OutputStream os, ArrayList<Boolean> gArray) {
         this.application = app;
         this.arguments = args;
         osRequired = true;
         this.os = os;
-	}
+        this.gArray = gArray;
+    }
+    
+    public boolean getGlobb(){
+        return globb;
+    }
+
+    public ArrayList<Boolean> getGlobbArray(){
+        return gArray;
+    }
 
 	public String getSymbol() {
         return symbol;

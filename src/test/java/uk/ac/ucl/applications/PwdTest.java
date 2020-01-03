@@ -33,7 +33,7 @@ public class PwdTest {
     @Test
     public void testPwd() throws IOException {
         String currentDirectory = System.getProperty("user.dir");
-        testPwd.exec(testArray, null, out);
+        testPwd.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         String line = scn.nextLine();
         assertEquals(line, currentDirectory ); 

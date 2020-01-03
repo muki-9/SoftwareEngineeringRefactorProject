@@ -24,7 +24,7 @@ public class Rmdir implements Application {
 
     */
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         int numOfFiles = validateArgs(args);
         for (int i = 0; i < numOfFiles; i++) {
             String path = buildString(Jsh.getCurrentDirectory(), args.get(i));

@@ -61,7 +61,7 @@ public class CatTest{
         // ByteArrayOutputStream stream = new ByteArrayOutputStream();
         // BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         
-        testCat.exec(testArray, null, out);
+        testCat.exec(testArray, null, out, null);
         String line = null;
         Scanner scn = new Scanner(in);
         line = scn.nextLine() + '\n';
@@ -78,7 +78,7 @@ public class CatTest{
     @Test
     public void testCatWithNoInputs() throws IOException{
         assertThatThrownBy(()->{
-            testCat.exec(testArray, null, out);
+            testCat.exec(testArray, null, out, null);
         }).isInstanceOf(RuntimeException.class).hasMessageContaining("cat: missing arguments");
 
     }
@@ -90,7 +90,7 @@ public class CatTest{
         String originalString = "test line absolute\n2nd line!\nabsent\n"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-        testCat.exec(testArray, inputStream, out);
+        testCat.exec(testArray, inputStream, out, null);
 
         Scanner scn = new Scanner(in);
         String line  = scn.nextLine()+'\n';
@@ -105,7 +105,7 @@ public class CatTest{
     public void ifFileisDirShouldOutputToConsoleAndNoExceptionThrown() throws IOException {
 
         testArray.add("src");
-        testCat.exec(testArray, null, out);
+        testCat.exec(testArray, null, out, null);
 
         Scanner scn = new Scanner(in);
         byte[] line  = scn.nextLine().getBytes();
@@ -121,7 +121,7 @@ public class CatTest{
 
         testArray.add("notafile.txt");
         assertThatThrownBy(() -> {
-            testCat.exec(testArray, null, out);
+            testCat.exec(testArray, null, out, null);
         }).isInstanceOf(RuntimeException.class).hasMessageContaining("cat: file does not exist");
         
     }

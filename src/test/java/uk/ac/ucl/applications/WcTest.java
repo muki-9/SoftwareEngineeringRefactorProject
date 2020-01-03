@@ -46,7 +46,7 @@ public class WcTest{
     public void wcShouldThrowExceptionifNoArgsAndNoInputGiven(){
 
         assertThatThrownBy(() -> {
-            testWc.exec(testArray, null, out);
+            testWc.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("wc: wrong number of arguments");
@@ -60,7 +60,7 @@ public class WcTest{
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
         assertThatCode(() -> {
-            testWc.exec(testArray, inputStream, out);
+            testWc.exec(testArray, inputStream, out, null);
         }).doesNotThrowAnyException();
 
     }
@@ -69,7 +69,7 @@ public class WcTest{
         testArray.add("-m");
 
         assertThatThrownBy(() -> {
-            testWc.exec(testArray, null, out);
+            testWc.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("wc: wrong number of arguments");
@@ -84,7 +84,7 @@ public class WcTest{
         int byteNo = originalString.getBytes().length +1;
         int wordNo = 6;
         int linesNo = 3;
-        testWc.exec(testArray, inputStream, out);
+        testWc.exec(testArray, inputStream, out, null);
         Scanner scn = new Scanner(in);
         int linesAct = Integer.parseInt(scn.next());
         int wordAct = Integer.parseInt(scn.next());
@@ -128,7 +128,7 @@ public class WcTest{
         testArray.add(tmp1);
         testArray.add(tmp2);
 
-        testWc.exec(testArray, null, out);
+        testWc.exec(testArray, null, out, null);
 
         Scanner scn = new Scanner(in);
 
@@ -160,7 +160,7 @@ public class WcTest{
         testArray.add(tmp1);
         testArray.add(tmp2);
 
-        testWc.exec(testArray, null, out);
+        testWc.exec(testArray, null, out, null);
 
         Scanner scn = new Scanner(in);
 
@@ -211,7 +211,7 @@ public class WcTest{
         String originalString = "test line absolute\n2nd line!\nabsent"; //if only print new lie counts then 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
     
-        testWc.exec(test, inputStream, out);
+        testWc.exec(test, inputStream, out, null);
         Scanner scn = new Scanner(in);
         int optAct = Integer.parseInt(scn.next());
         scn.close();

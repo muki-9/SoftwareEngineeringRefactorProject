@@ -19,7 +19,7 @@ public class History implements Application {
 
     */
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         validateArgs(args);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         ArrayList<String> listOfCommands = Jsh.getCommands();

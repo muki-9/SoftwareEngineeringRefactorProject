@@ -127,7 +127,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             }
         }
         String newS = s.substring(1, s.length() - 1);
-        return new Call(newS);
+        return new Call(newS, false);
     }
 
     /**
@@ -145,7 +145,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     public CommandVisitable visitSinglequoted(SinglequotedContext ctx) {
         String s = ctx.getText();
         String newS = s.substring(1, s.length() - 1);
-        return new Call(newS);
+        return new Call(newS, false);
     }
 
 
@@ -161,7 +161,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     */
     @Override
     public CommandVisitable visitUnquoted(AntlrGrammarParser.UnquotedContext ctx) {
-        return new Call(ctx.getChild(0).getText());
+        return new Call(ctx.getChild(0).getText(), true);
     }
 
     /**
@@ -190,7 +190,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         ArrayList<String> bqArgs = new ArrayList<>();
         boolean arg = false;
         boolean integrate = false;
-
+        boolean globb = false;
         if (ctx.unquoted().size() > 0 && ctx.backquoted().size() > 0) {
             integrate = true;
         }
@@ -210,16 +210,17 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                     }
                 }
             } else {
+                globb = c.getGlobb();
                 string = string.concat(c.getCurrArgs());
             }
         }
         if (integrate) {
-            return new Call(string);
+            return new Call(string, globb);
         }
         if (arg) {
             return new Call(bqArgs);
         }
-        return new Call(string);
+        return new Call(string, globb);
     }
 
     /**
@@ -276,9 +277,11 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         List<RedirectionContext> redirections = ctx.redirection();
         if (redirections.size() == 0) {
             ArrayList<String> args = getCallArgs(ctx);
+            ArrayList<Boolean> globb = getGlobbArray(ctx);
             String app = args.get(0);
+            globb.remove(0);
             args.remove(0);
-            return new Call(app, args);
+            return new Call(app, args, globb);
 
         } else {
             for (int i = 0; i < redirections.size();) {
@@ -301,12 +304,13 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                         throw new RuntimeException("redirection: error writing to file");
                     }
                     ArrayList<String> args = getCallArgs(ctx);
+                    ArrayList<Boolean> globb = getGlobbArray(ctx);
                     String app = null;
                     if (args.size()>0) {
                         app = args.get(0);
                         args.remove(0);
                     }
-                    return new Call(app, args, os);
+                    return new Call(app, args, os, globb);
 
                 } else if (c.getSymbol().matches("<")) {
                     if (!file.exists()) {
@@ -332,12 +336,15 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                     }
 
                     ArrayList<String> args = getCallArgs(ctx);
+                    ArrayList<Boolean> globb = getGlobbArray(ctx);
                     String app = null;
                     if (args.size()>0) {
                         app = args.get(0);
                         args.remove(0);
+                        globb.remove(0);
+
                     }
-                    return new Call(app, args, is);
+                    return new Call(app, args, is, globb);
                 } else {
                     throw new RuntimeException("antlr: parsing error- invalid character: " + c.getSymbol());
                 }
@@ -376,4 +383,22 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         }
         return args;
     }
+
+    public ArrayList<Boolean> getGlobbArray(CallContext ctx){
+
+        ArrayList<Boolean> globb = new ArrayList<>();
+        for(int n = 0; n<ctx.argument().size();n++) {
+            Call call = (Call) ctx.argument().get(n).accept(this);
+            if (call.getCurrArgs() != null) {
+                globb.add(call.getGlobb());
+            }
+            if (call.getSplit()) {
+                for(String s:call.getBqArray()) {
+                    globb.add(false);
+                }
+            }
+        }
+        return globb;
+    }
+
 }

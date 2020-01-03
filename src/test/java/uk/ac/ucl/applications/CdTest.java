@@ -45,7 +45,7 @@ public class CdTest{
     @Test
     public void testCd() throws IOException {
         testArray.add("src");
-        testCd.exec(testArray, null, out);
+        testCd.exec(testArray, null, out, null);
         String currentDir= Jsh.getCurrentDirectory();
         assertThat(currentDir).contains("src");
 
@@ -65,7 +65,7 @@ public class CdTest{
         testArray.add("jsh");
 
         assertThatThrownBy(() -> {
-            testCd.exec(testArray, null, out);
+            testCd.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("cd: too many arguments");
@@ -78,7 +78,7 @@ public class CdTest{
         testArray.add("index.txt");
 
         assertThatThrownBy(() -> {
-            testCd.exec(testArray, null, out);
+            testCd.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("cd: index.txt is not an existing directory");

@@ -15,9 +15,9 @@ public class UnsafeDecorator implements Application {
     }
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output) throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         try {
-            app.exec(args, input, output);
+            app.exec(args, input, output, globbArray);
         } catch (Exception e) {
             OutputStreamWriter writer = new OutputStreamWriter(output);
             writer.write(e.getMessage());
