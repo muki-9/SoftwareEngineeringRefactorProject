@@ -60,14 +60,11 @@ public class Sed implements Application {
         }
 
         if (args.get(0) != null && useIS || args.get(1) != null) {
-            String delimiter = Character.toString(args.get(0).charAt(1));
-            if (delimiter.matches("\\|")) {
-                delimiter = "\\|";
-            }
-            s = args.get(0).split(delimiter);
+            char delimiter = args.get(0).charAt(1);
+            s = args.get(0).split(Pattern.quote(Character.toString(delimiter)));
 
-            if (!s[0].matches("s")) {
-                throw new RuntimeException("sed: regex in incorrect form");
+            if (!"s".equals(s[0])) {
+                throw new RuntimeException("sed: regex in incorrect form, first letter must be an 's'");
             }
 
             if (args.get(0).lastIndexOf(delimiter) < args.get(0).length() - 1) {
