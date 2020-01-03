@@ -14,6 +14,10 @@ public class UnsafeDecorator implements Application {
         app = newApplication;
     }
 
+    /**
+    * Unsafe decorator that catched all exceptions here, and prints them out instead of throwing it,
+    * allows the program to continue and doesn't force immediate termination.
+    */
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         try {

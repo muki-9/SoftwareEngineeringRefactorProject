@@ -33,6 +33,8 @@ import uk.ac.ucl.jsh.AntlrGrammarParser.SinglequotedContext;
  */
 public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
 
+    
+
     /**
     * The right-most child of a redirection node will always be an argument. The left most child will either
     * be an input or output redirection. Depending in which it is, a special symbol is given as an argument
