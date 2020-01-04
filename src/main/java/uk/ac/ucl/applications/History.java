@@ -23,18 +23,17 @@ public class History implements Application {
         validateArgs(args);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         ArrayList<String> listOfCommands = Jsh.getCommands();
-        if (listOfCommands.size() > 0) {
-            for (String command : listOfCommands) {
-                writer.write(command);
-                writer.write(System.getProperty("line.separator"));
-                writer.flush();
-            }
-        }
-        else {
-            writer.write("history: there are no commands in history");
+        
+        for (String command : listOfCommands) {
+            writer.write(command);
             writer.write(System.getProperty("line.separator"));
             writer.flush();
         }
+
+        writer.write("history");
+        writer.write(System.getProperty("line.separator"));
+        writer.flush();
+  
     }
 
     /*

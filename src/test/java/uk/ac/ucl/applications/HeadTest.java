@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
@@ -31,12 +32,16 @@ public class HeadTest {
     PipedOutputStream out;
     ArrayList<String> testArray;
     Head testHead;
+    ByteArrayOutputStream outContent;
 
     @Before
     public void init() throws IOException {
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();
+        outContent  = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        testHead = new Head();
     }
 
     @After
@@ -49,65 +54,48 @@ public class HeadTest {
     @Test
 
     public void testhead() throws IOException{
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
-
         testArray.add("-n");
         testArray.add("5");
         testArray.add(filename); //replace with tempfile name
         
-        testHead= new Head(writer);
-        testHead.exec(testArray, null, null, null);
+        testHead.exec(testArray, null, System.out, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n';
-        String actual = stream.toString(); 
-        assertEquals(actual, expected);
-        stream.close();
-        writer.close();
+        assertEquals(outContent.toString(),expected);
     }
 
     @Test
 
     public void headWithInputShouldOutput() throws IOException {
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
-
         String originalString = "test line absolute\n2nd line!\nabsent"; //if only print new lie counts then 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-        testHead= new Head(writer);
-
         testArray.add("-n");
         testArray.add("2");
-        testHead.exec(testArray, inputStream, null, null);
+        testHead.exec(testArray, inputStream, System.out, null);
 
-        String actual = stream.toString();
-        assertThat(actual).isEqualTo("test line absolute\n2nd line!\n");
-
-        writer.close();
-        stream.close();
+        assertThat(outContent.toString()).isEqualTo("test line absolute\n2nd line!\n");
 
     }
 
-    // @Test
-    // public void testHeadWithNoArgsButInputShouldNotThrowException(){
+    @Test
+    public void testHeadWithNoArgsButInputShouldNotThrowException(){
 
-    //     String originalString = "test line absolute\n2nd line!\nabsent"; 
-    //     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+        String originalString = "test line absolute\n2nd line!\nabsent"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-    //     assertThatCode(() ->{
+        assertThatCode(() ->{
 
-    //         testHead.exec(testArray, inputStream, out);
-    //     }).doesNotThrowAnyException();
-    // }
+            testHead.exec(testArray, inputStream, out, null);
+        }).doesNotThrowAnyException();
+    }
 
     @Test
 
     public void headWithExtrArgShouldThrowExc() throws IOException{
-        testHead = new Head();
+   
         testArray.add("-n");
         testArray.add("5");
         testArray.add("input.txt");
@@ -123,52 +111,48 @@ public class HeadTest {
     @Test
 
     public void headWithNoArgShouldThrowExceptionNoInput() throws IOException{
-        testHead  = new Head();
+     
         assertThatThrownBy(() -> {
             testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("head: missing arguments");
+        .hasMessageContaining("head: wrong arguments");
 
     }
     //need to change code to allow this test
-    // @Test
 
-    // public void headWithInputShouldThrowExceptionWithMoreThan2Args(){
+    @Test
 
-    //     String originalString = "test line absolute\n2nd line!\nabsent"; 
-    //     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+    public void headWithInputShouldThrowExceptionWithMoreThan2Args(){
 
-    //     testArray.add("-n");
-    //     testArray.add("15");
-    //     testArray.add("file.txt");
+        String originalString = "test line absolute\n2nd line!\nabsent"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+   
+        testArray.add("-n");
+        testArray.add("15");
+        testArray.add("file.txt");
 
-    //     assertThatThrownBy(() -> {
-    //         testHead.exec(testArray, inputStream, out);
-    //     })
-    //     .isInstanceOf(RuntimeException.class)
-    //     .hasMessageContaining("head: wrong arguments file.txt");
+        assertThatThrownBy(() -> {
+            testHead.exec(testArray, inputStream, out, null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("head: wrong arguments");
         
-    // }
+    }
 
     @Test
 
     public void headWithNoLineLimitShouldPrintFirst10LinesifFileIsArg() throws IOException{
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
 
         testArray.add(filename); 
-        
-        testHead= new Head(writer);
-        testHead.exec(testArray, null, null, null);
+    
+        testHead.exec(testArray, null, System.out, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n'+"Line5" +'\n';
         expected+="Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n';
-        String actual = stream.toString();
+        String actual = outContent.toString();
         assertEquals(actual, expected);
-        stream.close();
-        writer.close();
     }
 
     @Test
@@ -176,12 +160,11 @@ public class HeadTest {
         testArray.add("-n");
         testArray.add("s");
         testArray.add("input1.txt");
-        testHead  = new Head();
         assertThatThrownBy(() -> {
             testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("head: wrong argument " + "s");
+        .hasMessageContaining("head: wrong argument: " + "s");
 
     }
 
@@ -191,7 +174,6 @@ public class HeadTest {
         testArray.add("-n");
         testArray.add("5");
         testArray.add("input1.txt");
-        testHead  = new Head();
         assertThatThrownBy(() -> {
             testHead.exec(testArray, null, out, null);
         })
@@ -203,25 +185,20 @@ public class HeadTest {
     /* right now the code does now throw error if 3rd arg isnt a file in the dir it would just print out the result*/
     @Test
     public void headShouldOutputAllLinesIfIntegerGivenIsMoreThanLinesOfFileWithoutException() throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
 
         testArray.add("-n");
         testArray.add("20");
         testArray.add(filename); //replace with tempfile name
-        
-        testHead= new Head(writer);
-        testHead.exec(testArray, null, null, null);
+    ;
+        testHead.exec(testArray, null, System.out, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n'+"Line5" +'\n';
         expected+="Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10"+'\n'+"Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n';
         expected+= "Line14"+'\n';
-        String actual = stream.toString();
+        String actual = outContent.toString();
         assertEquals(actual, expected);
-        assertThatCode(() -> { testHead.exec(testArray, null, null, null); }).doesNotThrowAnyException();
-        stream.close();
-        writer.close();
+        assertThatCode(() -> { testHead.exec(testArray, null, System.out, null); }).doesNotThrowAnyException();
     }
 
     @Test
@@ -229,12 +206,11 @@ public class HeadTest {
         testArray.add("-s");
         testArray.add("5");
         testArray.add("input1.txt");
-        testHead  = new Head();
         assertThatThrownBy(() -> {
             testHead.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("head: wrong argument " + "-s");
+        .hasMessageContaining("head: wrong argument: " + "-s");
     }
 
     private String createTempFile() throws IOException{

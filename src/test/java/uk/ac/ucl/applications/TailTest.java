@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class TailTest{
@@ -26,6 +27,7 @@ public class TailTest{
     PipedOutputStream out;
     ArrayList<String> testArray;
     Tail testTail;
+    ByteArrayOutputStream outContent;
 
     @Before
     public void init() throws IOException {
@@ -33,78 +35,77 @@ public class TailTest{
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();
+        testTail = new Tail();
+        outContent  = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
     }
 
     @Test
 
-    public void tailWithInputShouldOutput() throws IOException {
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
+    public void tailWithInputShouldOutputLast2() throws IOException {
 
         String originalString = "test line absolute\n2nd line!\nabsent"; //if only print new lie counts then 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-        testTail= new Tail(writer);
-
         testArray.add("-n");
         testArray.add("2");
-        testTail.exec(testArray, inputStream, null, null);
-        String actual1 = stream.toString();
+        testTail.exec(testArray, inputStream, System.out, null);
+        String actual1 = outContent.toString();
         assertThat(actual1).isEqualTo("2nd line!\nabsent\n");
-
-        writer.close();
-        stream.close();
-
     }
 
     @Test
 
     public void tailWithInputNoArgsShouldOutputAll() throws IOException {
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
-
         String originalString = "test line absolute\n2nd line!\nabsent"; //if only print new lie counts then 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-        testTail= new Tail(writer);
-        testTail.exec(testArray, inputStream, null, null);
-        String actual1 = stream.toString();
+        testTail.exec(testArray, inputStream, System.out, null);
+        String actual1 = outContent.toString();
         assertThat(actual1).isEqualTo("test line absolute\n2nd line!\nabsent\n");
 
-        writer.close();
-        stream.close();
 
     }
 
     @Test
 
-    public void testTail() throws IOException{
+    public void testTailWithoutInputSWithOption () throws IOException{
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
 
         testArray.add("-n");
         testArray.add("5");
         testArray.add(filename); //replace with tempfile name
         
-        testTail= new Tail(writer);
-        testTail.exec(testArray, null, null, null);
+        testTail.exec(testArray, null, System.out, null);
 
         String expected = "Line10" +'\n'+"Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n'+"Line14"+'\n';
-        String actual = stream.toString();
+        String actual = outContent.toString();
         assertEquals(actual, expected);
-        stream.close();
-        writer.close();
+
+    }
+
+    @Test
+
+    public void ifArgSizeIs2AndInputNullShouldThrowExc(){
+
+        testArray.add("-n");
+        testArray.add("5");
+    
+        
+        assertThatThrownBy(() -> {
+            testTail.exec(testArray, null, out, null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("tail: wrong arguments");
+
 
     }
     @Test
 
     public void tailWithExtrArgShouldThrowExc() throws IOException{
 
-        testTail= new Tail();
         testArray.add("-n");
         testArray.add("5");
         testArray.add("input.txt");
@@ -117,34 +118,33 @@ public class TailTest{
         .hasMessageContaining("tail: wrong arguments");
     }
 
-    // @Test
+    @Test
 //should work so edit code to allow it
-    // public void tailWithExtrArgShouldThrowExcWithInput() throws IOException{
+    public void tailWithExtrArgShouldThrowExcWithInput() throws IOException{
 
-    //     String originalString = "test line absolute\n2nd line!\nabsent"; 
-    //     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+        String originalString = "test line absolute\n2nd line!\nabsent"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-    //     testTail= new Tail();
-    //     testArray.add("-n");
-    //     testArray.add("5");
-    //     testArray.add("test2.txt");
+        testArray.add("-n");
+        testArray.add("5");
+        testArray.add("test2.txt");
+
         
-    //     assertThatThrownBy(() -> {
-    //         testTail.exec(testArray, inputStream, out);
-    //     })
-    //     .isInstanceOf(RuntimeException.class)
-    //     .hasMessageContaining("tail: wrong arguments");
-    // }
+        assertThatThrownBy(() -> {
+            testTail.exec(testArray, inputStream, out,null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("tail: wrong arguments");
+    }
 
     @Test
 
     public void tailWithNoArgShouldThrowException() throws IOException{
-        testTail  = new Tail();
         assertThatThrownBy(() -> {
             testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("tail: missing arguments");
+        .hasMessageContaining("tail: wrong arguments");
 
     }
 
@@ -152,21 +152,16 @@ public class TailTest{
 
     public void tailWithNoLineLimitShouldPrintLast10LinesifFileIsArg() throws IOException{
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
 
         testArray.add(filename); 
-        
-        testTail= new Tail(writer);
-        testTail.exec(testArray, null, null, null);
+        testTail.exec(testArray, null, System.out, null);
 
         String expected = "Line5" +'\n'+"Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10" +'\n';
         expected+="Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n'+"Line14"+'\n';
-        String actual = stream.toString();
+        String actual = outContent.toString();
         assertEquals(actual, expected);
-        stream.close();
-        writer.close();
+
     }
 
     @Test
@@ -179,7 +174,7 @@ public class TailTest{
             testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("tail: wrong argument " + "s");
+        .hasMessageContaining("tail: wrong argument: " + "s");
 
     }
 
@@ -199,30 +194,24 @@ public class TailTest{
 
     }
     
-
-    // /* right now the code does now throw error if 3rd arg isnt a file in the dir it would just print out the result*/
     @Test
     public void tailShouldOutputAllLinesIfIntegerGivenIsMoreThanLinesOfFileWithoutException() throws IOException {
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
         String filename = createTempFile();
 
         testArray.add("-n");
         testArray.add("20");
         testArray.add(filename); //replace with tempfile name
         
-        testTail= new Tail(writer);
-        testTail.exec(testArray, null, null, null);
+        testTail.exec(testArray, null, System.out, null);
 
         String expected = "Line0" +'\n'+"Line1"+'\n'+"Line2"+'\n'+"Line3"+'\n'+"Line4"+'\n'+"Line5" +'\n';
         expected+="Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10"+'\n'+"Line11"+'\n'+"Line12"+'\n'+"Line13"+'\n';
         expected+= "Line14"+'\n';
-        String actual = stream.toString();
+        String actual = outContent.toString();
         assertEquals(actual, expected);
-        assertThatCode(() -> { testTail.exec(testArray, null, null, null); }).doesNotThrowAnyException();
-        stream.close();
-        writer.close();
+        assertThatCode(() -> { testTail.exec(testArray, null, System.out, null); }).doesNotThrowAnyException();
+
 
 
     }
@@ -237,7 +226,7 @@ public class TailTest{
             testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("tail: wrong argument " + "-s");
+        .hasMessageContaining("tail: wrong argument: " + "-s");
 
     }
 
