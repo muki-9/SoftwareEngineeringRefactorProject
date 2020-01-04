@@ -14,7 +14,7 @@ public class Cd implements Application {
     public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException { 
         if (args.isEmpty()) {
             // takes user to home directory when 'cd' is called alone
-            Jsh.setCurrentDirectory(System.getProperty("user.home"));
+            Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
         }
         else if (args.size() > 1) {
             throw new RuntimeException("cd: too many arguments");

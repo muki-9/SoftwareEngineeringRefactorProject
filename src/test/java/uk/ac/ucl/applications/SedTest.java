@@ -114,6 +114,27 @@ public class SedTest{
 
     }
 
+    @Test
+
+    public void sedWithoutG() throws IOException {
+
+        testArray.add("s/e/E/");
+        String tmp1 = createTempFile();
+        writeNewStringToFile(tmp1);
+        testArray.add(tmp1);
+        
+        testSed.exec(testArray, null, out, null);
+        Scanner scn = new Scanner(in);
+        String line = "";
+        for(int i=0; i<3; i++){
+            line+=scn.nextLine()+'\n';
+
+        }
+        assertThat(line).isEqualTo("REpeat0\nREpeat1\nREpeat2\n");
+        scn.close();
+
+    }
+
 
     @Test
     public void ifSedArgsis1AndInputNotNullThenNoException(){
@@ -126,15 +147,20 @@ public class SedTest{
         assertThatCode(() -> {
             testSed.exec(testArray, inputStream, out, null);
         }).doesNotThrowAnyException();
-        
-        testArray.add("s/a/b/");
-        testArray.add("src");
+    }
 
-        assertThatThrownBy(() -> {
+    @Test
+    public void ifInputArgIs2AndInputIsNotNullNoException() throws IOException {
+        String originalString = "test line absolute\n2nd line!\nabsent\n"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+        String tmp1 = createTempFile();
+
+        testArray.add("s/a/b/");
+        testArray.add(tmp1);
+
+        assertThatCode(() -> {
             testSed.exec(testArray, inputStream, out, null);
-        })
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("sed: wrong number of arguments");
+        }).doesNotThrowAnyException();
 
     }
 
@@ -147,7 +173,7 @@ public class SedTest{
             testSed.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("sed: wrong number of arguments");
+        .hasMessageContaining("sed: not enough arguments");
     }
 
     @Test
@@ -260,8 +286,16 @@ public class SedTest{
     }
     private void writeToFile(String filename) throws IOException{
         BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-        for(int i =0; i<3; i++){
+        for(int i=0; i<3; i++){
             bw.write("Line"+ i);
+            bw.write(System.getProperty("line.separator"));
+        }
+        bw.close();
+    }
+    private void writeNewStringToFile(String filename) throws IOException{
+        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+        for(int i=0; i<3; i++){
+            bw.write("Repeat"+ i);
             bw.write(System.getProperty("line.separator"));
         }
         bw.close();

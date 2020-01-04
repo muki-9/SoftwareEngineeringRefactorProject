@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Jsh {
     private static String currentDirectory = System.getProperty("user.dir");
+    final private static String homeDirectory = System.getProperty("user.dir");
     private static ArrayList<String> commands = new ArrayList<>();
     private static boolean default_constr = true;
     public Jsh(){
@@ -32,6 +33,10 @@ public class Jsh {
         CommandVisitable command = myVisitor.visit(tree);
         CommandVisitor commandVisitor = new Eval(output);
         command.accept(commandVisitor);
+    }
+
+    public static String getHomeDirectory() {
+        return homeDirectory;
     }
 
     public static ArrayList<String> getCommands() {

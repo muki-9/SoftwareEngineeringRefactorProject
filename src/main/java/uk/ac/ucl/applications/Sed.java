@@ -38,7 +38,7 @@ public class Sed implements Application {
             String file = args.get(1);
             Path currentDir = Paths.get(Jsh.getCurrentDirectory());
             Path filePath = currentDir.resolve(file);
-            if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
+            if (Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
                 throw new RuntimeException("sed: wrong file argument");
             }
 
@@ -46,7 +46,6 @@ public class Sed implements Application {
             writeOutput(writer, lines);
         }
     }
-
     
     /*
 
@@ -59,15 +58,10 @@ public class Sed implements Application {
     private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
         // ensures only either 1 or 2 arguments are provided
-        if (args.size() != 2) {
-            if (args.size() == 1 && input != null) {
-                useIS = true;
-            }
-            else {
-                throw new RuntimeException("sed: wrong number of arguments");
-            }
+        if ((args.size() == 1) && (input != null)) {
+            useIS = true;
         }
-        if (((args.get(0) != null) && useIS) || (args.get(1) != null)) {
+        if (args.size()==2 || useIS) {
             // splits REPLACEMENT into array by the delimiter used
             char delimiter = args.get(0).charAt(1);
             s = args.get(0).split(Pattern.quote(Character.toString(delimiter)));
