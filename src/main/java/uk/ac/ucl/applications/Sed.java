@@ -25,31 +25,40 @@ public class Sed implements Application {
 
     @Override
     public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
-        String currentDirectory = Jsh.getCurrentDirectory();
-        String file;
         String[] s = validateArgs(args, input);
+
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+        ArrayList<String> lines = new ArrayList<>();
+
         if (useIS) {
-            ArrayList<String> lines = new ArrayList<>();
             lines = performSed(s, input, g);
             writeOutput(writer, lines);
         }
         else {
-            file = args.get(1);
-            Path currentDir = Paths.get(currentDirectory);
+            String file = args.get(1);
+            Path currentDir = Paths.get(Jsh.getCurrentDirectory());
             Path filePath = currentDir.resolve(file);
             if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
                 throw new RuntimeException("sed: wrong file argument");
             }
-            ArrayList<String> lines = new ArrayList<>();
+
             lines = performSed(s, file, g);
             writeOutput(writer, lines);
         }
     }
 
+    
+    /*
+
+        Method uses if statements to select the REPLACEMENT of the sed command.
+        REPLACEMENT is split into array of strings separated by delimiter used in command line using split function.
+        Array of Strings is returned.
+        Method also checks if stdin is to be used by altering useIS, and if 'g' is at end of REPLACEMENT.
+
+    */
     private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
-
+        // ensures only either 1 or 2 arguments are provided
         if (args.size() != 2) {
             if (args.size() == 1 && input != null) {
                 useIS = true;
@@ -58,16 +67,13 @@ public class Sed implements Application {
                 throw new RuntimeException("sed: wrong number of arguments");
             }
         }
+        if (((args.get(0) != null) && useIS) || (args.get(1) != null)) {
+            // splits REPLACEMENT into array by the delimiter used
+            char delimiter = args.get(0).charAt(1);
+            s = args.get(0).split(Pattern.quote(Character.toString(delimiter)));
 
-        if (args.get(0) != null && useIS || args.get(1) != null) {
-            String delimiter = Character.toString(args.get(0).charAt(1));
-            if (delimiter.matches("\\|")) {
-                delimiter = "\\|";
-            }
-            s = args.get(0).split(delimiter);
-
-            if (!s[0].matches("s")) {
-                throw new RuntimeException("sed: regex in incorrect form");
+            if (!"s".equals(s[0])) {
+                throw new RuntimeException("sed: regex in incorrect form, first letter must be an 's'");
             }
 
             if (args.get(0).lastIndexOf(delimiter) < args.get(0).length() - 1) {
@@ -88,36 +94,63 @@ public class Sed implements Application {
         return s;
     }
 
+
+    /*
+
+        Overloaded version of method that takes in file.
+        Lines of file are retrieved using getLines and updated depending on command line args using sedUpdateLines.
+        Method returns updated lines.
+
+    */
     private ArrayList<String> performSed(String[] s, String file, Boolean g) throws IOException {
-        ArrayList<String> fileLines = getLines(file);
         ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> fileLines = getLines(file);
+        
         if (g) {
-            lines = sedForAll(s[1], s[2], fileLines);
+            lines = sedUpdateLines(s[1], s[2], fileLines, true);
         }
         else {
-            lines = sedFirstInstance(s[1], s[2], fileLines);
+            lines = sedUpdateLines(s[1], s[2], fileLines, false);
         }
+
         return lines;
     }
 
+
+    /*
+
+        Overloaded version of method that takes in stdin.
+        Lines of file are retrieved using readAllBytes + split, and updated depending on command line args using sedUpdateLines.
+        Method returns updated lines.
+
+    */
     private ArrayList<String> performSed(String[] s, InputStream input, Boolean g) throws IOException {
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> argLines = new ArrayList<>();
+
         String line = new String(input.readAllBytes());
         String[] splitLine = line.split(System.getProperty("line.separator"));
-        ArrayList<String> argLines = new ArrayList<>();
-        ArrayList<String> lines = new ArrayList<>();
-        for(String string:splitLine) {
+        
+        for(String string : splitLine) {
             argLines.add(string);
         }
 
         if (g) {
-            lines = sedForAll(s[1], s[2], argLines);
+            lines = sedUpdateLines(s[1], s[2], argLines, true);
         }
         else {
-            lines = sedFirstInstance(s[1], s[2], argLines);
+            lines = sedUpdateLines(s[1], s[2], argLines, false);
         }
+
         return lines;
     }
 
+
+    /*
+
+        Method uses BufferedWriter to write all lines in lines array to OutputStream.
+
+    */
     private void writeOutput(BufferedWriter writer, ArrayList<String> lines) throws IOException {
         for(String str : lines) {
             writer.write(str);
@@ -126,14 +159,22 @@ public class Sed implements Application {
         }
     }
     
+
+    /*
+
+        Method uses BufferedReader to add each line of file to array of lines.
+        Lines array is returned.
+
+    */
     public ArrayList<String> getLines(String file) throws IOException {
+        ArrayList<String> lines = new ArrayList<>();
+
         Path currentDir = Paths.get(Jsh.getCurrentDirectory());
         Path filePath = currentDir.resolve(file);
         Charset encoding = StandardCharsets.UTF_8;
-        String line;
-        ArrayList<String> lines = new ArrayList<>();
 
         try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+            String line;
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
             }
@@ -141,30 +182,32 @@ public class Sed implements Application {
         } catch (IOException e) {
             throw new RuntimeException("sed: cannot open "+file);
         }
+
         return lines;
     }
 
-    private ArrayList<String> sedForAll(String regex, String replacement, ArrayList<String> fileLines) {
+
+    /*
+
+        Method uses a for loop to go through each line.
+        Each line is checked to see if it matches regex using Matcher.
+        The 'all' parameter determines if all or first matches are updated.
+        Updated lines are returned.
+
+    */
+    private ArrayList<String> sedUpdateLines(String regex, String replacement, ArrayList<String> fileLines, Boolean all) {
         ArrayList<String> changedlines = new ArrayList<>();
         Pattern sedPattern = Pattern.compile(regex);
 
-        for(String line: fileLines) {
+        for(String line : fileLines) {
             Matcher matcher = sedPattern.matcher(line);
             if (matcher.find()) {
-                line = line.replaceAll(regex, replacement);
-            }
-            changedlines.add(line);
-        }
-        return changedlines;
-    }
-
-    private ArrayList<String> sedFirstInstance(String regex, String replacement, ArrayList<String> fileLines) {
-        ArrayList<String> changedlines = new ArrayList<>();
-        Pattern sedPattern = Pattern.compile(regex);
-        for(String line: fileLines) {
-            Matcher matcher = sedPattern.matcher(line);
-            if (matcher.find()) {
-                line = line.replaceFirst(regex, replacement);
+                if(all){
+                    line = line.replaceAll(regex, replacement);
+                }
+                else {
+                    line = line.replaceFirst(regex, replacement);
+                }
             }
             changedlines.add(line);
         }
