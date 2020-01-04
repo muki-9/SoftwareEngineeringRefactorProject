@@ -344,18 +344,13 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                         app = args.get(0);
                         args.remove(0);
                         globb.remove(0);
-
                     }
                     return new Call(app, args, is, globb);
-                } else {
-                    throw new RuntimeException("antlr: parsing error- invalid character: " + c.getSymbol());
                 }
             }
         }
         return null;
     }
-
-    
 
 
     /**
