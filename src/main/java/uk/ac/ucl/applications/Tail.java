@@ -76,7 +76,7 @@ public class Tail implements Application {
             throw new RuntimeException("tail: wrong arguments");   
         }
 
-        if((args.size() ==2 || args.isEmpty()) && input!=null){
+        if(args.size() ==2 || args.isEmpty()){
             useIS = true;
         }
     }

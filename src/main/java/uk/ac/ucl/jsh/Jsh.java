@@ -2,6 +2,7 @@ package uk.ac.ucl.jsh;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.antlr.v4.runtime.CharStream;
@@ -14,6 +15,7 @@ public class Jsh {
     final private static String homeDirectory = System.getProperty("user.dir");
     private static ArrayList<String> commands = new ArrayList<>();
     private static boolean default_constr = true;
+    private static PrintStream setOutput = System.out;
     public Jsh(){
 
     }
@@ -51,6 +53,14 @@ public class Jsh {
         Jsh.currentDirectory = dir;
     }
 
+    final static void setTestOutput(PrintStream output){
+        Jsh.setOutput = output;
+    }
+
+    final static PrintStream getOutput(){
+        return setOutput;
+    }
+
     /**
      * 
      * @param s - this is the string the user enters at the command line
@@ -78,7 +88,7 @@ public class Jsh {
                 if(blankShell(cmdline)){
                     continue;
                 }
-                eval(cmdline, System.out);
+                eval(cmdline, getOutput());
             }catch(Exception e){
                 System.out.println("jsh: "+e.getMessage());
 
@@ -118,7 +128,7 @@ public class Jsh {
                 throw new RuntimeException("jsh: " + args[0] + ": unexpected argument");
             }
     
-            newShell.eval(args[1], System.out);
+            newShell.eval(args[1], getOutput());
    
             } 
             else {

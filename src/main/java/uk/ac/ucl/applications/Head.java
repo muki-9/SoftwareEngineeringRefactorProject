@@ -76,15 +76,17 @@ public class Head implements Application {
     //     Method takes in command line arguments and adjusts class state or throws exception depending on arguments using if statements.
 
     // */
+    
 
     public void checkArgs(ArrayList<String> args, InputStream input){
-
         if(((args.isEmpty() || args.size() ==2)&& input == null)|| args.size() > 3){
             throw new RuntimeException("head: wrong arguments");   
         }
-        if((args.size() ==2 || args.isEmpty()) && input!=null){
+
+        if(args.size() ==2 || args.isEmpty()){
             useIS = true;
         }
+
     }
 
     private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory)

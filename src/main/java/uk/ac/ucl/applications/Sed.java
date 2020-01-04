@@ -38,7 +38,7 @@ public class Sed implements Application {
             String file = args.get(1);
             Path currentDir = Paths.get(Jsh.getCurrentDirectory());
             Path filePath = currentDir.resolve(file);
-            if (Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
+            if (Files.isDirectory(filePath)) {
                 throw new RuntimeException("sed: wrong file argument");
             }
 
@@ -57,33 +57,31 @@ public class Sed implements Application {
     */
     private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
-        // ensures only either 1 or 2 arguments are provided
-        if ((args.size() == 1) && (input != null)) {
+
+        if((args.size() ==1 && input == null )||args.size() > 2 || args.size() < 1){
+            throw new RuntimeException("sed: wrong arguments");
+        }
+        // use InputStream if replacement given with no file
+        if (args.size() ==1) {
             useIS = true;
         }
-        if (args.size()==2 || useIS) {
-            // splits REPLACEMENT into array by the delimiter used
-            char delimiter = args.get(0).charAt(1);
-            s = args.get(0).split(Pattern.quote(Character.toString(delimiter)));
-
-            if (!"s".equals(s[0])) {
-                throw new RuntimeException("sed: regex in incorrect form, first letter must be an 's'");
-            }
-
-            if (args.get(0).lastIndexOf(delimiter) < args.get(0).length() - 1) {
-                if (args.get(0).charAt(args.get(0).lastIndexOf(delimiter) + 1) == 'g') {
-                    g = true;
-                }
-                else if (args.get(0).lastIndexOf(delimiter) == args.get(0).length() - 1) {
-                    g = false;
-                }
-                else {
-                    throw new RuntimeException("sed: regex must end in either a delimiter or 'g'");
-                }
-            }
+        // splits REPLACEMENT into array by the delimiter used
+        final String replacement  = args.get(0);
+        
+        char delimiter = replacement.charAt(1);
+        if(args.get(0).chars().filter(num -> num == delimiter).count() !=3){
+            throw new RuntimeException("sed: wrong number of delimiters");
         }
-        else {
-            throw new RuntimeException("sed: not enough arguments");
+        s = args.get(0).split(Pattern.quote(Character.toString(delimiter)));
+
+        if (!"s".equals(s[0])) {
+            throw new RuntimeException("sed: regex in incorrect form, first letter must be an 's'");
+        }
+
+        if (replacement.charAt(replacement.length()-1) == 'g') {
+                g = true;
+        }else if(replacement.charAt(replacement.length()-1) != delimiter){
+            throw new RuntimeException("sed: last char should be delimiter or g");
         }
         return s;
     }
@@ -160,7 +158,7 @@ public class Sed implements Application {
         Lines array is returned.
 
     */
-    public ArrayList<String> getLines(String file) throws IOException {
+    private ArrayList<String> getLines(String file) throws IOException {
         ArrayList<String> lines = new ArrayList<>();
 
         Path currentDir = Paths.get(Jsh.getCurrentDirectory());

@@ -70,7 +70,7 @@ public class FindTest{
             testFind.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("find: arg -wrong not correct");
+        .hasMessageContaining("find: args not correct");
 
 
     }
@@ -129,21 +129,21 @@ public class FindTest{
         
     }
 
-    // @Test
+    @Test
 
-    // public void catchExceptionIfCannotWriteToStdout() throws IOException {
+    public void catchExceptionIfCannotWriteToStdout() throws IOException {
 
-    //     PipedOutputStream out = new PipedOutputStream();
+        PipedOutputStream out = new PipedOutputStream();
 
-    //     testArray.add("-name");
-    //     testArray.add("*java");
+        testArray.add("-name");
+        testArray.add("*java");
 
-    //     assertThatThrownBy(() ->{
-    //         testFind.exec(testArray, null, out, null);
-    //     }).isInstanceOf(RuntimeException.class)
-    //     .hasMessage("cannot write to output");
+        assertThatThrownBy(() ->{
+            testFind.exec(testArray, null, out, null);
+        }).isInstanceOf(RuntimeException.class)
+        .hasMessage("cannot write to output");
 
-    // }
+    }
 
 
     private String createTempFile(String extension) throws IOException{

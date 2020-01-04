@@ -27,12 +27,15 @@ public class JshTest {
     PipedInputStream input;
     PipedOutputStream out;
     Jsh testJsh;
+    ByteArrayOutputStream outContent;
 
     @Before
     public void init() throws IOException{
 
         input = new PipedInputStream();
         out = new PipedOutputStream(input);
+        outContent  = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
 
     }
 
@@ -41,6 +44,8 @@ public class JshTest {
     public void tear(){
 
         System.setIn(System.in);
+        File delete  = new File("result.txt");
+        delete.delete();
 
     }
 
@@ -82,10 +87,10 @@ public class JshTest {
     public void jshShouldNotThrowErrorIf2ArgsAndCorrectFormat(){
 
         String[] args=  {"-c", "pwd"};
+
         assertThatCode(() -> {
             Jsh.main(args);
         }).doesNotThrowAnyException();
-
 
     }
 
@@ -102,7 +107,6 @@ public class JshTest {
         newshell.takesInput();
 
         assertThat(outContent.toString()).isEqualTo("/workspaces/jsh-team-44> ");
-        // scn.close();
 
     }
 
@@ -115,9 +119,10 @@ public class JshTest {
         InputStream in = new ByteArrayInputStream(input.getBytes());
         System.setIn(in);
 
-        assertThatCode(() -> {
-            testJsh.takesInput();
-        }).doesNotThrowAnyException();
+      
+        testJsh.takesInput();
+        assertThat(outContent.toString()).isEqualTo(Jsh.getHomeDirectory()+"> ");
+    
         // scn.close();
 
     }
@@ -197,6 +202,20 @@ public class JshTest {
 
     }
 
+    @Test
+
+    public void testJshWithRedirectionCreatesFile(){
+        testJsh = new Jsh(false);
+
+        String input = "> result.txt";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        assertThatCode(() -> {
+            testJsh.takesInput();
+        }).doesNotThrowAnyException(); 
+
+
+    }
 
 
     @Test

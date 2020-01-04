@@ -13,9 +13,13 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.xml.namespace.QName;
+
 import static org.assertj.core.api.Assertions.*;
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +39,7 @@ public class GrepTest{
     PipedOutputStream out;
     Grep testGrep;
     ArrayList<String> testArray;
+    ByteArrayOutputStream outContent;
     
 
     @Before
@@ -44,7 +49,8 @@ public class GrepTest{
         out= new PipedOutputStream(in);
         testGrep = new Grep();
         testArray = new ArrayList<>();
-
+        outContent  = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
     }
 
 
@@ -74,6 +80,22 @@ public class GrepTest{
     } 
 
     @Test
+
+    public void grepShouldThrowErrorIffileIsntReadable() throws IOException {
+
+        File unreadable = new File(createTempFile());
+        unreadable.setReadable(false);
+        testArray.add("aba");
+        testArray.add(unreadable.getName());
+        assertThatThrownBy(() -> {
+            testGrep.exec(testArray, null, out, null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("grep: wrong file argument");
+
+    }
+
+    @Test
     
     public void shouldThrowExceptionifWrongFile() throws IOException {
 
@@ -82,7 +104,7 @@ public class GrepTest{
         testArray.add("test.txt");
 
         assertThatThrownBy(() -> {
-            testGrep.getPathArray(testArray);
+            testGrep.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("grep: wrong file argument");
@@ -98,7 +120,7 @@ public class GrepTest{
 
    
         assertThatThrownBy(() -> {
-            testGrep.getPathArray(testArray);
+            testGrep.exec(testArray, null, out,null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("grep: wrong file argument");
@@ -108,44 +130,38 @@ public class GrepTest{
     @Test
 
     public void ifInputNotNullThenShouldOutputCorrect() throws IOException {
-        // ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        // BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
 
         String originalString = "test line absolute\n2nd line!\nabsent";
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
         testArray.add("ab");
-        String line  =null;
-        testGrep.exec(testArray, inputStream, out, null);
-        Scanner scn = new Scanner(in);
-        line = scn.nextLine() +'\n';
-        line += scn.nextLine()+'\n';
-        byte[] actual = line.getBytes();
-        byte[] expected  = "test line absolute\nabsent\n".getBytes();
-        scn.close();
+       
+        testGrep.exec(testArray, inputStream, System.out, null);
+        String actual = outContent.toString();
 
-        assertArrayEquals(actual, expected);
+        String expected = "test line absolute\nabsent\n";
+        assertEquals(actual, expected);
 
     }
-    @Test
-    public void ifMoreThan2ArgsThenShouldGetAllPaths() throws IOException {
+    // @Test
+    // public void ifMoreThan2ArgsThenShouldGetAllPaths() throws IOException {
 
-        testArray.add("ab");
-        String tmp1  = createTempFile();
-        String tmp2 = createTempFile();
-        String tmp3 = createTempFile();
-        testArray.add(tmp1);
-        testArray.add(tmp2);
-        testArray.add(tmp3);
+    //     testArray.add("ab");
+    //     String tmp1  = createTempFile();
+    //     String tmp2 = createTempFile();
+    //     String tmp3 = createTempFile();
+    //     testArray.add(tmp1);
+    //     testArray.add(tmp2);
+    //     testArray.add(tmp3);
 
-        assertThatCode(() -> {
-            testGrep.getPathArray(testArray);
-        }).doesNotThrowAnyException();
+    //     assertThatCode(() -> {
+    //         testGrep.exec(testArray, null, out,null);
+    //     }).doesNotThrowAnyException();
 
-        Path[] pathArray = testGrep.getPathArray(testArray);
-        assertThat(pathArray).hasSize(3);
+    //     Path[] pathArray = testGrep.getPathArray(testArray);
+    //     assertThat(pathArray).hasSize(3);
 
-    }
+    // }
 
     @Test
     public void testGrepWithMoreArgsShouldOutputCorrectContent() throws IOException {
@@ -159,17 +175,11 @@ public class GrepTest{
         testArray.add(tmp1);
         testArray.add(tmp2);
 
-        testGrep.exec(testArray, null, out, null);
-        String line = null;
-        Scanner scn = new Scanner(in);
-        line = scn.nextLine() +'\n';
-        line += scn.nextLine()+'\n';
-        byte[] actual = line.getBytes();
+        testGrep.exec(testArray, null, System.out, null);
+        String actual = outContent.toString();
         String exp  = "absent this should print on"+tmp1+'\n'+"absent this should print on"+tmp2+'\n';
-        byte[] expected = exp.getBytes();
-        scn.close();
 
-        assertArrayEquals(actual, expected);
+        assertEquals(actual, exp);
         
     }
 

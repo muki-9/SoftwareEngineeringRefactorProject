@@ -79,7 +79,18 @@ public class HeadTest {
         assertThat(outContent.toString()).isEqualTo("test line absolute\n2nd line!\n");
 
     }
+    @Test
 
+    public void headWithNoArgsAndInputShouldOutput() throws IOException {
+
+        String originalString = "test line absolute\n2nd line!\nabsent"; 
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
+        testHead.exec(testArray, inputStream, System.out, null);
+
+        assertThat(outContent.toString()).isEqualTo("test line absolute\n2nd line!\nabsent\n");
+
+    }
     @Test
     public void testHeadWithNoArgsButInputShouldNotThrowException(){
 
@@ -123,21 +134,21 @@ public class HeadTest {
 
     @Test
 
-    public void headWithInputShouldThrowExceptionWithMoreThan2Args(){
+    public void headWithInputShouldNotThrowExceptionWithMoreThan2Args() throws IOException {
 
         String originalString = "test line absolute\n2nd line!\nabsent"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
-   
+        String tmp = createTempFile();
         testArray.add("-n");
         testArray.add("15");
-        testArray.add("file.txt");
+        testArray.add(tmp);
 
-        assertThatThrownBy(() -> {
-            testHead.exec(testArray, inputStream, out, null);
+        assertThatCode(() -> {
+            testHead.exec(testArray, inputStream, System.out, null);
         })
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("head: wrong arguments");
-        
+        .doesNotThrowAnyException();
+        String actual = outContent.toString();
+        assertThat(actual).contains("Line").doesNotContain("test line absolute");
     }
 
     @Test

@@ -88,6 +88,24 @@ public class TailTest{
 
     @Test
 
+    public void tailShouldThrowExceptionIfMoreThan3Args(){
+        testArray.add("-n");
+        testArray.add("5");
+        testArray.add("test.txt");
+        testArray.add("otherfile.txt");
+    
+        
+        assertThatThrownBy(() -> {
+            testTail.exec(testArray, null, out, null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("tail: wrong arguments");
+
+
+    }
+
+    @Test
+
     public void ifArgSizeIs2AndInputNullShouldThrowExc(){
 
         testArray.add("-n");
@@ -100,41 +118,37 @@ public class TailTest{
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: wrong arguments");
 
-
     }
     @Test
 
-    public void tailWithExtrArgShouldThrowExc() throws IOException{
-
-        testArray.add("-n");
-        testArray.add("5");
-        testArray.add("input.txt");
-        testArray.add("input1.txt");
-        
+    public void ifNoArgsAndInputNullShouldThrowExc(){
+    
         assertThatThrownBy(() -> {
             testTail.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("tail: wrong arguments");
+
     }
 
     @Test
-//should work so edit code to allow it
-    public void tailWithExtrArgShouldThrowExcWithInput() throws IOException{
+
+    public void tailWithExtrArgShouldNotThrowExceptionWithInput() throws IOException{
 
         String originalString = "test line absolute\n2nd line!\nabsent"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
-
+        String tmp1 = createTempFile();
         testArray.add("-n");
         testArray.add("5");
-        testArray.add("test2.txt");
+        testArray.add(tmp1);
 
         
-        assertThatThrownBy(() -> {
-            testTail.exec(testArray, inputStream, out,null);
+        assertThatCode(() -> {
+            testTail.exec(testArray, inputStream, System.out ,null);
         })
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("tail: wrong arguments");
+        .doesNotThrowAnyException();
+        String actual = outContent.toString();
+        assertThat(actual).contains("Line").doesNotContain("test line absolute");
     }
 
     @Test

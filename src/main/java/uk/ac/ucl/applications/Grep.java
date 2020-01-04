@@ -65,7 +65,7 @@ public class Grep implements Application {
         If file exists, it is added to a new array, which is returned by the method.
     
     */
-    public Path[] getPathArray(ArrayList<String> args) {
+    private Path[] getPathArray(ArrayList<String> args) {
         Path currentDir = Paths.get(Jsh.getCurrentDirectory());
         int numOfFiles = args.size() - 1;
         Path[] filePathArray = new Path[numOfFiles];
@@ -73,7 +73,7 @@ public class Grep implements Application {
 
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + 1));
-            if (Files.notExists(filePath) || Files.isDirectory(filePath) || !Files.exists(filePath) || !Files.isReadable(filePath)) {
+            if (Files.isDirectory(filePath) || !Files.isReadable(filePath)) {
                 throw new RuntimeException("grep: wrong file argument");
             }
             else {
