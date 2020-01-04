@@ -1,13 +1,17 @@
 package uk.ac.ucl.applications;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ucl.applications.Find;
 import static org.assertj.core.api.Assertions.*;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -19,7 +23,7 @@ public class FindTest{
     PipedOutputStream out;
     ArrayList<String> testArray;
     Find testFind;
-
+    ByteArrayOutputStream outContent;
     @Before
     public void init() throws IOException{
 
@@ -27,6 +31,8 @@ public class FindTest{
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();
         testFind = new Find();
+        outContent  = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
 
     }
     @After
@@ -97,7 +103,8 @@ public class FindTest{
   
     }
 
-    @Test
+
+        @Test
     public void findShouldThrowExceptionIfPathIncorrect() throws IOException{
 
         testArray.add("randompath/src");
@@ -114,8 +121,19 @@ public class FindTest{
 
     @Test
 
-    public void ifContainsPathShouldContainPathNameAtStart() throws IOException {
+    public void ifDoenstContainsPathShouldContainDotAtStart() throws IOException {
 
+        testArray.add("-name");
+        testArray.add("*java");
+
+        testFind.exec(testArray, null, System.out, null);
+
+        assertThat(outContent.toString()).startsWith(".");
+        
+    }
+    @Test
+
+    public void ifContainsPathShouldpathnameAtStart() throws IOException {
         testArray.add("target");
         testArray.add("-name");
         testArray.add("*java");

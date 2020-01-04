@@ -29,11 +29,6 @@ public class History implements Application {
             writer.write(System.getProperty("line.separator"));
             writer.flush();
         }
-
-        writer.write("history");
-        writer.write(System.getProperty("line.separator"));
-        writer.flush();
-  
     }
 
     /*
