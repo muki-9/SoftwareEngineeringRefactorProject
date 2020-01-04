@@ -53,6 +53,16 @@ public class CdTest{
 
     @Test
 
+    public void testCdWithNoInputShouldTakeToHome() throws IOException {
+        Jsh.setCurrentDirectory("/workspaces/jsh-team-44/src");
+        testCd.exec(testArray, null, out, null);
+        String currentDir= Jsh.getCurrentDirectory();
+        assertThat(currentDir).contains("/workspaces/jsh-team-44").doesNotContain("src");   
+
+    }
+
+    @Test
+
     public void cdShouldThrowExceptionifNoArgsOrMoreThan1Arg(){
 
         // assertThatThrownBy(() -> {
@@ -82,6 +92,19 @@ public class CdTest{
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("cd: index.txt is not an existing directory");
+
+    }
+
+    @Test
+
+    public void throwExceptionifArgDoesntExist(){
+        testArray.add("file.txt");
+
+        assertThatThrownBy(() -> {
+            testCd.exec(testArray, null, out, null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("cd: file.txt is not an existing directory");
 
     }
 

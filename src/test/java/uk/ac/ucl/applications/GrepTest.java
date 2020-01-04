@@ -90,6 +90,22 @@ public class GrepTest{
     }
 
     @Test
+    
+    public void shouldThrowExceptionifDir() throws IOException {
+
+        testArray.add("a");
+        testArray.add("src");
+
+   
+        assertThatThrownBy(() -> {
+            testGrep.getPathArray(testArray);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("grep: wrong file argument");
+
+    }
+
+    @Test
 
     public void ifInputNotNullThenShouldOutputCorrect() throws IOException {
         // ByteArrayOutputStream stream = new ByteArrayOutputStream();

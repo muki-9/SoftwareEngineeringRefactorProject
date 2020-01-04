@@ -82,7 +82,6 @@ public class FindTest{
         createTempFile(".txt");
         createTempFile(".txt");
         createTempFile(".out");
-
         testArray.add("-name");
         testArray.add("in*xt");
 
@@ -92,7 +91,7 @@ public class FindTest{
         String output = scn.nextLine();
         String output2 = scn.nextLine();
 
-        assertThat(output).contains(".txt");
+        assertThat(output).startsWith(".").contains(".txt");
         assertThat(output2).contains(".txt");
         scn.close();
   
@@ -105,14 +104,47 @@ public class FindTest{
         testArray.add("-name");
         testArray.add("*java");
 
-        assertThatThrownBy(() -> {
-            testFind.exec(testArray, null, out, null);
-        })
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("find: randompath/src does not exist");
 
+        assertThatThrownBy(() ->{
+            testFind.exec(testArray, null, out, null);
+        }).isInstanceOf(RuntimeException.class)
+        .hasMessage("find: randompath/src does not exist");
 
     }
+
+    @Test
+
+    public void ifContainsPathShouldContainPathNameAtStart() throws IOException {
+
+        testArray.add("target");
+        testArray.add("-name");
+        testArray.add("*java");
+
+        testFind.exec(testArray, null, out, null);
+
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        assertThat(output).startsWith("target");
+        scn.close();
+        
+    }
+
+    @Test
+
+    public void catchExceptionIfCannotWriteToStdout() throws IOException {
+
+        PipedOutputStream out = new PipedOutputStream();
+
+        testArray.add("-name");
+        testArray.add("*java");
+
+        assertThatThrownBy(() ->{
+            testFind.exec(testArray, null, out, null);
+        }).isInstanceOf(RuntimeException.class)
+        .hasMessage("cannot write to output");
+
+    }
+
 
     private String createTempFile(String extension) throws IOException{
 

@@ -1,7 +1,5 @@
 package uk.ac.ucl.applications;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -79,13 +77,19 @@ public class SedTest{
         scn.close();
 
     }
+    //needs to be fixed
 
     // @Test
 
-    // public void anySymbolCanBeUsedAsDelimeterShouldNotThrowExceptionUnlessInArgs(){
+    // public void anySymbolCanBeUsedAsDelimeterShouldNotThrowExceptionUnlessInArgs() throws IOException {
+    //     String tmp1 = createTempFile();
+    //     testArray.add("s$a$b$");
 
-    //     testArray.add("s[a[b");
-    //     testArray.add(e)
+    //     testArray.add(tmp1);
+
+    //     assertThatCode(() ->{
+    //         testSed.exec(testArray, null, out, null);
+    //     }).doesNotThrowAnyException();
     // }
 
 
