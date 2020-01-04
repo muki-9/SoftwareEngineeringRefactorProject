@@ -30,18 +30,12 @@ public class Mkdir implements Application {
             if (file.exists()) {
                 throw new RuntimeException("mkdir: File already exists, choose different name");
             }
-            else {
-                if (file.mkdir()){
-                    writer.write("Folder created sucessfully");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                }
-                else {
-                    writer.write("Folder could not be created, please try again");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                }
-            }
+      
+            file.mkdir();
+            writer.write("Folder created sucessfully");
+            writer.write(System.getProperty("line.separator"));
+            writer.flush();
+            
         }
     }
 

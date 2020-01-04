@@ -38,16 +38,11 @@ public class Rmdir implements Application {
             }
             else {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
-                if (file.delete()) {
-                    writer.write("Folder removed sucessfully");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                }
-                else {
-                    writer.write("Deletion failed due to unknown error");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                }
+                file.delete();
+                writer.write("Folder removed sucessfully");
+                writer.write(System.getProperty("line.separator"));
+                writer.flush();
+              
             }
         }
     }

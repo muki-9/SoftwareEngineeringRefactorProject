@@ -29,11 +29,8 @@ public class Head implements Application {
             throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
-        if(input != null){
-            useIS = true;
-        }
-    
-        checkArgs(args);
+
+        checkArgs(args, input);
         String file  = getFile(args);
 
         if (useIS) {
@@ -80,10 +77,13 @@ public class Head implements Application {
 
     // */
 
-    public void checkArgs(ArrayList<String> args){
+    public void checkArgs(ArrayList<String> args, InputStream input){
 
-        if(((args.isEmpty() || args.size() ==2)&& !useIS)|| args.size() > 3 || ((args.size() ==3 || args.size()==1))&& useIS){
+        if(((args.isEmpty() || args.size() ==2)&& input == null)|| args.size() > 3){
             throw new RuntimeException("head: wrong arguments");   
+        }
+        if((args.size() ==2 || args.isEmpty()) && input!=null){
+            useIS = true;
         }
     }
 
