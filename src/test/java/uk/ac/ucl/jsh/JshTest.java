@@ -106,7 +106,7 @@ public class JshTest {
         System.setOut(new PrintStream(outContent));
         newshell.takesInput();
 
-        assertThat(outContent.toString()).isEqualTo("/workspaces/jsh-team-44> ");
+        assertThat(outContent.toString()).isEqualTo(Jsh.getHomeDirectory()+"> ");
 
     }
 
@@ -245,6 +245,6 @@ public class JshTest {
         System.setOut(new PrintStream(outContent));
         testJsh.takesInput();
 
-        assertThat(outContent.toString()).isEqualTo("/workspaces/jsh-team-44> jsh: No line found\n");
+        assertThat(outContent.toString()).isEqualTo(Jsh.getHomeDirectory()+"> jsh: No line found\n");
     }
 }

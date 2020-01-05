@@ -20,6 +20,8 @@ COPY test /jsh/test
 RUN chmod +x /jsh/test
 COPY coverage /jsh/coverage
 RUN chmod +x /jsh/coverage
+COPY Dockerfile /jsh/Dockerfile
+RUN chmod +x /jsh/Dockerfile
 
 RUN cd /jsh && mvn package
 

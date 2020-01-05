@@ -54,10 +54,10 @@ public class CdTest{
     @Test
 
     public void testCdWithNoInputShouldTakeToHome() throws IOException {
-        Jsh.setCurrentDirectory("/workspaces/jsh-team-44/src");
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory()+"src");
         testCd.exec(testArray, null, out, null);
         String currentDir= Jsh.getCurrentDirectory();
-        assertThat(currentDir).contains("/workspaces/jsh-team-44").doesNotContain("src");   
+        assertThat(currentDir).contains(Jsh.getHomeDirectory()).doesNotContain("src");   
 
     }
 
