@@ -13,14 +13,18 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import uk.ac.ucl.applications.Head;
+import uk.ac.ucl.jsh.Jsh;
 
 
 public class HeadTest {
@@ -36,6 +40,7 @@ public class HeadTest {
 
     @Before
     public void init() throws IOException {
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();
@@ -48,16 +53,21 @@ public class HeadTest {
     public void tear() throws IOException {
         in.close();
         out.close();
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
     
     }
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
     @Test
 
     public void testhead() throws IOException{
-        String filename = createTempFile();
+        File filename = folder.newFile();
+        writeToFile(filename);
         testArray.add("-n");
         testArray.add("5");
-        testArray.add(filename); //replace with tempfile name
+        testArray.add(filename.getName()); //replace with tempfile name
         
         testHead.exec(testArray, null, System.out, null);
 
@@ -138,10 +148,11 @@ public class HeadTest {
 
         String originalString = "test line absolute\n2nd line!\nabsent"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
-        String tmp = createTempFile();
+        File tmp = folder.newFile();
+        writeToFile(tmp);
         testArray.add("-n");
         testArray.add("15");
-        testArray.add(tmp);
+        testArray.add(tmp.getName());
 
         assertThatCode(() -> {
             testHead.exec(testArray, inputStream, System.out, null);
@@ -154,9 +165,9 @@ public class HeadTest {
     @Test
 
     public void headWithNoLineLimitShouldPrintFirst10LinesifFileIsArg() throws IOException{
-        String filename = createTempFile();
-
-        testArray.add(filename); 
+        File filename = folder.newFile();
+        writeToFile(filename);
+        testArray.add(filename.getName()); 
     
         testHead.exec(testArray, null, System.out, null);
 
@@ -196,11 +207,11 @@ public class HeadTest {
     /* right now the code does now throw error if 3rd arg isnt a file in the dir it would just print out the result*/
     @Test
     public void headShouldOutputAllLinesIfIntegerGivenIsMoreThanLinesOfFileWithoutException() throws IOException {
-        String filename = createTempFile();
-
+        File filename = folder.newFile();
+        writeToFile(filename);
         testArray.add("-n");
         testArray.add("20");
-        testArray.add(filename); //replace with tempfile name
+        testArray.add(filename.getName()); //replace with tempfile name
     ;
         testHead.exec(testArray, null, System.out, null);
 
@@ -224,18 +235,20 @@ public class HeadTest {
         .hasMessageContaining("head: wrong argument: " + "-s");
     }
 
-    private String createTempFile() throws IOException{
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        writeToFile(temp1.getName());
-        return temp1.getName();
-    }
-    private void writeToFile(String filename) throws IOException{
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+    // private String createTempFile() throws IOException{
+    //     File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
+    //     temp1.deleteOnExit();
+    //     writeToFile(temp1.getName());
+    //     return temp1.getName();
+    // }
+
+    private void writeToFile(File file) throws IOException{
+        PrintWriter out1 = new PrintWriter(file);
         for(int i =0; i<15; i++){
-            bw.write("Line"+ i);
-            bw.write(System.getProperty("line.separator"));
+            out1.write("Line"+ i);
+            out1.write(System.getProperty("line.separator"));
         }
-        bw.close();
+        out1.flush();
+        out1.close();
     }
 }

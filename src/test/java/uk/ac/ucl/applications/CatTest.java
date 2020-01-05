@@ -5,20 +5,27 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import uk.ac.ucl.applications.Cat;
+import uk.ac.ucl.jsh.Jsh;
 
 
 public class CatTest{
@@ -29,6 +36,7 @@ public class CatTest{
     ArrayList<String> testArray;
     PipedInputStream in;
     PipedOutputStream out;
+    ByteArrayOutputStream outContent;
    
 
     @Before
@@ -37,42 +45,37 @@ public class CatTest{
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testCat = new Cat();
+        outContent  = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
     }
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
     @After
     public void tear() throws IOException {
         in.close();
         out.close();
         testCat = null;
-
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
     
     }
     
     @Test
     public void testCatWithTwoInputs() throws IOException {
-        String tmp1 = createTempFile();
-        String tmp2 = createTempFile();
-        writeToFile(tmp1, "First File");
-        writeToFile(tmp2, "Second File");
+        File file = folder.newFile();
+        writeToFile(file, "First File");
+        File file1 = folder.newFile();
+        writeToFile(file1, "Second File");
 
-        testArray.add(tmp1);
-        testArray.add(tmp2);
+        testArray.add(file.getName());
+        testArray.add(file1.getName());
 
-        // ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        // BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
-        
-        testCat.exec(testArray, null, out, null);
-        String line = null;
-        Scanner scn = new Scanner(in);
-        line = scn.nextLine() + '\n';
-        line+= scn.nextLine() + '\n';
-        assertEquals(line, "First File\nSecond File\n");
-        scn.close();
-        // byte[] actualResult = stream.toByteArray();
-        // String expected = "First File\nSecond File\n";
-        // byte[] expectedResult = expected.getBytes();
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        testCat.exec(testArray, null, System.out, null);
+        assertEquals(outContent.toString(), "First File\nSecond File\n");
+      
 
-        // assertArrayEquals(actualResult, expectedResult);
      }
 
     @Test
@@ -90,14 +93,9 @@ public class CatTest{
         String originalString = "test line absolute\n2nd line!\nabsent\n"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
-        testCat.exec(testArray, inputStream, out, null);
+        testCat.exec(testArray, inputStream, System.out, null);
 
-        Scanner scn = new Scanner(in);
-        String line  = scn.nextLine()+'\n';
-        line  += scn.nextLine()+'\n';
-        line  += scn.nextLine()+'\n';
-        assertThat(line).isEqualTo(originalString);
-        scn.close();
+        assertThat(outContent.toString()).isEqualTo(originalString);
     }
 
     @Test
@@ -105,14 +103,11 @@ public class CatTest{
     public void ifFileisDirShouldOutputToConsoleAndNoExceptionThrown() throws IOException {
 
         testArray.add("src");
-        testCat.exec(testArray, null, out, null);
+        testCat.exec(testArray, null, System.out, null);
 
-        Scanner scn = new Scanner(in);
-        byte[] line  = scn.nextLine().getBytes();
-        byte[] expected = "cat: src is a directory".getBytes();
+        String expected = "cat: src is a directory";
+        assertEquals(outContent.toString(),expected);
 
-        assertArrayEquals(line,expected);
-        scn.close();
 
     }
 
@@ -126,18 +121,10 @@ public class CatTest{
         
     }
 
-    private String createTempFile() throws IOException{
-
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        //File temp1 = new File("/workspaces/jsh-team-44/temp1.txt");
-        temp1.deleteOnExit();
-        //temp1.deleteOnExit();
-        return temp1.getName();
-    }
-
-    private void writeToFile(String filename, String content) throws IOException{
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-        bw.write(content);
-        bw.close();
+    private void writeToFile(File file, String content) throws IOException{
+        PrintWriter out1 = new PrintWriter(file);
+        out1.print(content);
+        out1.flush();
+        out1.close();
     }
 }
