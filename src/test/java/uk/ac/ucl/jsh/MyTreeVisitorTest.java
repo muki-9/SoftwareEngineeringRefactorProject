@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import org.junit.AfterClass;
@@ -322,6 +323,8 @@ public class MyTreeVisitorTest extends ParserT{
                 add(new TestToken("`find -name \'*.java\'`", AntlrGrammarLexer.BQ));
         }};
 
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+
         AntlrGrammarParser ap = createParserNoError(tokens);
         ArgumentContext ac = ap.argument();
 
@@ -485,6 +488,8 @@ public class MyTreeVisitorTest extends ParserT{
             add(new TestToken(" ", AntlrGrammarLexer.WS));
         }};
 
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+
         AntlrGrammarParser ap = createParserNoError(tokens);
         CallContext call = ap.call();
         MyTreeVisitor tree= new MyTreeVisitor();
@@ -527,6 +532,7 @@ public class MyTreeVisitorTest extends ParserT{
     public void testCallWithRedirAndBackQ() throws IOException {
 
         File file = folder.newFile();
+        writeToFile(file);
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
@@ -592,22 +598,13 @@ public class MyTreeVisitorTest extends ParserT{
 
     }
 
-    private String createTempFile() throws IOException{
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        writeToFile(temp1.getName());
-        return temp1.getName();
-    }
-
-    private void writeToFile(String filename) throws IOException{
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-        for(int i =0; i<2; i++){
-            bw.write("Line"+ i);
-            bw.write(System.getProperty("line.separator"));
+    private void writeToFile(File file) throws IOException {
+        PrintWriter writer = new PrintWriter(file);
+        for(int i =0; i<3; i++){
+            writer.write("Line "+ i);
+            writer.write(System.getProperty("line.separator"));
+            writer.flush();
         }
-        bw.close();
-    }
-
-
-
+        writer.close();
+     }
 }
