@@ -1,14 +1,17 @@
 package uk.ac.ucl.jsh;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import static org.assertj.core.api.Assertions.*;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class GlobbingTest {
 
@@ -21,6 +24,10 @@ public class GlobbingTest {
      ArrayList<Boolean> testGlobb;
      String currentDir = Jsh.getCurrentDirectory();
      Path currDir = Paths.get(currentDir);
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+
     @Before
 
     public void init() {
@@ -33,35 +40,37 @@ public class GlobbingTest {
     @Test
 
     public void globbShouldExpandEachArgWhichContainsUnquotedAsterisk() throws IOException {
-        String tmp1 = createTempFile(currentDir);
-        String tmp2 = createTempFile(currentDir);
-        String tmp3 = createTempFile(currentDir);
-        String tmp4 = createTempFile(currentDir);
+        File file1 = folder.newFile();
+        File file2 = folder.newFile();
+        File file3 = folder.newFile();
+        File file4 = folder.newFile();
         
-        testArray.add(tmp1.substring(0, 10)+"*");
-        testArray.add(tmp2);
-        testArray.add(tmp3+"*");
-        testArray.add(tmp4);
+        testArray.add(file1.getName().substring(0, 10)+"*");
+        testArray.add(file2.getName());
+        testArray.add(file3.getName()+"*");
+        testArray.add(file4.getName());
         testGlobb.add(true);
         testGlobb.add(false);
         testGlobb.add(false);
         testGlobb.add(true);
 
-        glob= new Globbing(testGlobb);
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        glob = new Globbing(testGlobb);
         ArrayList<String> result = glob.globbing(testArray);
 
-        assertThat(result).containsOnly(tmp1, tmp2, tmp3+"*", tmp4);
+        assertThat(result).containsOnly(file1.getName(), file2.getName(), file3.getName()+"*", file4.getName());
 
     }
 
     @Test
 
     public void globbShouldNotThrowExceptionIfNoFilesInDir() throws IOException {
-        String tmp1 = createTempDir();
+        File file1 = folder.newFile();
         
-        testArray.add(tmp1+"/*");
+        testArray.add(file1.getName()+"/*");
         testGlobb.add(true);
-        glob= new Globbing(testGlobb);
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        glob = new Globbing(testGlobb);
         ArrayList<String> result = glob.globbing(testArray);
         assertThat(result).isEmpty();
 
@@ -88,20 +97,4 @@ public class GlobbingTest {
 
 
     // }
-
-    private String createTempFile(String path) throws IOException{
-        File temp1 = File.createTempFile("input", ".txt", new File(path));
-        temp1.deleteOnExit();
-        return temp1.getName();
-    }
-
-    private String createTempDir() throws IOException{
-        File temp1 = Files.createTempDirectory(currDir, "input").toFile();
-        temp1.deleteOnExit();
-        return temp1.getName();
-    }
-
-
-
-
 }

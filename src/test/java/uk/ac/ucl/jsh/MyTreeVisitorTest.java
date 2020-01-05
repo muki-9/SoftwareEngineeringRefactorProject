@@ -1,9 +1,21 @@
 package uk.ac.ucl.jsh;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.from;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
+
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.assertj.core.api.Assertions.*;
+import org.junit.rules.TemporaryFolder;
 
 import uk.ac.ucl.jsh.AntlrGrammarParser.ArgumentContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.BackquotedContext;
@@ -14,35 +26,17 @@ import uk.ac.ucl.jsh.AntlrGrammarParser.SeqContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.SinglequotedContext;
 import uk.ac.ucl.jsh.AntlrGrammarParser.UnquotedContext;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream; 
-import java.util.Scanner;
-import uk.ac.ucl.jsh.Jsh;
-import static org.assertj.core.api.Assertions.*;
-
 public class MyTreeVisitorTest extends ParserT{
 
     public MyTreeVisitorTest(){
 
     }
 
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+
     @AfterClass
     public static void tear(){
-
         File f = new File("randomfile.txt");
         f.delete();
     }
@@ -317,19 +311,15 @@ public class MyTreeVisitorTest extends ParserT{
     @Test
 
     public void testArgumentWithBackquoteAndUnquoted(){
-
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
             *
             */
             private static final long serialVersionUID = -112447375692081252L;
-
-            { 
+            {
                 add(new TestToken("wc", AntlrGrammarLexer.UQ));
                 add(new TestToken("-l", AntlrGrammarLexer.UQ));
                 add(new TestToken("`find -name \'*.java\'`", AntlrGrammarLexer.BQ));
-
-            
         }};
 
         AntlrGrammarParser ap = createParserNoError(tokens);
@@ -338,7 +328,6 @@ public class MyTreeVisitorTest extends ParserT{
         MyTreeVisitor tree= new MyTreeVisitor();
         Call c = (Call) tree.visitArgument(ac);
         assertThat(c).returns(true, from(Call::getGlobb));
-
     }
 
     @Test
@@ -503,7 +492,6 @@ public class MyTreeVisitorTest extends ParserT{
         assertThatCode(() ->{
             tree.visitCall(call);
         }).doesNotThrowAnyException();
-        
     }
 
     @Test
@@ -538,7 +526,7 @@ public class MyTreeVisitorTest extends ParserT{
 
     public void testCallWithRedirAndBackQ() throws IOException {
 
-        String file1 = createTempFile();
+        File file = folder.newFile();
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
@@ -553,11 +541,10 @@ public class MyTreeVisitorTest extends ParserT{
                 add(new TestToken(" ", AntlrGrammarLexer.WS));
                 add(new TestToken("<", AntlrGrammarLexer.LT));
                 add(new TestToken(" ", AntlrGrammarLexer.WS));
-                add(new TestToken(file1, AntlrGrammarLexer.UQ));
-                
-
-
+                add(new TestToken(file.getName(), AntlrGrammarLexer.UQ));
         }};
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
         AntlrGrammarParser ap = createParserNoError(tokens);
         CallContext call = ap.call();

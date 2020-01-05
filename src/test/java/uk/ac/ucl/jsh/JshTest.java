@@ -235,7 +235,6 @@ public class JshTest {
     @Test
 
     public void jshShouldThrowExceptionIfCannotReadUserInput(){
-
         testJsh = new Jsh(false);
 
         String input = "";
@@ -246,14 +245,6 @@ public class JshTest {
         System.setOut(new PrintStream(outContent));
         testJsh.takesInput();
 
-
         assertThat(outContent.toString()).isEqualTo("/workspaces/jsh-team-44> jsh: No line found\n");
     }
-    private String createTempFile() throws IOException{
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        return temp1.getName();
-    }
-
-
 }

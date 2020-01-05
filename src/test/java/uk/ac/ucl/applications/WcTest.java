@@ -1,6 +1,8 @@
 package uk.ac.ucl.applications;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -9,13 +11,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import uk.ac.ucl.applications.Wc;
+import uk.ac.ucl.jsh.Jsh;
 
 
 public class WcTest{
@@ -40,8 +46,10 @@ public class WcTest{
 
     }
 
-    @Test
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
+    @Test
     public void wcShouldThrowExceptionifNoArgsAndNoInputGiven(){
 
         assertThatThrownBy(() -> {
@@ -51,15 +59,20 @@ public class WcTest{
         .hasMessageContaining("wc: wrong number of arguments");
     }
 
-    // @Test
-    // public void wcShouldThrowExceptionIfDirGivenAsInput() {
-
-    // }
+    @Test
+    public void wcShouldThrowExceptionIfDirGivenAsInput() throws IOException {
+        File file = folder.newFolder();
+        testArray.add(file.getName());
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        assertThatThrownBy(() -> {
+            testWc.exec(testArray, null, out, null);
+        })
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("wc: wrong file argument");
+    } 
 
     @Test
-
     public void wcShouldNotThrowExceptionIfInputGivenAndNoArgs(){
-
         String originalString = "test line absolute\n2nd line!\nabsent";
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
@@ -68,6 +81,7 @@ public class WcTest{
         }).doesNotThrowAnyException();
 
     }
+
     @Test
     public void wcShouldThrowExcpetionifOneArgWithOptionsAndNoInput(){
         testArray.add("-m");
@@ -129,12 +143,14 @@ public class WcTest{
     @Test
     public void testWcFromFileM() throws IOException {
         int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
-        String tmp1 = createTempFile();
+        File file = folder.newFile();
+        writeToFile(file);
         testArray.add("-m");
-        testArray.add(tmp1);
+        testArray.add(file.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
         testWc.exec(testArray, null, out, null);
-
         Scanner scn = new Scanner(in);
         String output = scn.nextLine();
         String split = output.split("\\s")[0];
@@ -146,9 +162,12 @@ public class WcTest{
     @Test
     public void testWcFromFileL() throws IOException {
         int lineNo = 3;
-        String tmp1 = createTempFile();
+        File file = folder.newFile();
+        writeToFile(file);
         testArray.add("-l");
-        testArray.add(tmp1);
+        testArray.add(file.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
         testWc.exec(testArray, null, out, null);
 
@@ -163,9 +182,12 @@ public class WcTest{
     @Test
     public void testWcFromFileW() throws IOException {
         int wordNo = 6;
-        String tmp1 = createTempFile();
+        File file = folder.newFile();
+        writeToFile(file);
         testArray.add("-w");
-        testArray.add(tmp1);
+        testArray.add(file.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
         testWc.exec(testArray, null, out, null);
 
@@ -179,12 +201,17 @@ public class WcTest{
     @Test
     public void testWcFromFileWTotalNeeded() throws IOException {
         int wordNo = 6;
-        String tmp1 = createTempFile();
-        String tmp2 = createTempFile();
-        testArray.add("-w");
-        testArray.add(tmp1);
-        testArray.add(tmp2);
 
+        File file = folder.newFile();
+        writeToFile(file);
+        File file2 = folder.newFile();
+        writeToFile(file2);
+
+        testArray.add("-w");
+        testArray.add(file.getName());
+        testArray.add(file2.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         testWc.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         String output = scn.nextLine();
@@ -199,12 +226,17 @@ public class WcTest{
     @Test
     public void testWcFromFileLTotalNeeded() throws IOException {
         int lineNo = 3;
-        String tmp1 = createTempFile();
-        String tmp2 = createTempFile();
-        testArray.add("-l");
-        testArray.add(tmp1);
-        testArray.add(tmp2);
 
+        File file = folder.newFile();
+        writeToFile(file);
+        File file2 = folder.newFile();
+        writeToFile(file2);
+
+        testArray.add("-l");
+        testArray.add(file.getName());
+        testArray.add(file2.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         testWc.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         String output = scn.nextLine();
@@ -219,12 +251,17 @@ public class WcTest{
     @Test
     public void testWcFromFileMTotalNeeded() throws IOException {
         int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
-        String tmp1 = createTempFile();
-        String tmp2 = createTempFile();
-        testArray.add("-m");
-        testArray.add(tmp1);
-        testArray.add(tmp2);
 
+        File file = folder.newFile();
+        writeToFile(file);
+        File file2 = folder.newFile();
+        writeToFile(file2);
+
+        testArray.add("-m");
+        testArray.add(file.getName());
+        testArray.add(file2.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         testWc.exec(testArray, null, out, null);
         Scanner scn = new Scanner(in);
         String output = scn.nextLine();
@@ -239,15 +276,19 @@ public class WcTest{
     @Test
     public void testWcfor2orMoreArgsShouldProduceCorrectOutput() throws IOException {
         testArray.add("-m");
-        String tmp1 = createTempFile();
-        String tmp2 = createTempFile();
-        testArray.add(tmp1);
-        testArray.add(tmp2);
 
+        File file = folder.newFile();
+        writeToFile(file);
+        File file2 = folder.newFile();
+        writeToFile(file2);
+
+        testArray.add(file.getName());
+        testArray.add(file2.getName());
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         testWc.exec(testArray, null, out, null);
 
         Scanner scn = new Scanner(in);
-
         String line = scn.nextLine();
         String[] split = line.split("\\s");
         int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
@@ -267,17 +308,18 @@ public class WcTest{
     }
 
     @Test
-
     public void testWcWithoutOptFor2orMoreArgs() throws IOException {
-        String tmp1 = createTempFile();
-        String tmp2 = createTempFile();
-        testArray.add(tmp1);
-        testArray.add(tmp2);
+        File file = folder.newFile();
+        writeToFile(file);
+        File file2 = folder.newFile();
+        writeToFile(file2);
+        testArray.add(file.getName());
+        testArray.add(file2.getName());
 
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         testWc.exec(testArray, null, out, null);
 
         Scanner scn = new Scanner(in);
-
         String line = scn.nextLine();
         String[] split = line.split("\\s");
 
@@ -327,19 +369,13 @@ public class WcTest{
         return optAct;
     }
 
-    private String createTempFile() throws IOException{
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        writeToFile(temp1.getName());
-        return temp1.getName();
-
-    }
-    private void writeToFile(String filename) throws IOException{
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+    private void writeToFile(File file) throws IOException {
+        PrintWriter writer = new PrintWriter(file);
         for(int i =0; i<3; i++){
-            bw.write("Line "+ i);
-            bw.write(System.getProperty("line.separator"));
+            writer.write("Line "+ i);
+            writer.write(System.getProperty("line.separator"));
+            writer.flush();
         }
-        bw.close();
+        writer.close();
      }
 }

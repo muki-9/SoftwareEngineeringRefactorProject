@@ -41,9 +41,6 @@ public class Wc implements Application {
             else if (args.size() == 1) {
                 writeUsingInputStream(writer, lines, args.get(0));
             }
-            else {
-                throw new RuntimeException("wc: wrong arguments");
-            }
         }
         else {
             int numOfFiles = args.size();
