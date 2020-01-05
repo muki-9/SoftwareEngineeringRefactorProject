@@ -46,6 +46,7 @@ public class LsTest{
          testLs = new Ls();
          outContent  = new ByteArrayOutputStream();
          System.setOut(new PrintStream(outContent));
+         Jsh.setCurrentDirectory(folder.getRoot().toString());
     }
     @Rule
     public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
@@ -61,17 +62,22 @@ public class LsTest{
 
     public void testLsWhenNoArgumentsShouldOutputFilesOfCurrentDir() throws IOException {
         //check if output same as what is should be
+        folder.newFile("test");
+        folder.newFile("ben");
+        folder.newFile("raghib");
+        folder.newFile("muki");
+        //check if output same as what is should be
         testLs.exec(testArray, null, System.out,null);
-        assertThat(outContent.toString()).contains("analysis", "test", "Dockerfile", "target", "pom.xml", "coverage");
-
+        assertThat(outContent.toString()).contains("muki", "ben", "raghib", "test");
     }
     @Test
 
     public void testLsWithOneArgShouldOutputFilesOfArgDirIfInCurrDir() throws IOException{
 
-        testArray.add("src");
+        folder.newFile("random");
+        testArray.add(folder.getRoot().toPath().toFile().getName());
         testLs.exec(testArray, null, System.out,null);
-        assertThat(outContent.toString()).contains("test", "main");
+        assertThat(outContent.toString()).contains("random");
   
     }
 
@@ -92,6 +98,22 @@ public class LsTest{
 
     @Test
 
+    public void lsShouldThrowExceptionifFileArgDoesntExist(){
+
+
+        testArray.add("test");
+        assertThatThrownBy(() -> { 
+
+            testLs.exec(testArray, null, out,null);
+        })
+        .isInstanceOf(RuntimeException.class )
+        .hasMessageContaining("ls: no such directory");
+
+
+    }
+
+    @Test
+
     public void testLsShouldIgnoreFilesStartingWithDot() throws IOException{
         Jsh.setCurrentDirectory(folder.getRoot().toString());
 
@@ -102,6 +124,11 @@ public class LsTest{
     }
     @Test
     public void testLsShouldSeparateFilesUsingTabs() throws IOException{
+        
+        folder.newFile("muki");
+        folder.newFile("ben");
+        folder.newFile("raghib");
+        testArray.add(folder.getRoot().toPath().toFile().getName());
 
         testLs.exec(testArray, null, out,null);
         Scanner scn = new Scanner(in);

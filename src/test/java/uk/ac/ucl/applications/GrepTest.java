@@ -106,7 +106,7 @@ public class GrepTest{
             testGrep.exec(testArray, null, out, null);
         })
         .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("grep: wrong file argument");
+        .hasMessageContaining("grep: cannot open file");
 
     }
 

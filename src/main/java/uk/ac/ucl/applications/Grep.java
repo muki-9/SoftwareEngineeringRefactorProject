@@ -73,7 +73,7 @@ public class Grep implements Application {
 
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + 1));
-            if (Files.exists(filePath) && Files.isReadable(filePath) && !Files.isDirectory(filePath)) {
+            if (!Files.isDirectory(filePath)) {
                 filePathArray[i] = filePath;
             }
             else {
@@ -106,7 +106,7 @@ public class Grep implements Application {
                     }
                 }
             } catch (IOException e) {
-                throw new RuntimeException("grep: IO exception");
+                throw new RuntimeException("grep: cannot open file");
             }
             
         }
