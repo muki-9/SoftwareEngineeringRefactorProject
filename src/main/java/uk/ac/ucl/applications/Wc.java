@@ -12,6 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import uk.ac.ucl.jsh.Application;
 import uk.ac.ucl.jsh.Globbing;
@@ -38,7 +42,7 @@ public class Wc implements Application {
             if (args.size() == 0) {
                 writeUsingInputStream(writer, lines, "all");
             }
-            else if (args.size() == 1) {
+            else{
                 writeUsingInputStream(writer, lines, args.get(0));
             }
         }
@@ -74,7 +78,7 @@ public class Wc implements Application {
         // if file specified in command line by user is a real/usable file, it will return an array of the paths of the files
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + offset));
-            if (Files.isDirectory(filePath)) {
+            if (Files.isDirectory(filePath) || !Files.isReadable(filePath)){
                 throw new RuntimeException("wc: wrong file argument");
             } else {
                 filePathArray[i] = filePath;
@@ -91,119 +95,88 @@ public class Wc implements Application {
         int totalLineCount = 0;
         int totalWordCount = 0;
         int totalCharCount = 0;
+        int totalCount = 0;
+
+        List<String> options = Arrays.asList("-l","-w", "-m");
+        
         for(Path path : filePathArray){
-            switch (option) {
-                case "-m":
-                    String chars = calcChars(path);
-                    totalCharCount += Integer.parseInt(chars);
-                    writer.write(chars);
-                    writer.write("\t");
-                    writer.write(getFileName(path.toString()));
-                    writer.write(System.getProperty("line.separator"));
+            Map<String, String> hmap  = new HashMap<>();
+
+            hmap.put("-w", calcWords(path));
+            hmap.put("-m", calcChars(path));
+            hmap.put("-l", calcNewlines(path));
+            
+            if(option!="all"){
+                String result= hmap.get(option);
+                totalCount += Integer.parseInt(result);
+                writer.write(result + '\t');
+
+            }else{
+                List<String> result= new ArrayList<>();
+
+                for(String opt: options){
+                    result.add(hmap.get(opt));
+                    writer.write(hmap.get(opt)+ '\t');
                     writer.flush();
-                    break;
-                case "-w":
-                    String words = calcWords(path);
-                    totalWordCount += Integer.parseInt(words);
-                    writer.write(words);
-                    writer.write("\t");
-                    writer.write(getFileName(path.toString()));
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                    break;
-                case "-l":
-                    String lines = calcNewlines(path);
-                    totalLineCount += Integer.parseInt(lines);
-                    writer.write(lines);
-                    writer.write("\t");
-                    writer.write(getFileName(path.toString()));
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();            
-                    break;
-                case "all":
-                    String chars1 = calcChars(path);
-                    String words1 = calcWords(path);
-                    String lines1 = calcNewlines(path);
-                    totalCharCount += Integer.parseInt(chars1);
-                    totalWordCount += Integer.parseInt(words1);
-                    totalLineCount += Integer.parseInt(lines1);
-                    writer.write(lines1);
-                    writer.write("\t");
-                    writer.write(words1);
-                    writer.write("\t");
-                    writer.write(chars1);
-                    writer.write("\t");
-                    writer.write(getFileName(path.toString()));
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush(); 
-                    break;
+                }
+
+                 totalCharCount+= Integer.parseInt(result.get(2));
+                 totalWordCount+= Integer.parseInt(result.get(1));
+                 totalLineCount+= Integer.parseInt(result.get(0));
+
             }
+            writer.write(getFileName(path.toString()));
+            writer.write(System.getProperty("line.separator"));
+            writer.flush();
         }
+
+        Map<String, String> hmap2  = new HashMap<>();
+        hmap2.put("-m", Integer.toString(totalCharCount));
+        hmap2.put("-w", Integer.toString(totalWordCount));
+        hmap2.put("-l", Integer.toString(totalLineCount));
+        
         if (totalNeeded) {
-            switch (option) {
-                case "-m":
-                    writer.write(Integer.toString(totalCharCount));
-                    writer.write("\t");
-                    writer.write("total");
-                    writer.write(System.getProperty("line.separator"));
+
+            if(option!="all"){
+
+                writer.write(Integer.toString(totalCount) + '\t');
+
+            }else{
+
+                for(String opt: options){
+                    writer.write(hmap2.get(opt)+ '\t');
                     writer.flush();
-                    break;
-                case "-w":
-                    writer.write(Integer.toString(totalWordCount));
-                    writer.write("\t");
-                    writer.write("total");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                    break;
-                case "-l":
-                    writer.write(Integer.toString(totalLineCount));
-                    writer.write("\t");
-                    writer.write("total");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();            
-                    break;
-                case "all":
-                    writer.write(Integer.toString(totalLineCount)); 
-                    writer.write("\t");
-                    writer.write(Integer.toString(totalWordCount));
-                    writer.write("\t");
-                    writer.write(Integer.toString(totalCharCount));
-                    writer.write("\t");
-                    writer.write("total");
-                    writer.write(System.getProperty("line.separator"));
-                    writer.flush();
-                    break;
+                }
             }
+            writer.write("total");
+            writer.write(System.getProperty("line.separator"));
+            writer.flush();
+
         }
     }
 
     private void writeUsingInputStream(BufferedWriter writer, String[] lines, String option) throws IOException {
-        switch (option) {
-            case "-m":
-                writer.write(calcChars(lines));
-                writer.write(System.getProperty("line.separator"));
-                writer.flush();
-                break;
-            case "-w":
-                writer.write(calcWords(lines));
-                writer.write(System.getProperty("line.separator"));
-                writer.flush();
-                break;
-            case "-l":
-                writer.write(Integer.toString(lines.length));
-                writer.write(System.getProperty("line.separator"));
-                writer.flush();            
-                break;
-            case "all":
-                writer.write(Integer.toString(lines.length));
-                writer.write("\t");
-                writer.write(calcWords(lines));
-                writer.write("\t");
-                writer.write(calcChars(lines));
-                writer.write(System.getProperty("line.separator"));
-                writer.flush(); 
-                break;
+
+        List<String> options  = Arrays.asList("-l", "-w", "-m");
+        Map<String, String> hmap  = new HashMap<>();
+
+        hmap.put("-w", calcWords(lines));
+        hmap.put("-m", calcChars(lines));
+        hmap.put("-l", Integer.toString(lines.length));
+        
+        if(option!="all"){
+
+            writer.write(hmap.get(option));
+
+        }else{
+            for(String opt: options){
+                writer.write(hmap.get(opt)+ '\t');
+            }
+
         }
+        writer.write(System.getProperty("line.separator"));
+        writer.flush();
+
     }
 
     private String calcNewlines(Path path) throws IOException {
@@ -251,9 +224,9 @@ public class Wc implements Application {
                 ArrayList<String> words = new ArrayList<>();
 
                 for (int i = 0; i < preWords.length; i++) {
-                    if (preWords[i].length() > 0) {
-                        words.add(preWords[i]);
-                    }
+                    
+                    words.add(preWords[i]);
+                    
                 }
                 wordCount += words.size(); 
             }
@@ -268,9 +241,9 @@ public class Wc implements Application {
             ArrayList<String> words = new ArrayList<>();
 
             for (int i = 0; i < preWords.length; i++) {
-                if (preWords[i].length() > 0) {
-                    words.add(preWords[i]);
-                }
+              
+                words.add(preWords[i]);
+                
             }
             wordCount += words.size(); 
         }
@@ -287,15 +260,17 @@ public class Wc implements Application {
                 return;
             }
         }
-        else if (args.size() == 1) {
-            if (args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l")) {
-                if(input != null){
-                    useInputStream = true; 
-                }
-                else {
-                    throw new RuntimeException("wc: wrong number of arguments");
-                }
-            }
+        if(args.get(0).startsWith("-") && !(args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l"))){
+
+            throw new RuntimeException("wc: illegal option given");
+        }
+
+        if (args.size() == 1 && args.get(0).startsWith("-")){
+            if(input!=null){
+                useInputStream = true;           
+            }else{
+                throw new RuntimeException("wc: wrong number of arguments");
+            }    
         }
     }
 }

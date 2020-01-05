@@ -54,6 +54,8 @@ public class HistoryTest{
         assertThat(actual).contains("cd src", "history");
     }
 
+    @Test
+    
     public void historyShouldThrowErrorIfAnyArgGiven(){
         testArray.add("src");
         assertThatThrownBy(() ->{
