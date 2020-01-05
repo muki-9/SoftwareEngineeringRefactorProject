@@ -3,17 +3,22 @@ package uk.ac.ucl.applications;
 import uk.ac.ucl.jsh.Jsh;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import static org.assertj.core.api.Assertions.*;
 
 import uk.ac.ucl.applications.Cd;
@@ -24,6 +29,7 @@ public class MkdirTest{
     PipedOutputStream out;
     Mkdir testMkdir;
     ArrayList<String> testArray;
+    ByteArrayOutputStream outContent;
 
     @Before
     public void init() throws IOException {
@@ -32,7 +38,17 @@ public class MkdirTest{
          out = new PipedOutputStream(in);
          testMkdir = new Mkdir();
          testArray = new ArrayList<>();
+         outContent  = new ByteArrayOutputStream();
+         System.setOut(new PrintStream(outContent));
        
+    }
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+
+    @After
+
+    public void tear1(){
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
     }
 
     @AfterClass
@@ -63,8 +79,10 @@ public class MkdirTest{
     
     public void mkdirShouldThrowExceptionIfDirExists() throws IOException {
 
-        String tmp = createTempFile();
-        testArray.add(tmp);
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+
+        File tmp = folder.newFolder();
+        testArray.add(tmp.getName());
 
         assertThatThrownBy(() ->{
 
@@ -104,13 +122,6 @@ public class MkdirTest{
 
 
     // }
-
-    private String createTempFile() throws IOException{
-        File temp1 = File.createTempFile("testfile", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        return temp1.getName();
-    }
-
 
 
 

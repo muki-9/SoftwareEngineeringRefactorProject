@@ -3,10 +3,12 @@ package uk.ac.ucl.applications;
 import uk.ac.ucl.jsh.Jsh;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +18,10 @@ import java.util.Scanner;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -28,6 +33,7 @@ public class RmdirTest{
     PipedOutputStream out;
     Rmdir testRmdir;
     ArrayList<String> testArray;
+    ByteArrayOutputStream outContent;
 
     @Before
     public void init() throws IOException {
@@ -36,7 +42,18 @@ public class RmdirTest{
          out = new PipedOutputStream(in);
          testRmdir = new Rmdir();
          testArray = new ArrayList<>();
-       
+         outContent  = new ByteArrayOutputStream();
+         System.setOut(new PrintStream(outContent));
+    }
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+
+    @After
+
+    public void tear1(){
+
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
     }
 
     @AfterClass
@@ -44,24 +61,21 @@ public class RmdirTest{
 
         File del = new File("testfile2");
         del.delete();
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
     }
 
     @Test
 
     public void RmdirShouldDeleteFileIfExists() throws IOException {
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        File tmp = folder.newFolder();
+        testArray.add(tmp.getName());
 
-        String tmp = createTempDir();
-        testArray.add(tmp);
 
+        testRmdir.exec(testArray, null, System.out, null );
 
-        Scanner scn = new Scanner(in);
+        assertThat(outContent.toString()).isEqualTo("Folder removed sucessfully\n");
 
-        testRmdir.exec(testArray, null, out, null );
-
-        String line = scn.nextLine();
-        assertThat(line).isEqualTo("Folder removed sucessfully");
-
-        scn.close();
 
     }
     @Test
@@ -81,10 +95,8 @@ public class RmdirTest{
 
     public void rmdirShouldThrowExceptionIfTryingtoRemoveNonEmptyDir() throws IOException {
 
-        String tmpDir = createTempDir();
-        createTempFile("/workspaces/jsh-team-44/"+tmpDir);
-        testArray.add(tmpDir);
-
+        testArray.add(folder.getRoot().toPath().getFileName().toString());
+        folder.newFolder();
         assertThatThrownBy(() ->{
 
             testRmdir.exec(testArray, null, out, null );
@@ -125,18 +137,6 @@ public class RmdirTest{
 
 
     // }
-
-    private String createTempFile(String path) throws IOException{
-        File temp1 = File.createTempFile("testfile", ".txt", new File(path));
-        temp1.deleteOnExit();
-        return temp1.getName();
-    }
-
-    private String createTempDir() throws IOException{
-        File temp1 = Files.createTempDirectory(currDir, "input").toFile();
-        temp1.deleteOnExit();
-        return temp1.getName();
-    }
 
 
 

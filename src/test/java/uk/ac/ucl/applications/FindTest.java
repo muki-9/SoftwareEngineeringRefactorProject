@@ -2,8 +2,13 @@ package uk.ac.ucl.applications;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import uk.ac.ucl.applications.Find;
+import uk.ac.ucl.jsh.Jsh;
+
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
@@ -42,6 +47,8 @@ public class FindTest{
         out.close();
 
     }
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
 
     @Test
@@ -84,22 +91,17 @@ public class FindTest{
     @Test
     public void findShouldFilterAllPathsDependingOnPattern() throws IOException{
 
-        createTempFile(".java");
-        createTempFile(".txt");
-        createTempFile(".txt");
-        createTempFile(".out");
+        folder.newFile("input.java");
+        folder.newFile("input11.txt");
+        folder.newFile("input345.txt");
+        folder.newFile("random.out");
         testArray.add("-name");
         testArray.add("in*xt");
 
-        testFind.exec(testArray, null, out, null);
+        testFind.exec(testArray, null, System.out, null);
 
-        Scanner scn = new Scanner(in);
-        String output = scn.nextLine();
-        String output2 = scn.nextLine();
+        assertThat(outContent.toString()).startsWith(".").endsWith(".txt\n").doesNotContain("random.out", "input.java");
 
-        assertThat(output).startsWith(".").contains(".txt");
-        assertThat(output2).contains(".txt");
-        scn.close();
   
     }
 
@@ -138,12 +140,9 @@ public class FindTest{
         testArray.add("-name");
         testArray.add("*java");
 
-        testFind.exec(testArray, null, out, null);
+        testFind.exec(testArray, null, System.out, null);
 
-        Scanner scn = new Scanner(in);
-        String output = scn.nextLine();
-        assertThat(output).startsWith("target");
-        scn.close();
+        assertThat(outContent.toString()).startsWith("target");
         
     }
 
@@ -162,18 +161,6 @@ public class FindTest{
         .hasMessage("cannot write to output");
 
     }
-
-
-    private String createTempFile(String extension) throws IOException{
-
-        File temp1 = File.createTempFile("input", extension, new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        return temp1.getName();
-
-    }
-
-
-
 
 
 }

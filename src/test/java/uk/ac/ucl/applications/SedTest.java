@@ -10,12 +10,20 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
+
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import uk.ac.ucl.applications.Sed;
+import uk.ac.ucl.jsh.Jsh;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -37,8 +45,20 @@ public class SedTest{
         testArray = new ArrayList<>();
         outContent  = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
     }
+    @After
+
+    public void tear(){
+
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
+    }
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+
+    
     @Test
     public void sedShouldProduceCorrectOutputwithInputStream() throws IOException {
         
@@ -67,10 +87,11 @@ public class SedTest{
     @Test
     public void sedShouldProduceCorrectOutputwithNoInputAndG() throws IOException {
         
-        String tmp = createTempFile();
+        File tmp = folder.newFile();
+        writeNewStringToFile(tmp);
 
         testArray.add("s/e/E/g");
-        testArray.add(tmp);
+        testArray.add(tmp.getName());
 
         testSed.exec(testArray, null, System.out, null);
         assertThat(outContent.toString()).isEqualTo("REpEat0\nREpEat1\nREpEat2\n");
@@ -82,10 +103,11 @@ public class SedTest{
     @Test
 
     public void anySymbolCanBeUsedAsDelimeterShouldNotThrowExceptionUnlessInArgs() throws IOException {
-        String tmp1 = createTempFile();
+        File tmp1 = folder.newFile();
+
         testArray.add("s$a$b$");
 
-        testArray.add(tmp1);
+        testArray.add(tmp1.getName());
 
         assertThatCode(() ->{
             testSed.exec(testArray, null, out, null);
@@ -97,8 +119,9 @@ public class SedTest{
     public void sedWithoutG() throws IOException {
 
         testArray.add("s/e/E/");
-        String tmp1 = createTempFile();
-        testArray.add(tmp1);
+        File tmp1 = folder.newFile();
+        writeNewStringToFile(tmp1);
+        testArray.add(tmp1.getName());
         
         testSed.exec(testArray, null, System.out, null);
 
@@ -125,10 +148,10 @@ public class SedTest{
     public void ifInputArgIs2AndInputIsNotNullNoException() throws IOException {
         String originalString = "test line absolute\n2nd line!\nabsent\n"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
-        String tmp1 = createTempFile();
+        File tmp1 = folder.newFile();
 
         testArray.add("s/a/b/");
-        testArray.add(tmp1);
+        testArray.add(tmp1.getName());
 
         assertThatCode(() -> {
             testSed.exec(testArray, inputStream, out, null);
@@ -229,10 +252,12 @@ public class SedTest{
     // }
 
     @Test
-    public void sedThrowsExceptionIfDir(){
+    public void sedThrowsExceptionIfDir() throws IOException {
+
+        File tmp = folder.newFolder();
 
         testArray.add("s/a/b/");
-        testArray.add("src");
+        testArray.add(tmp.getName());
 
         assertThatThrownBy(() -> {
             testSed.exec(testArray, null, out, null);
@@ -257,18 +282,14 @@ public class SedTest{
 
     }
 
-    private String createTempFile() throws IOException{
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        writeNewStringToFile(temp1.getName());
-        return temp1.getName();
-    }
-    private void writeNewStringToFile(String filename) throws IOException{
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-        for(int i=0; i<3; i++){
-            bw.write("Repeat"+ i);
-            bw.write(System.getProperty("line.separator"));
+    private void writeNewStringToFile(File filename) throws IOException{
+
+        PrintWriter out1 = new PrintWriter(filename);
+        for(int i =0; i<3; i++){
+            out1.write("Repeat"+ i);
+            out1.write(System.getProperty("line.separator"));
         }
-        bw.close();
+        out1.flush();
+        out1.close();
     }
 }

@@ -1,8 +1,14 @@
 package uk.ac.ucl.applications;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import uk.ac.ucl.applications.Tail;
+import uk.ac.ucl.jsh.Jsh;
+
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
 import java.io.BufferedWriter;
@@ -16,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class TailTest{
@@ -31,7 +38,7 @@ public class TailTest{
 
     @Before
     public void init() throws IOException {
-        
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
         in = new PipedInputStream();
         out = new PipedOutputStream(in);
         testArray = new ArrayList<>();
@@ -39,6 +46,16 @@ public class TailTest{
         outContent  = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
     }
+
+    @After
+    public void tear() throws IOException {
+        in.close();
+        out.close();
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
+    }
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
     @Test
 
@@ -72,11 +89,11 @@ public class TailTest{
 
     public void testTailWithoutInputSWithOption () throws IOException{
 
-        String filename = createTempFile();
-
+        File filename = folder.newFile();
+        writeToFile(filename);
         testArray.add("-n");
         testArray.add("5");
-        testArray.add(filename); //replace with tempfile name
+        testArray.add(filename.getName()); //replace with tempfile name
         
         testTail.exec(testArray, null, System.out, null);
 
@@ -137,10 +154,11 @@ public class TailTest{
 
         String originalString = "test line absolute\n2nd line!\nabsent"; 
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
-        String tmp1 = createTempFile();
+        File tmp1 = folder.newFile();
+        writeToFile(tmp1);
         testArray.add("-n");
         testArray.add("5");
-        testArray.add(tmp1);
+        testArray.add(tmp1.getName());
 
         
         assertThatCode(() -> {
@@ -166,9 +184,9 @@ public class TailTest{
 
     public void tailWithNoLineLimitShouldPrintLast10LinesifFileIsArg() throws IOException{
 
-        String filename = createTempFile();
-
-        testArray.add(filename); 
+        File filename = folder.newFile();
+        writeToFile(filename);
+        testArray.add(filename.getName()); 
         testTail.exec(testArray, null, System.out, null);
 
         String expected = "Line5" +'\n'+"Line6"+'\n'+"Line7"+'\n'+"Line8"+'\n'+"Line9"+'\n'+"Line10" +'\n';
@@ -211,11 +229,11 @@ public class TailTest{
     @Test
     public void tailShouldOutputAllLinesIfIntegerGivenIsMoreThanLinesOfFileWithoutException() throws IOException {
 
-        String filename = createTempFile();
-
+        File filename = folder.newFile();
+        writeToFile(filename);
         testArray.add("-n");
         testArray.add("20");
-        testArray.add(filename); //replace with tempfile name
+        testArray.add(filename.getName()); //replace with tempfile name
         
         testTail.exec(testArray, null, System.out, null);
 
@@ -244,23 +262,14 @@ public class TailTest{
 
     }
 
-    private String createTempFile() throws IOException{
-
-        File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-        temp1.deleteOnExit();
-        writeToFile(temp1.getName());
-        return temp1.getName();
-
-    }
-    private void writeToFile(String filename) throws IOException{
-
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+    private void writeToFile(File file) throws IOException{
+        PrintWriter out1 = new PrintWriter(file);
         for(int i =0; i<15; i++){
-            bw.write("Line"+ i);
-            bw.write(System.getProperty("line.separator"));
+            out1.write("Line"+ i);
+            out1.write(System.getProperty("line.separator"));
         }
-        bw.close();
-
-     }
+        out1.flush();
+        out1.close();
+    }
 
 }
