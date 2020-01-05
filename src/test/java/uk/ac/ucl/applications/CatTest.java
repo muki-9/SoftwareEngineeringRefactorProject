@@ -105,7 +105,7 @@ public class CatTest{
         testArray.add("src");
         testCat.exec(testArray, null, System.out, null);
 
-        String expected = "cat: src is a directory";
+        String expected = "cat: src is a directory\n";
         assertEquals(outContent.toString(),expected);
 
 

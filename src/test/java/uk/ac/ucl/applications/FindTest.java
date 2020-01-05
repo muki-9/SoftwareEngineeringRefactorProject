@@ -92,7 +92,7 @@ public class FindTest{
     public void findShouldFilterAllPathsDependingOnPattern() throws IOException{
 
         folder.newFile("input.java");
-        folder.newFile("input.java");
+        folder.newFile("input11.txt");
         folder.newFile("input345.txt");
         folder.newFile("random.out");
         testArray.add("-name");

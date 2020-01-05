@@ -286,57 +286,25 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             return new Call(app, args, globb);
 
         } else {
-            for (int i = 0; i < redirections.size();) {
-                Call c = (Call) redirections.get(i).accept(this);
-                String filePath = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs();
-                File file = new File(filePath);
-                OutputStream os;
+            Call c = (Call) redirections.get(0).accept(this);
+            String filePath = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs();
+            File file = new File(filePath);
+            OutputStream os;
 
-                if (c.getSymbol().matches(">")) {
-                    try {
-                        if (file.createNewFile()) {
-                            System.out.println("redirection: file created successfully");
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException("redirection: file could not be created");
-                    }
-                    try {
-                        os = new FileOutputStream(file);
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException("redirection: error writing to file");
-                    }
-                    ArrayList<String> args = getCallArgs(ctx);
-                    ArrayList<Boolean> globb = getGlobbArray(ctx);
-                    String app = null;
-                    if (args.size()>0) {
-                        app = args.get(0);
-                        args.remove(0);
-                    }
-                    return new Call(app, args, os, globb);
-
-                } else if (c.getSymbol().matches("<")) {
-                    if (!file.exists()) {
-                        throw new RuntimeException("redirection: file could not be found");
-                    }
-                    Charset encoding = StandardCharsets.UTF_8;
+            if (c.getSymbol().matches(">")) {
+                os = pipeToFile(file);
+                ArrayList<String> args = getCallArgs(ctx);
+                ArrayList<Boolean> globb = getGlobbArray(ctx);
+                String app = null;
+                if (args.size()>0) {
+                    app = args.get(0);
+                    args.remove(0);
+                }
+                return new Call(app, args, os, globb);
+            } else if (c.getSymbol().matches("<")) {
+                if (file.exists()) {
                     Path path = Paths.get(filePath);
-                    InputStream is;
-                    try (BufferedReader reader = Files.newBufferedReader(path, encoding)) {
-                        is = new PipedInputStream(90000);
-
-                        OutputStream outputstream = new PipedOutputStream((PipedInputStream) is);
-                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputstream));
-                        String line = null;
-                        while ((line = reader.readLine()) != null) {
-                            writer.write(String.valueOf(line));
-                            writer.write(System.getProperty("line.separator"));
-                            writer.flush();
-                        }
-                        writer.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException("redirection: error reading input from file");
-                    }
-
+                    InputStream is = getISFromFile(path);
                     ArrayList<String> args = getCallArgs(ctx);
                     ArrayList<Boolean> globb = getGlobbArray(ctx);
                     String app = null;
@@ -344,31 +312,77 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                         app = args.get(0);
                         args.remove(0);
                         globb.remove(0);
-
                     }
                     return new Call(app, args, is, globb);
                 } else {
-                    throw new RuntimeException("antlr: parsing error- invalid character: " + c.getSymbol());
+                    throw new RuntimeException("redirection: file could not be found");
                 }
             }
         }
         return null;
     }
 
-    
 
+
+    /*
+    AUXILLIARY FUNCTIONS FOR VISIT METHODS
+    */
+
+
+    private OutputStream pipeToFile(File file) {
+        try {
+            if (file.createNewFile()) {
+                System.out.println("redirection: file created successfully");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("redirection: file could not be created");
+        }
+        try {
+            OutputStream os = new FileOutputStream(file);
+            return os;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("redirection: error writing to file");
+        }
+    }
 
     /**
-    * auxilliary function for call method
-    * performs visits all the nodes required to get the application and correct arguments
-    * separated from Call() function for reusability.
-    *
-    * @param ctx The context (node) the parser is at, will be call node
-    * whose children are the application and arguments (with other nooes in between
-    * such as quoted, unquoted, argument and so forth)
-    *
-    * @return An array list where the first element is the name of the aplication, as a string,
-    * and the rest of the elements are the arguments
+     * auxilliary function for call method, reads file given as argument during >
+     * redirection, and pipes it into an input stream.
+     *
+     *  @param path the path to the file in the argument
+     *
+     *  @return An input stream containing the contents of the file given as input
+     */
+    private InputStream getISFromFile(Path path) {
+        InputStream is;
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            is = new PipedInputStream(90000);
+            OutputStream outputstream = new PipedOutputStream((PipedInputStream) is);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputstream));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                writer.write(String.valueOf(line));
+                writer.write(System.getProperty("line.separator"));
+                writer.flush();
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException("redirection: error reading input from file");
+        }
+        return is;
+    }
+
+    /**
+     * auxilliary function for call method performs visits all the nodes required to
+     * get the application and correct arguments separated from Call() function for
+     * reusability.
+     *
+     *  @param ctx The context (node) the parser is at, will be call node whose
+     * children are the application and arguments (with other nooes in between such
+     * as quoted, unquoted, argument and so forth)
+     *
+     *  @return An array list where the first element is the name of the aplication,
+     * as a string, and the rest of the elements are the arguments
     */
     private ArrayList<String> getCallArgs(CallContext ctx) {
         ArrayList<String> args = new ArrayList<>();
@@ -386,8 +400,17 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         return args;
     }
 
+    /**
+     * auxilliary function for call method...
+     *
+     *  @param ctx The context (node) the parser is at, will be call node whose
+     * children are the application and arguments (with other nooes in between such
+     * as quoted, unquoted, argument and so forth)
+     *
+     *  @return An array list where the first element is the name of the aplication,
+     * as a string, and the rest of the elements are the arguments
+    */
     public ArrayList<Boolean> getGlobbArray(CallContext ctx){
-
         ArrayList<Boolean> globb = new ArrayList<>();
         for(int n = 0; n<ctx.argument().size();n++) {
             Call call = (Call) ctx.argument().get(n).accept(this);
@@ -395,7 +418,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                 globb.add(call.getGlobb());
             }
             if (call.getSplit()) {
-                for(String s:call.getBqArray()) {
+                for(String s: call.getBqArray()) {
                     globb.add(false);
                 }
             }

@@ -73,11 +73,11 @@ public class Grep implements Application {
 
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + 1));
-            if (Files.isDirectory(filePath) || !Files.isReadable(filePath)) {
-                throw new RuntimeException("grep: wrong file argument");
+            if (Files.exists(filePath) && Files.isReadable(filePath) && !Files.isDirectory(filePath)) {
+                filePathArray[i] = filePath;
             }
             else {
-                filePathArray[i] = filePath;
+                throw new RuntimeException("grep: wrong file argument");
             }
         }
         return filePathArray;
@@ -90,10 +90,12 @@ public class Grep implements Application {
         Lines which match pattern are written to OutputStream.
     
     */
-    private void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray) throws IOException {
+    private void writeOutput(BufferedWriter writer, Pattern grepPattern, Path[] filePathArray) {
         for (int j = 0; j < (filePathArray.length); j++) {
             Charset encoding = StandardCharsets.UTF_8;
-            try (BufferedReader reader = Files.newBufferedReader(filePathArray[j], encoding)) {
+            BufferedReader reader;
+            try {
+                reader = Files.newBufferedReader(filePathArray[j], encoding);
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     Matcher matcher = grepPattern.matcher(line);
@@ -103,7 +105,10 @@ public class Grep implements Application {
                         writer.flush();
                     }
                 }
-            } 
+            } catch (IOException e) {
+                throw new RuntimeException("grep: IO exception");
+            }
+            
         }
     }
 }
