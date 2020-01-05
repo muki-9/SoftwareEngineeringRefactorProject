@@ -1,7 +1,7 @@
 package uk.ac.ucl.applications;
 
-import uk.ac.ucl.jsh.Jsh;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -9,11 +9,7 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -22,12 +18,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.assertj.core.api.Assertions.*;
+import uk.ac.ucl.jsh.Jsh;
 
 
 public class RmdirTest{
-
-    private Path currDir = Paths.get(Jsh.getCurrentDirectory());
 
     PipedInputStream in;
     PipedOutputStream out;

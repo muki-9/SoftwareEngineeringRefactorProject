@@ -9,11 +9,9 @@ public class ParserTest extends ParserT{
     @Test
 
     public void getTokenNamesShouldReturnTokens(){
-
         ArrayList<TestToken> tokens = new ArrayList<>();
         AntlrGrammarParser ap = createParserNoError(tokens);
         assertThat(ap.getTokenNames()).hasSize(13); //includes INVALID token
-
     }
 
     @Test

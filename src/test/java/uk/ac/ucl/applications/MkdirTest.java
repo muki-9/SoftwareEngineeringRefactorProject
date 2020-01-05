@@ -1,7 +1,7 @@
 package uk.ac.ucl.applications;
 
-import uk.ac.ucl.jsh.Jsh;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,9 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.assertj.core.api.Assertions.*;
-
-import uk.ac.ucl.applications.Cd;
+import uk.ac.ucl.jsh.Jsh;
 
 public class MkdirTest{
 

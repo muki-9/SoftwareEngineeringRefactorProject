@@ -88,50 +88,19 @@ public class CallContextTest extends ParserT{
             *
             */
             private static final long serialVersionUID = -112447375692081252L;
-
             { 
             add(new TestToken("<", AntlrGrammarLexer.LT));
             add(new TestToken(" ", AntlrGrammarLexer.WS));
             add(new TestToken("result.txt", AntlrGrammarLexer.UQ));
-
-            
         }};
 
         AntlrGrammarParser ap = createParserNoError(tokens);
-        CallContext call = ap.call();
 
-        // assertThat(); terminal should be empty essentially
+        assertThatCode(() -> {
+            ap.call();
+        }).doesNotThrowAnyException();
+
     }
-
-
-
-    //
-    // MESSAGE FOR MUKI: I replaced the function below "callShouldThrowExceptionIfMismatchInput" with "callDoesNothingIfEmptyArgLTRedirect"
-    //
-
-    // @Test
-
-    // public void callShouldThrowExceptionIfMismatchInput(){
-
-    //     ArrayList<TestToken> tokens = new ArrayList<>(){
-    //         /**
-    //         *
-    //         */
-    //         private static final long serialVersionUID = -112447375692081252L;
-
-    //         { 
-    //         add(new TestToken("<", AntlrGrammarLexer.LT));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken("result.txt", AntlrGrammarLexer.UQ));
-
-            
-    //     }};
-
-    //     AntlrGrammarParser ap = createParserNoError(tokens);
-    //     CallContext call = ap.call();
-
-    //     assertThat(call.exception).isNotNull();
-    // }
 
     @Test
 

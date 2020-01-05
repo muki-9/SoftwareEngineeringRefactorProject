@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.junit.After;
@@ -20,8 +18,6 @@ import uk.ac.ucl.jsh.Jsh;
 
 
 public class HistoryTest{
-
-    private Path currDir = Paths.get(Jsh.getCurrentDirectory());
 
     PipedInputStream in;
     PipedOutputStream out;
@@ -75,7 +71,4 @@ public class HistoryTest{
     //     jsh.eval("", out);
     //     assertThat(outContent.toString()).isEqualTo("");
     // }
-
-
-
 }

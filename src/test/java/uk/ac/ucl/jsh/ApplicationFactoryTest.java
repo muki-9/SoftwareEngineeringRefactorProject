@@ -3,8 +3,6 @@ package uk.ac.ucl.jsh;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 

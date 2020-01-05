@@ -1,8 +1,6 @@
 package uk.ac.ucl.jsh;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -13,8 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.ucl.applications.Cd;
-import uk.ac.ucl.applications.Echo;
 import uk.ac.ucl.applications.Pwd;
 
 public class UnsafeDecoratorTest {
@@ -39,9 +35,7 @@ public class UnsafeDecoratorTest {
         
     }
 
-
     @Test
-
     public void UnsafeshouldCatchExceptionAndWriteErrorToStdout() throws IOException {
 
         ArrayList<String> args = new ArrayList<>();
