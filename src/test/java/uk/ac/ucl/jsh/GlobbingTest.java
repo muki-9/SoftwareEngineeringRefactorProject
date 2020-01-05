@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,16 +30,18 @@ public class GlobbingTest {
     public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
     @Before
-
     public void init() {
-
         testArray = new ArrayList<>();
         testGlobb = new ArrayList<>();
+    }
 
+    @After
+    public void tear() throws IOException {
+        testGlobb = null;
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
     }
 
     @Test
-
     public void globbShouldExpandEachArgWhichContainsUnquotedAsterisk() throws IOException {
         File file1 = folder.newFile();
         File file2 = folder.newFile();

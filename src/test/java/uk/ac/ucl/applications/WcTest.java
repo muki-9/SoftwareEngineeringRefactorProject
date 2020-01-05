@@ -15,6 +15,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import static org.assertj.core.api.Assertions.*;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,6 +50,14 @@ public class WcTest{
 
     @Rule
     public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+
+    @After
+    public void tear() throws IOException {
+        in.close();
+        out.close();
+        testWc = null;
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
+    }
 
     @Test
     public void wcShouldThrowExceptionifNoArgsAndNoInputGiven(){
