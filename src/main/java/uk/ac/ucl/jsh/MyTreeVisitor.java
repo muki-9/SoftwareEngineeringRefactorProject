@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -418,7 +417,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                 globb.add(call.getGlobb());
             }
             if (call.getSplit()) {
-                for(String s: call.getBqArray()) {
+                for(int i=0; i<call.getBqArray().size(); i++) {
                     globb.add(false);
                 }
             }

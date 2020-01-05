@@ -77,7 +77,7 @@ public class Wc implements Application {
         // if file specified in command line by user is a real/usable file, it will return an array of the paths of the files
         for (int i = 0; i < numOfFiles; i++) {
             filePath = currentDir.resolve(args.get(i + offset));
-            if (Files.isDirectory(filePath) || !Files.isReadable(filePath)) {
+            if (Files.isDirectory(filePath)) {
                 throw new RuntimeException("wc: wrong file argument");
             } else {
                 filePathArray[i] = filePath;

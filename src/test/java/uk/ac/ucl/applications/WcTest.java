@@ -23,7 +23,6 @@ public class WcTest{
 
     public WcTest(){
 
-
     }
 
     PipedInputStream in;
@@ -51,6 +50,11 @@ public class WcTest{
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("wc: wrong number of arguments");
     }
+
+    // @Test
+    // public void wcShouldThrowExceptionIfDirGivenAsInput() {
+
+    // }
 
     @Test
 
@@ -96,32 +100,144 @@ public class WcTest{
         assertThat(linesAct).isEqualTo(linesNo);
 
     }
+
     @Test
 
-    public void testOutputWithOneArgAndInput() throws IOException {
-
+    public void testOutputWithOneArgAndInputM() throws IOException {
         int byteNo = 36;
-        int wordNo = 6;
-        int linesNo = 3;
-
         testArray.add("-m");
         int result = optionResult(testArray);
         assertThat(result).isEqualTo(byteNo);
+    }
 
-        ArrayList<String> newArray = new ArrayList<>();
-        newArray.add("-l");
-        int result1 = optionResult(newArray);
-        assertThat(result1).isEqualTo(linesNo);
+    @Test
+    public void testOutputWithOneArgAndInputL() throws IOException {
+        int linesNo = 3;
+        testArray.add("-l");
+        int result = optionResult(testArray);
+        assertThat(result).isEqualTo(linesNo);
+    }
 
-        ArrayList<String> newArray1= new ArrayList<>();
-        newArray1.add("-w");
-        int result2 = optionResult(newArray1);
-        assertThat(result2).isEqualTo(wordNo);
+    @Test
+    public void testOutputWithOneArgAndInputW() throws IOException {
+        int wordNo = 6;
+        testArray.add("-w");
+        int result = optionResult(testArray);
+        assertThat(result).isEqualTo(wordNo);
+    }
+
+    @Test
+    public void testWcFromFileM() throws IOException {
+        int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
+        String tmp1 = createTempFile();
+        testArray.add("-m");
+        testArray.add(tmp1);
+
+        testWc.exec(testArray, null, out, null);
+
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        String split = output.split("\\s")[0];
+        assertThat(split).isEqualTo(Integer.toString(bytesNo));
+        scn.close();
 
     }
+
+    @Test
+    public void testWcFromFileL() throws IOException {
+        int lineNo = 3;
+        String tmp1 = createTempFile();
+        testArray.add("-l");
+        testArray.add(tmp1);
+
+        testWc.exec(testArray, null, out, null);
+
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        String split = output.split("\\s")[0];
+        assertThat(split).isEqualTo(Integer.toString(lineNo));
+        scn.close();
+
+    }
+
+    @Test
+    public void testWcFromFileW() throws IOException {
+        int wordNo = 6;
+        String tmp1 = createTempFile();
+        testArray.add("-w");
+        testArray.add(tmp1);
+
+        testWc.exec(testArray, null, out, null);
+
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        String split = output.split("\\s")[0];
+        assertThat(split).isEqualTo(Integer.toString(wordNo));
+        scn.close();
+    }
+
+    @Test
+    public void testWcFromFileWTotalNeeded() throws IOException {
+        int wordNo = 6;
+        String tmp1 = createTempFile();
+        String tmp2 = createTempFile();
+        testArray.add("-w");
+        testArray.add(tmp1);
+        testArray.add(tmp2);
+
+        testWc.exec(testArray, null, out, null);
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        for (int i=0; i<2; i++) {
+            output = scn.nextLine();
+        }
+        String split = output.split("\\s")[0];
+        assertThat(split).isEqualTo(Integer.toString(wordNo*2));
+        scn.close();
+    }
+
+    @Test
+    public void testWcFromFileLTotalNeeded() throws IOException {
+        int lineNo = 3;
+        String tmp1 = createTempFile();
+        String tmp2 = createTempFile();
+        testArray.add("-l");
+        testArray.add(tmp1);
+        testArray.add(tmp2);
+
+        testWc.exec(testArray, null, out, null);
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        for (int i=0; i<2; i++) {
+            output = scn.nextLine();
+        }
+        String split = output.split("\\s")[0];
+        assertThat(split).isEqualTo(Integer.toString(lineNo*2));
+        scn.close();
+    }
+
+    @Test
+    public void testWcFromFileMTotalNeeded() throws IOException {
+        int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
+        String tmp1 = createTempFile();
+        String tmp2 = createTempFile();
+        testArray.add("-m");
+        testArray.add(tmp1);
+        testArray.add(tmp2);
+
+        testWc.exec(testArray, null, out, null);
+        Scanner scn = new Scanner(in);
+        String output = scn.nextLine();
+        for (int i=0; i<2; i++) {
+            output = scn.nextLine();
+        }
+        String split = output.split("\\s")[0];
+        assertThat(split).isEqualTo(Integer.toString(bytesNo*2));
+        scn.close();
+    }
+
     @Test
     public void testWcfor2orMoreArgsShouldProduceCorrectOutput() throws IOException {
-
         testArray.add("-m");
         String tmp1 = createTempFile();
         String tmp2 = createTempFile();
@@ -134,7 +250,7 @@ public class WcTest{
 
         String line = scn.nextLine();
         String[] split = line.split("\\s");
-        int bytesNo = "Line 1\nLine 2\nLine3\n".getBytes().length +1;
+        int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
          
         assertThat(Integer.parseInt(split[0])).isEqualTo(bytesNo);
 
@@ -148,13 +264,11 @@ public class WcTest{
 
         assertThat(Integer.parseInt(split2[0])).isEqualTo(2*bytesNo);
         scn.close();
-
     }
 
     @Test
 
     public void testWcWithoutOptFor2orMoreArgs() throws IOException {
-
         String tmp1 = createTempFile();
         String tmp2 = createTempFile();
         testArray.add(tmp1);
@@ -184,8 +298,7 @@ public class WcTest{
     }
 
     private void testOutput(boolean last, String[] split){
-
-        int bytesNo = "Line 1\nLine 2\nLine3\n".getBytes().length +1;
+        int bytesNo = "Line 1\nLine 2\nLine 3\n".getBytes().length;
         int wordsNo = 6;
         int linesNo = 3;
         Integer[] intArray= {linesNo, wordsNo, bytesNo};
@@ -193,18 +306,14 @@ public class WcTest{
             for(int i=0; i<3; i++){
                 assertThat(Integer.parseInt(split[i])).isEqualTo(intArray[i]);
             }
-
         }else{
             for(int i=0; i<3; i++){
                 assertThat(Integer.parseInt(split[i])).isEqualTo(intArray[i]*2);
             }
-
         }
-    
     }
 
     private int optionResult(ArrayList<String> test) throws IOException {
-
         PipedInputStream in = new PipedInputStream();
         PipedOutputStream out = new PipedOutputStream(in);
 
@@ -216,12 +325,9 @@ public class WcTest{
         int optAct = Integer.parseInt(scn.next());
         scn.close();
         return optAct;
-
-
     }
 
     private String createTempFile() throws IOException{
-
         File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
         temp1.deleteOnExit();
         writeToFile(temp1.getName());
@@ -229,21 +335,11 @@ public class WcTest{
 
     }
     private void writeToFile(String filename) throws IOException{
-
         BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
         for(int i =0; i<3; i++){
             bw.write("Line "+ i);
             bw.write(System.getProperty("line.separator"));
         }
         bw.close();
-
      }
-
-
-
-
-
-    
-
-    
 }

@@ -127,7 +127,6 @@ public class CatTest{
     }
 
     private String createTempFile() throws IOException{
-
         File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
         //File temp1 = new File("/workspaces/jsh-team-44/temp1.txt");
         temp1.deleteOnExit();
