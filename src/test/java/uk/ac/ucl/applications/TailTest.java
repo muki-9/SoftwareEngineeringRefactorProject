@@ -54,7 +54,7 @@ public class TailTest{
     }
 
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @Test
 

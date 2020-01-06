@@ -41,10 +41,9 @@ public class JshTest {
     }
 
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @After
-
     public void tear(){
         System.setIn(System.in);
         File delete  = new File("result.txt");

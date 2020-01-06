@@ -27,7 +27,7 @@ public class GlobbingTest {
      Path currDir = Paths.get(currentDir);
 
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @Before
     public void init() {

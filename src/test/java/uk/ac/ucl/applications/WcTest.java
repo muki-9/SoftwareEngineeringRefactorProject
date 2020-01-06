@@ -51,7 +51,7 @@ public class WcTest{
     }
 
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @After
     public void tear() throws IOException {
