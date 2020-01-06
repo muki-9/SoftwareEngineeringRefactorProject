@@ -45,9 +45,9 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     * be the argument, usually a filename, and the middle-child will be a whitespace constant.
     *
     * @return a Call object with a string as an argument and the relevant redirection symbol. 
-    * Later on, in the "visitCall" method of this class, 
-    * a check is performed to see which, which of these instance variables is true to run the correct procedures
-    * if neither are true, a normal Call instance is returned.
+    * This strings comes about as a result of visiting all the children of the argument node, and then
+    * converting the input into an argument of the correct form- this could include removing double quote,
+    * performing a backquoted command etc.
     */
     @Override
     public CommandVisitable visitRedirection(AntlrGrammarParser.RedirectionContext ctx) {
@@ -93,7 +93,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             s = new String(input.readAllBytes());
             s = s.replaceAll(System.getProperty("line.separator"), " ");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("backquotation: IO error occured");
         }
         return new Call(s.split(" "));
     }
@@ -304,8 +304,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         if(lastOccLT != -1){
             Call c = (Call) redirections.get(lastOccLT).accept(this);
             Path p = Paths.get(Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs());
-  
-            is =getISFromFile(p);
+            is = getISFromFile(p);
 
         }
         if(lastOccGT !=  -1){

@@ -34,7 +34,6 @@ public class RedirectionContextTest extends ParserT{
         assertThat(redir.argument().getText()).isEqualTo("text.txt");
         assertThat(redir.getRuleIndex()).isGreaterThan(0);
         assertThat(redir.exception).isNull();
-
     }
 
     @Test
@@ -117,7 +116,6 @@ public class RedirectionContextTest extends ParserT{
             rdir.exitRule(agl);
 
         }).doesNotThrowAnyException();
-
 
         assertThatCode(() ->{
 

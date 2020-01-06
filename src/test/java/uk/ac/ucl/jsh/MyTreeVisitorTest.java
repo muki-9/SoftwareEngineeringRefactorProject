@@ -61,7 +61,6 @@ public class MyTreeVisitorTest extends ParserT{
         Call c = (Call) tree.visitRedirection(redir);
         assertThat(c).returns("text.txt", from(Call::getCurrArgs));
         assertThat(c).returns("<", from(Call::getSymbol));
-
     }
 
     @Test
