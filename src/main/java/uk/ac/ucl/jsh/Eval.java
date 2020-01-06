@@ -73,7 +73,7 @@ public class Eval implements CommandVisitor {
         if (call.getIS() != null) {
             isList.add(call.getIS());
         }
-        if (call.getIS() != null) {
+        if (call.getOS() != null) {
             osList.add(call.getOS());
         }
         InputStream is = isList.get(isList.size()-1);
