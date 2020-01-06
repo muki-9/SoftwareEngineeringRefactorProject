@@ -1,8 +1,15 @@
 package uk.ac.ucl.jsh;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import java.util.ArrayList;
+
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.assertj.core.api.Assertions.*;
+import org.junit.rules.TemporaryFolder;
+
 import uk.ac.ucl.jsh.AntlrGrammarParser.CallContext;
 
 public class CallContextTest extends ParserT{
@@ -12,15 +19,12 @@ public class CallContextTest extends ParserT{
     }
 
     @Test
-
     public void testCall(){
-
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
             *
             */
             private static final long serialVersionUID = -112447375692081252L;
-
             {
             add(new TestToken("grep", AntlrGrammarLexer.UQ));
             add(new TestToken(" ", AntlrGrammarLexer.WS));
@@ -35,7 +39,6 @@ public class CallContextTest extends ParserT{
             add(new TestToken("result.txt", AntlrGrammarLexer.UQ));
             
         }};
-
         AntlrGrammarParser ap = createParserNoError(tokens);
         CallContext call = ap.call();
 
@@ -46,11 +49,10 @@ public class CallContextTest extends ParserT{
         assertThat(call.redirection().get(0).getText()).isEqualTo("< text.txt");
         assertThat(call.redirection(1).getText()).isEqualTo("> result.txt");
         assertThat(call.getRuleIndex()).isNotNull();
-
     }
+            
 
     @Test
-
     public void callTakingRedirFromStart(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
@@ -74,15 +76,12 @@ public class CallContextTest extends ParserT{
 
         AntlrGrammarParser ap = createParserNoError(tokens);
         CallContext call = ap.call();
-
         assertThat(call.exception).isNull();
-
     }
 
     @Test
 
     public void callDoesNothingIfEmptyArgLTRedirect(){
-
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
             *
@@ -99,7 +98,6 @@ public class CallContextTest extends ParserT{
         assertThatCode(() -> {
             ap.call();
         }).doesNotThrowAnyException();
-
     }
 
     @Test
@@ -140,11 +138,5 @@ public class CallContextTest extends ParserT{
             call.enterRule(ptl);
             call.exitRule(ptl);
         }).doesNotThrowAnyException();
-
-        
-
     }
-
-
-
 }

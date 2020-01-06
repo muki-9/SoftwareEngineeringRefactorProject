@@ -38,7 +38,6 @@ public class JshTest {
         outContent  = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Jsh.setCurrentDirectory(folder.getRoot().toString());
-
     }
 
     @Rule
@@ -47,14 +46,12 @@ public class JshTest {
     @After
 
     public void tear(){
-
         System.setIn(System.in);
         File delete  = new File("result.txt");
         delete.delete();
         File delete1  = new File("randomfile.txt");
         delete1.delete();
         Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
-
     }
 
     @Test
@@ -118,14 +115,24 @@ public class JshTest {
         assertThatCode(() -> {
             Jsh.main(args);
         }).doesNotThrowAnyException(); 
+    }
 
+    @Test
+    public void normalCatLTRedirectionTest() throws IOException {
+        File f = folder.newFile("filename.txt");
+        writeToFile(f, "this is some random text");
 
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        String[] args = {"-c", "cat < filename.txt"};
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        String actual = outContent.toString();
 
+        assertThat(actual).isEqualTo("this is some random text\n");
     }
 
     @Test
     public void testJshDirCorrectWithSymbol() throws IOException {
-
         Jsh newshell = new Jsh(false);
 
         String input = "\r";
@@ -136,7 +143,6 @@ public class JshTest {
         newshell.takesInput();
 
         assertThat(outContent.toString()).isEqualTo(Jsh.getCurrentDirectory()+"> ");
-
     }
 
     @Test
@@ -153,9 +159,7 @@ public class JshTest {
     }
 
     @Test
-
     public void testJshShouldAllowCarriageReturnAsInput(){
-
         testJsh = new Jsh(false);
 
         String input = "pwd";
@@ -168,9 +172,7 @@ public class JshTest {
     }
 
     @Test
-
     public void testJshWithPipe(){
-
         testJsh = new Jsh(false);
 
         String input = "grep a test2.txt | cat ";
@@ -183,7 +185,6 @@ public class JshTest {
     }
 
     @Test
-
     public void testJshWithSeqAndPipe() throws IOException {
 
         File tmp1 = folder.newFile();
@@ -210,12 +211,9 @@ public class JshTest {
         assertThatCode(() -> {
             Jsh.main(args);
         }).doesNotThrowAnyException(); 
-
-
     }
 
     @Test
-
     public void testJshWithRedirectionLT() throws IOException {
 
         File tmp1 = folder.newFile();
@@ -232,9 +230,7 @@ public class JshTest {
     }
 
     @Test
-
     public void testJshWithRedirectionLTAndGTGetsLastOneOfEach() throws IOException {
-
         File tmp1 = folder.newFile();
         File tmp2 = folder.newFile();
         String t1 = "randomwords9898\nrunchmod+x   \n output";
@@ -249,11 +245,9 @@ public class JshTest {
         assertThatCode(() -> {
             Jsh.main(args);
         }).doesNotThrowAnyException(); 
-
     }
 
     @Test
-
     public void testJshWithRedirectionCreatesFile() throws IOException {
         testJsh = new Jsh(false);
 
@@ -265,12 +259,9 @@ public class JshTest {
         assertThatCode(() -> {
             Jsh.main(args);
         }).doesNotThrowAnyException(); 
-
-
     }
 
     @Test
-
     public void jshShouldThrowExceptionIfCannotReadUserInput(){
         testJsh = new Jsh(false);
 
