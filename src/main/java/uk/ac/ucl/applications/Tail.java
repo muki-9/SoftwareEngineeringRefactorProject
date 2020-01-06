@@ -20,19 +20,16 @@ import uk.ac.ucl.jsh.Jsh;
 public class Tail implements Application {
 
     private int tailLines = 10;
+    private int index = 0;
     private boolean useIS = false;
-    private int index =0;
-    BufferedWriter writer;
-    private String currentDirectory = Jsh.getCurrentDirectory();
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray)
-            throws IOException {
-        writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+        String currentDirectory = Jsh.getCurrentDirectory();
 
         checkArgs(args, input);
-        String file  = getFile(args);
-
+        
         if (useIS) {
             String line = new String(input.readAllBytes());
             String[] lines = line.split(System.getProperty("line.separator"));
@@ -40,65 +37,90 @@ public class Tail implements Application {
             if (tailLines <= lines.length) {
                 index = lines.length - tailLines;
             }
+
             for (int i = index; i < lines.length; i++) {
                 writer.write(lines[i] + System.getProperty("line.separator"));
                 writer.flush();
             }
-
-        }else{
+        }
+        else {
+            String file = getFile(args);
             File tailFile = new File(currentDirectory + File.separator + file);
             writeOutput(file, tailFile, writer, currentDirectory);
-            }
+        }
     }
 
-    public String getFile(ArrayList<String> args){
+    /*
 
-        if(args.size()> 1){
-            if(!args.get(0).equals("-n")){throw new RuntimeException("tail: wrong argument: " + args.get(0) );}
-            try{
+        Method selects and returns file name using if statements.
+
+    */
+    private String getFile(ArrayList<String> args){
+        if (args.size() > 1) {
+            if (!args.get(0).equals("-n")) {
+                throw new RuntimeException("tail: wrong argument: " + args.get(0));
+            }
+
+            try {
                 tailLines = Integer.parseInt(args.get(1));  
-            }catch(RuntimeException e){
+            }
+            catch (RuntimeException e) {
                 throw new RuntimeException("tail: wrong argument: " + args.get(1));
             }
-            if(args.size() == 3){
+
+            if (args.size() == 3) {
                 return args.get(2);
             }
-           
-        }else if(args.size()==1){
+        }
+        else if (args.size() == 1) {
             return args.get(0);
         }
         return null;
     }
 
-    public void checkArgs(ArrayList<String> args, InputStream input){
+    /*
 
-        if(((args.isEmpty() || args.size() ==2)&& input == null)|| args.size() > 3){
+        Method checks args using if statements to update useIS if stdin is to be used.
+
+    */
+    private void checkArgs(ArrayList<String> args, InputStream input) {
+        if (((args.isEmpty() || args.size() == 2) && input == null) || args.size() > 3) {
             throw new RuntimeException("tail: wrong arguments");   
         }
 
-        if(args.size() ==2 || args.isEmpty()){
+        if (args.size() == 2 || args.isEmpty()) {
             useIS = true;
         }
     }
 
-    private void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory)
-            throws IOException {
+    /*
+
+        Method reads in file and stores lines into an array.
+        For loop is used to write number of lines required to OutputStream.
+
+    */
+    private void writeOutput(String tailArg, File tailFile, BufferedWriter writer, String currentDirectory) throws IOException {
         if (!tailFile.exists()) {
             throw new RuntimeException("tail: " + tailArg + " does not exist");
         }
+
         Charset encoding = StandardCharsets.UTF_8;
-        Path filePath = Paths.get((String) currentDirectory + File.separator + tailArg);
-        ArrayList<String> storage = new ArrayList<>();
+        Path filePath = Paths.get(currentDirectory + File.separator + tailArg);
+        
         try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+            ArrayList<String> lines = new ArrayList<>();
             String line = null;
+
             while ((line = reader.readLine()) != null) {
-                storage.add(line);
+                lines.add(line);
             }
-            if (tailLines <= storage.size()) {
-                index = storage.size() - tailLines;
+
+            if (tailLines <= lines.size()) {
+                index = lines.size() - tailLines;
             }
-            for (int i = index; i < storage.size(); i++) {
-                writer.write(storage.get(i) + System.getProperty("line.separator"));
+
+            for (int i = index; i < lines.size(); i++) {
+                writer.write(lines.get(i) + System.getProperty("line.separator"));
                 writer.flush();
             }            
         }

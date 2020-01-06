@@ -50,6 +50,7 @@ public class Wc implements Application {
             int numOfFiles = args.size();
             int offset = 0;
 
+            // if statement ensures that for loop in getFilePathArray doesn't treat option as a file
             if (args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l")) {
                 offset = 1;
                 numOfFiles -= 1;
@@ -70,6 +71,11 @@ public class Wc implements Application {
         }
     }
 
+    /*
+
+        Method loops through files and adds path to returned array if valid.
+
+    */
     private Path[] getFilePathArray(String currentDirectory, int numOfFiles, int offset, ArrayList<String> args) {
         Path filePath;
         Path currentDir = Paths.get(currentDirectory);
@@ -80,105 +86,124 @@ public class Wc implements Application {
             filePath = currentDir.resolve(args.get(i + offset));
             if (Files.isDirectory(filePath) || !Files.isReadable(filePath)){
                 throw new RuntimeException("wc: wrong file argument");
-            } else {
+            }
+            else {
                 filePathArray[i] = filePath;
             }
         }
         return filePathArray;
     }
 
+    /*
+
+        Method removes directory details to obtain only file name when given path as string.
+
+    */
     private String getFileName(String string) {
         return string.split("/")[string.split("/").length-1];
     }
 
+    /*
+
+        Method stores word, char and newline counts for each file in hashmap.
+        Writes count specified by option to OutputStream, and total if neccesary.
+
+    */
     private void writeUsingFiles(BufferedWriter writer, Path[] filePathArray, String option) throws IOException {
         int totalLineCount = 0;
         int totalWordCount = 0;
         int totalCharCount = 0;
         int totalCount = 0;
 
-        List<String> options = Arrays.asList("-l","-w", "-m");
+        List<String> options = Arrays.asList("-l", "-w", "-m");
         
         for(Path path : filePathArray){
-            Map<String, String> hmap  = new HashMap<>();
+            Map<String, String> resultsHashMap  = new HashMap<>();
 
-            hmap.put("-w", calcWords(path));
-            hmap.put("-m", calcChars(path));
-            hmap.put("-l", calcNewlines(path));
+            resultsHashMap.put("-w", calcWords(path));
+            resultsHashMap.put("-m", calcChars(path));
+            resultsHashMap.put("-l", calcNewlines(path));
             
-            if(option!="all"){
-                String result= hmap.get(option);
+            if (option != "all") {
+                String result = resultsHashMap.get(option);
                 totalCount += Integer.parseInt(result);
                 writer.write(result + '\t');
 
-            }else{
-                List<String> result= new ArrayList<>();
+            }
+            else {
+                List<String> result = new ArrayList<>();
 
-                for(String opt: options){
-                    result.add(hmap.get(opt));
-                    writer.write(hmap.get(opt)+ '\t');
+                for(String opt : options) {
+                    result.add(resultsHashMap.get(opt));
+                    writer.write(resultsHashMap.get(opt) + '\t');
                     writer.flush();
                 }
 
-                 totalCharCount+= Integer.parseInt(result.get(2));
-                 totalWordCount+= Integer.parseInt(result.get(1));
-                 totalLineCount+= Integer.parseInt(result.get(0));
-
+                totalCharCount+= Integer.parseInt(result.get(2));
+                totalWordCount+= Integer.parseInt(result.get(1));
+                totalLineCount+= Integer.parseInt(result.get(0));
             }
+
             writer.write(getFileName(path.toString()));
             writer.write(System.getProperty("line.separator"));
             writer.flush();
         }
 
-        Map<String, String> hmap2  = new HashMap<>();
-        hmap2.put("-m", Integer.toString(totalCharCount));
-        hmap2.put("-w", Integer.toString(totalWordCount));
-        hmap2.put("-l", Integer.toString(totalLineCount));
+        Map<String, String> totalsHashMap  = new HashMap<>();
+        totalsHashMap.put("-m", Integer.toString(totalCharCount));
+        totalsHashMap.put("-w", Integer.toString(totalWordCount));
+        totalsHashMap.put("-l", Integer.toString(totalLineCount));
         
         if (totalNeeded) {
-
-            if(option!="all"){
-
+            if(option != "all"){
                 writer.write(Integer.toString(totalCount) + '\t');
-
-            }else{
-
-                for(String opt: options){
-                    writer.write(hmap2.get(opt)+ '\t');
+            }
+            else {
+                for(String opt : options) {
+                    writer.write(totalsHashMap.get(opt) + '\t');
                     writer.flush();
                 }
             }
             writer.write("total");
             writer.write(System.getProperty("line.separator"));
             writer.flush();
-
         }
     }
 
+    /*
+
+        Method stores word, char and newline counts for stdin in hashmap.
+        Writes count specified by option to OutputStream, and total if neccesary.
+
+    */
     private void writeUsingInputStream(BufferedWriter writer, String[] lines, String option) throws IOException {
 
         List<String> options  = Arrays.asList("-l", "-w", "-m");
-        Map<String, String> hmap  = new HashMap<>();
+        Map<String, String> resultsHashMap  = new HashMap<>();
 
-        hmap.put("-w", calcWords(lines));
-        hmap.put("-m", calcChars(lines));
-        hmap.put("-l", Integer.toString(lines.length));
+        resultsHashMap.put("-w", calcWords(lines));
+        resultsHashMap.put("-m", calcChars(lines));
+        resultsHashMap.put("-l", Integer.toString(lines.length));
         
-        if(option!="all"){
-
-            writer.write(hmap.get(option));
-
-        }else{
-            for(String opt: options){
-                writer.write(hmap.get(opt)+ '\t');
-            }
-
+        if(option != "all"){
+            writer.write(resultsHashMap.get(option));
         }
+        else {
+            for(String opt : options){
+                writer.write(resultsHashMap.get(opt) + '\t');
+            }
+        }
+
         writer.write(System.getProperty("line.separator"));
         writer.flush();
-
     }
 
+    /*
+
+        Method to calculate newline count when using Files.
+        Increases a counter everytime '\n' is seen and returns counter as string.
+
+    */
     private String calcNewlines(Path path) throws IOException {
         Charset encoding = StandardCharsets.UTF_8;
         int value;
@@ -196,6 +221,13 @@ public class Wc implements Application {
         return Integer.toString(newlineCount);
     }
 
+    /*
+
+        Method to calculate char count when using Files.
+        Increases a counter by number of chars in line, accounting for newline char.
+        Returns string form of counter.
+
+    */
     private String calcChars(Path path) throws IOException {
         int charCount = Integer.parseInt(calcNewlines(path));
         try (BufferedReader reader = Files.newBufferedReader(path)) {
@@ -207,6 +239,13 @@ public class Wc implements Application {
         return Integer.toString(charCount);
     }
 
+    /*
+
+        Method to calculate char count when using stdin.
+        Increases a counter by number of chars in line, accounting for newline char.
+        Returns string form of counter.
+
+    */
     private String calcChars(String[] lines) {
         int charCount = lines.length;
         for (String line : lines) {
@@ -215,6 +254,13 @@ public class Wc implements Application {
         return Integer.toString(charCount);
     }
 
+    /*
+
+        Method to calculate word count when using Files.
+        Increases a counter by size of array of words in each line, for every line.
+        Returns string form of counter.
+
+    */
     private String calcWords(Path path) throws IOException {
         int wordCount = 0;
         try (BufferedReader reader = Files.newBufferedReader(path)) {
@@ -224,9 +270,7 @@ public class Wc implements Application {
                 ArrayList<String> words = new ArrayList<>();
 
                 for (int i = 0; i < preWords.length; i++) {
-                    
-                    words.add(preWords[i]);
-                    
+                    words.add(preWords[i]); 
                 }
                 wordCount += words.size(); 
             }
@@ -234,6 +278,13 @@ public class Wc implements Application {
         return Integer.toString(wordCount);
     }
 
+    /*
+
+        Method to calculate word count when using stdin.
+        Increases a counter by size of array of words in each line, for every line.
+        Returns string form of counter.
+
+    */
     private String calcWords(String[] lines){
         int wordCount = 0;
         for(String line : lines) {
@@ -241,15 +292,18 @@ public class Wc implements Application {
             ArrayList<String> words = new ArrayList<>();
 
             for (int i = 0; i < preWords.length; i++) {
-              
                 words.add(preWords[i]);
-                
             }
             wordCount += words.size(); 
         }
         return Integer.toString(wordCount);
     }
 
+    /*
+
+        Method checks args using if statements to update useInputStream if stdin is to be used and ensures options valid.
+
+    */
     private void validateArgs(ArrayList<String> args, InputStream input) {
         if (args.size() == 0) {
             if (input == null) {
@@ -260,15 +314,16 @@ public class Wc implements Application {
                 return;
             }
         }
-        if(args.get(0).startsWith("-") && !(args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l"))){
 
+        if(args.get(0).startsWith("-") && !(args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l"))){
             throw new RuntimeException("wc: illegal option given");
         }
 
         if (args.size() == 1 && args.get(0).startsWith("-")){
-            if(input!=null){
+            if(input != null){
                 useInputStream = true;           
-            }else{
+            }
+            else{
                 throw new RuntimeException("wc: wrong number of arguments");
             }    
         }
