@@ -29,6 +29,7 @@ public class Tail implements Application {
         String currentDirectory = Jsh.getCurrentDirectory();
 
         checkArgs(args, input);
+        String file = getFile(args);
         
         if (useIS) {
             String line = new String(input.readAllBytes());
@@ -44,7 +45,6 @@ public class Tail implements Application {
             }
         }
         else {
-            String file = getFile(args);
             File tailFile = new File(currentDirectory + File.separator + file);
             writeOutput(file, tailFile, writer, currentDirectory);
         }

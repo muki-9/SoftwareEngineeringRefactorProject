@@ -33,11 +33,9 @@ public class GrepTest{
     Grep testGrep;
     ArrayList<String> testArray;
     ByteArrayOutputStream outContent;
-    
 
     @Before
     public void init() throws IOException {
-
         in = new PipedInputStream();
         out= new PipedOutputStream(in);
         testGrep = new Grep();
@@ -49,15 +47,16 @@ public class GrepTest{
     public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
     @After
-
-    public void tear(){
+    public void tear() throws IOException {
+        in.close();
+        out.close();
         Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
+        testGrep = null;
     }
+
     @Test
     public void testGrepShouldThrowExceptionIfWrongArgs(){
-
         testArray.add("aba");
-
         assertThatThrownBy(() -> {
             testGrep.exec(testArray, null, out, null);
         })
@@ -111,12 +110,9 @@ public class GrepTest{
     }
 
     @Test
-    
     public void shouldThrowExceptionifDir() throws IOException {
-
         testArray.add("a");
         testArray.add("src");
-
    
         assertThatThrownBy(() -> {
             testGrep.exec(testArray, null, out,null);
@@ -127,9 +123,7 @@ public class GrepTest{
     }
 
     @Test
-
     public void ifInputNotNullThenShouldOutputCorrect() throws IOException {
-
         String originalString = "test line absolute\n2nd line!\nabsent";
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
@@ -140,8 +134,8 @@ public class GrepTest{
 
         String expected = "test line absolute\nabsent\n";
         assertEquals(actual, expected);
-
     }
+
     // @Test
     // public void ifMoreThan2ArgsThenShouldGetAllPaths() throws IOException {
 
@@ -164,22 +158,20 @@ public class GrepTest{
 
     @Test
     public void testGrepWithMoreArgsShouldOutputCorrectContent() throws IOException {
-
         File tmp1 = folder.newFile();
         File tmp2 = folder.newFile();
+
         writeToFile(tmp1);
         writeToFile(tmp2);
-        Jsh.setCurrentDirectory(folder.getRoot().toString());
+
         testArray.add("ab");
         testArray.add(tmp1.getName());
         testArray.add(tmp2.getName());
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
         testGrep.exec(testArray, null, System.out, null);
-        String actual = outContent.toString();
         String exp  = "absent this should print on"+tmp1.getName()+'\n'+"absent this should print on"+tmp2.getName()+'\n';
-
-        assertEquals(actual, exp);
-        
+        assertEquals(outContent.toString(), exp);
     }
 
     // private String createTempFile() throws IOException{
@@ -205,8 +197,4 @@ public class GrepTest{
         out1.flush();
         out1.close();
     }
-
-
-
-
 }

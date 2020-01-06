@@ -28,7 +28,6 @@ import uk.ac.ucl.jsh.AntlrGrammarParser.UnquotedContext;
 public class MyTreeVisitorTest extends ParserT{
 
     public MyTreeVisitorTest(){
-
     }
 
     @Rule
@@ -465,16 +464,12 @@ public class MyTreeVisitorTest extends ParserT{
     // }
 
     @Test
-
     public void testGTRedir(){
-
-
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
             *
             */
             private static final long serialVersionUID = -112447375692081252L;
-
             {
             add(new TestToken("echo", AntlrGrammarLexer.UQ));
             add(new TestToken(" ", AntlrGrammarLexer.WS));
@@ -561,7 +556,6 @@ public class MyTreeVisitorTest extends ParserT{
         exp.add("string");
         assertThat(c).returns("grep", Call::getApplication);
         assertThat(c).returns(exp, Call::getArguments);
-
     }
 
     @Test
@@ -575,11 +569,9 @@ public class MyTreeVisitorTest extends ParserT{
             private static final long serialVersionUID = -112447375692081252L;
 
             {
-
                 add(new TestToken("<", AntlrGrammarLexer.LT));
                 add(new TestToken(" ", AntlrGrammarLexer.WS));
                 add(new TestToken("randomfile.txt", AntlrGrammarLexer.UQ));
-                
         }};
 
         AntlrGrammarParser ap = createParserNoError(tokens);
@@ -591,9 +583,6 @@ public class MyTreeVisitorTest extends ParserT{
             tree.visitCall(call);
         }).isInstanceOf(RuntimeException.class)
         .hasMessage("redirection: file could not be found");
-
-
-
     }
 
     private void writeToFile(File file) throws IOException {
