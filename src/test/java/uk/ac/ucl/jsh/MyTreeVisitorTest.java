@@ -31,7 +31,7 @@ public class MyTreeVisitorTest extends ParserT{
     }
 
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @AfterClass
     public static void tear(){
@@ -464,7 +464,7 @@ public class MyTreeVisitorTest extends ParserT{
     // }
 
     @Test
-    public void testGTRedir(){
+    public void testGTRedir() throws IOException {
         ArrayList<TestToken> tokens = new ArrayList<>(){
             /**
             *
@@ -523,7 +523,6 @@ public class MyTreeVisitorTest extends ParserT{
     @Test
 
     public void testCallWithRedirAndBackQ() throws IOException {
-
         File file = folder.newFile();
         writeToFile(file);
 

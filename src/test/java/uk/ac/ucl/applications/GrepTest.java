@@ -43,8 +43,9 @@ public class GrepTest{
         outContent  = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
     }
+
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @After
     public void tear() throws IOException {
@@ -67,7 +68,6 @@ public class GrepTest{
     @Test
 
     public void testGrepShouldExceptionIfNoArgsGiven(){
-
         assertThatThrownBy(() -> {
             testGrep.exec(testArray, null, out, null);
         })
@@ -96,7 +96,6 @@ public class GrepTest{
     @Test
     
     public void shouldThrowExceptionifWrongFile() throws IOException {
-
         testArray.add("ab");
         testArray.add("wrongfile.txt"); 
         testArray.add("test.txt");
@@ -136,6 +135,27 @@ public class GrepTest{
         assertEquals(actual, expected);
     }
 
+    @Test
+    public void testGrepWithMoreArgsShouldOutputCorrectContent() throws IOException {
+        File tmp1 = folder.newFile();
+        File tmp2 = folder.newFile();
+        writeToFile(tmp1);
+        writeToFile(tmp2);
+
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
+        
+        testArray.add("ab");
+        testArray.add(tmp1.getName());
+        testArray.add(tmp2.getName());
+
+        testGrep.exec(testArray, null, System.out, null);
+        String actual = outContent.toString();
+        String exp  = "absent this should print on"+tmp1.getName()+'\n'+"absent this should print on"+tmp2.getName()+'\n';
+
+        assertEquals(actual, exp);
+        
+    }
+
     // @Test
     // public void ifMoreThan2ArgsThenShouldGetAllPaths() throws IOException {
 
@@ -156,37 +176,25 @@ public class GrepTest{
 
     // }
 
-    @Test
-    public void testGrepWithMoreArgsShouldOutputCorrectContent() throws IOException {
-        File tmp1 = folder.newFile();
-        File tmp2 = folder.newFile();
+    // @Test
+    // public void testGrepWith2Args() throws IOException {
+    //     File file1 = createTempFile();
+    //     File file2 = createTempFile();
 
-        writeToFile(tmp1);
-        writeToFile(tmp2);
+    //     testArray.add("ab");
+    //     testArray.add(file1.getName());
+    //     testArray.add(file2.getName());
 
-        testArray.add("ab");
-        testArray.add(tmp1.getName());
-        testArray.add(tmp2.getName());
-        Jsh.setCurrentDirectory(folder.getRoot().toString());
-
-        testGrep.exec(testArray, null, System.out, null);
-        String exp  = "absent this should print on"+tmp1.getName()+'\n'+"absent this should print on"+tmp2.getName()+'\n';
-        assertEquals(outContent.toString(), exp);
-    }
-
-    // private String createTempFile() throws IOException{
-    //     File temp1 = File.createTempFile("input", ".txt", new File("/workspaces/jsh-team-44"));
-    //     temp1.deleteOnExit();
-    //     writeToFile(temp1.getName());
-    //     return temp1.getName();
+    //     testGrep.exec(testArray, null, System.out, null);
+    //     String exp  = "absent this should print on"+file1.getName()+'\n'+"absent this should print on"+file2.getName()+'\n';
+    //     assertEquals(outContent.toString(), exp);
     // }
-    // private void writeToFile(String filename) throws IOException{
-    //     BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-    //     bw.write("absent this should print on" + filename);
-    //     bw.write(System.getProperty("line.separator"));
-    //     bw.write("nothing on this line" + filename);
-    //     bw.flush();
-    //     bw.close();
+
+    // private File createTempFile() throws IOException {
+    //     File temp1 = File.createTempFile("input", ".txt", new File(Jsh.getHomeDirectory()));
+    //     temp1.deleteOnExit();
+    //     writeToFile(temp1);
+    //     return temp1;
     // }
 
     private void writeToFile(File filename) throws IOException{

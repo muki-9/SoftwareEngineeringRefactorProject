@@ -149,7 +149,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         return new Call(newS, false);
     }
 
-
     /**
     * When at an unquoted node, the child will contain just the raw text we want to extract, this is passed into the
     * Call method and the constructor will make an instance variable in the Call class true. If this instance variable is true
