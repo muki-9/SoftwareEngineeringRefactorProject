@@ -85,16 +85,19 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         String s = null;
         try {
             Jsh j = new Jsh();
+        
             InputStream input = new PipedInputStream(90000);
             writer = new PipedOutputStream((PipedInputStream) input);
             String temp = ctx.getText();
-            j.eval(temp.substring(1, temp.length() - 1), writer);
+            String tmpSub = temp.substring(1, temp.length()-1);
+            j.eval(tmpSub, writer);
             writer.close();
             s = new String(input.readAllBytes());
             s = s.replaceAll(System.getProperty("line.separator"), " ");
         } catch (IOException e) {
             throw new RuntimeException("backquotation: IO error occured");
         }
+
         return new Call(s.split(" "));
     }
 
@@ -189,6 +192,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         ArrayList<ParseTree> s = new ArrayList<>();
         String string = "";
         ArrayList<String> bqArgs = new ArrayList<>();
+        ArrayList<Boolean> globbArray;
         boolean arg = false;
         boolean integrate = false;
         boolean globb = false;
@@ -210,11 +214,13 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                     for (String vals : c.getBqArray()) {
                         string = string.concat(vals);
                     }
+                    
                 }
             }
             else {
                 globb = c.getGlobb();
                 string = string.concat(c.getCurrArgs());
+     
             }
         }
         if (integrate) {
@@ -417,11 +423,11 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
      * auxilliary function for call method...
      *
      *  @param ctx The context (node) the parser is at, will be call node whose
-     * children are the application and arguments (with other nooes in between such
+     * children are the application and arguments (with other nodes in between such
      * as quoted, unquoted, argument and so forth)
      *
-     *  @return An array list where the first element is the name of the aplication,
-     * as a string, and the rest of the elements are the arguments
+     *  @return An array list where the each argument is a boolean depending on whether it was quoted or not originally
+     * This allows us to figure out whether or not globbing can be performed on each individual arg.
     */
     public ArrayList<Boolean> getGlobbArray(CallContext ctx){
         ArrayList<Boolean> globb = new ArrayList<>();
@@ -429,11 +435,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             Call call = (Call) ctx.argument().get(n).accept(this);
             if (call.getCurrArgs() != null) {
                 globb.add(call.getGlobb());
-            }
-            if (call.getSplit()) {
-                for(int i=0; i<call.getBqArray().size(); i++) {
-                    globb.add(false);
-                }
             }
         }
         return globb;

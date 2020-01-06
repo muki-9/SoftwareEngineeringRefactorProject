@@ -67,7 +67,7 @@ public class GlobbingTest {
 
     @Test
 
-    public void globbShouldNotThrowExceptionIfNoFilesInDir() throws IOException {
+    public void globbShouldReturnArgIfNoFilesInDir() throws IOException {
         File file1 = folder.newFile();
         
         testArray.add(file1.getName()+"/*");
@@ -75,29 +75,8 @@ public class GlobbingTest {
         Jsh.setCurrentDirectory(folder.getRoot().toString());
         glob = new Globbing(testGlobb);
         ArrayList<String> result = glob.globbing(testArray);
-        assertThat(result).isEmpty();
+        assertThat(result.get(0)).isEqualTo(file1.getName()+"/*");
 
     }
 
-    // @Test
-
-    // public void globbShouldProduceSeveralArgsifPathsfound() throws IOException {
-
-    //     String tmpDir1 = createTempDir();
-    //     String tmpFile1 = createTempFile(currentDir+"/"+tmpDir1);
-    //     String tmpFile2 = createTempFile(currentDir+"/"+tmpDir1);
-    //     String tmp2 = createTempFile(currentDir);
-
-    //     testArray.add(tmpDir1.substring(0,10)+"*/*");
-    //     testArray.add(tmp2.substring(0,12)+"*");
-
-    //     testGlobb.add(true);
-    //     testGlobb.add(true);
-
-    //     glob= new Globbing(testGlobb);
-    //     ArrayList<String> result = glob.globbing(testArray);
-    //     assertThat(result).containsOnly(tmpDir1+"/"+tmpFile1, tmpDir1+"/"+tmpFile2, tmp2);
-
-
-    // }
 }

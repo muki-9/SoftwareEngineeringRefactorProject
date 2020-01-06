@@ -2,7 +2,7 @@ package uk.ac.ucl.applications;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -77,21 +77,6 @@ public class GrepTest{
 
     } 
 
-    // @Test
-
-    // public void grepShouldThrowErrorIffileIsntReadable() throws IOException {
-
-    //     File unreadable = new File(createTempFile());
-    //     unreadable.setReadable(false);
-    //     testArray.add("aba");
-    //     testArray.add(unreadable.getName());
-    //     assertThatThrownBy(() -> {
-    //         testGrep.exec(testArray, null, out, null);
-    //     })
-    //     .isInstanceOf(RuntimeException.class)
-    //     .hasMessageContaining("grep: wrong file argument");
-
-    // }
 
     @Test
     
@@ -156,46 +141,6 @@ public class GrepTest{
         
     }
 
-    // @Test
-    // public void ifMoreThan2ArgsThenShouldGetAllPaths() throws IOException {
-
-    //     testArray.add("ab");
-    //     String tmp1  = createTempFile();
-    //     String tmp2 = createTempFile();
-    //     String tmp3 = createTempFile();
-    //     testArray.add(tmp1);
-    //     testArray.add(tmp2);
-    //     testArray.add(tmp3);
-
-    //     assertThatCode(() -> {
-    //         testGrep.exec(testArray, null, out,null);
-    //     }).doesNotThrowAnyException();
-
-    //     Path[] pathArray = testGrep.getPathArray(testArray);
-    //     assertThat(pathArray).hasSize(3);
-
-    // }
-
-    // @Test
-    // public void testGrepWith2Args() throws IOException {
-    //     File file1 = createTempFile();
-    //     File file2 = createTempFile();
-
-    //     testArray.add("ab");
-    //     testArray.add(file1.getName());
-    //     testArray.add(file2.getName());
-
-    //     testGrep.exec(testArray, null, System.out, null);
-    //     String exp  = "absent this should print on"+file1.getName()+'\n'+"absent this should print on"+file2.getName()+'\n';
-    //     assertEquals(outContent.toString(), exp);
-    // }
-
-    // private File createTempFile() throws IOException {
-    //     File temp1 = File.createTempFile("input", ".txt", new File(Jsh.getHomeDirectory()));
-    //     temp1.deleteOnExit();
-    //     writeToFile(temp1);
-    //     return temp1;
-    // }
 
     private void writeToFile(File filename) throws IOException{
         PrintWriter out1 = new PrintWriter(filename);

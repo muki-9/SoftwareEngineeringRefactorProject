@@ -60,9 +60,6 @@ public class JshTest {
     @Test
 
     public void jshShouldThrowExceptionIfMoreThan2ArgsGiven() throws IOException {
-        // ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        // PrintStream originalOut = System.out;
-        // System.setOut(new PrintStream(outContent));
    
         String[] args=  {"-c", "echo", "foo"};
         
@@ -77,9 +74,6 @@ public class JshTest {
     @Test
 
     public void jshShouldThrowExceptionIf1stArgNotCorrect() throws IOException {
-        // ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        // PrintStream originalOut = System.out;
-        // System.setOut(new PrintStream(outContent));
    
         String[] args=  {"-l", "echo"};
         
@@ -265,6 +259,23 @@ public class JshTest {
         assertThatCode(() -> {
             Jsh.main(args);
         }).doesNotThrowAnyException(); 
+
+
+    }
+
+    @Test
+
+    public void jshShouldTakeUserInputIfNothingInMainThrowErrorIfIncorrectInput() throws IOException {
+
+
+        String[] args = {};
+
+        String input = "pwd";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException();
 
 
     }

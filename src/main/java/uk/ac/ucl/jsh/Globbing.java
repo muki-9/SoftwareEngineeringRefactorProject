@@ -36,6 +36,9 @@ public class Globbing {
                                             .collect(Collectors.toList());
 
                     fileNames.forEach((w -> updatedArgsList.add(w)));
+                    if(fileNames.isEmpty()){
+                        updatedArgsList.add(arg);
+                    }
                 }
             }
             else {

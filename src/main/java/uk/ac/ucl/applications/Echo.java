@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import uk.ac.ucl.jsh.Application;
+import uk.ac.ucl.jsh.Globbing;
 
 public class Echo implements Application {
 
@@ -17,11 +18,13 @@ public class Echo implements Application {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
         boolean atLeastOnePrinted = !args.isEmpty();
 
+        Globbing globb = new Globbing(globbArray);
+        ArrayList<String> updatedArgs = globb.globbing(args);
         // arguments printed with space between them, ensuring no space printed after last element
         int count = 0;
-        for (String arg : args) {
+        for (String arg : updatedArgs) {
             writer.write(arg);
-            if (count < args.size() - 1) {
+            if (count < updatedArgs.size() - 1) {
                 writer.write(" ");
             }
             writer.flush();
