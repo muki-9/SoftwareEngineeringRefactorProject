@@ -47,7 +47,7 @@ public class CatTest {
     }
 
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @After
     public void tear() throws IOException {

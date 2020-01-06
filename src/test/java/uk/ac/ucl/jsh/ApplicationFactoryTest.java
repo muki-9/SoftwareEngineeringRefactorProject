@@ -22,7 +22,6 @@ public class ApplicationFactoryTest{
 
         af = new ApplicationFactory();
 
-
     }
 
 
@@ -221,10 +220,5 @@ public class ApplicationFactoryTest{
 
         }).isInstanceOf(RuntimeException.class)
         .hasMessageContaining("random: unknown application");
-
-
     }
-
-
-
 }

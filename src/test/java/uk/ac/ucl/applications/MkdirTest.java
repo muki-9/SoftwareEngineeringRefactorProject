@@ -41,7 +41,7 @@ public class MkdirTest{
        
     }
     @Rule
-    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
+    public TemporaryFolder folder  = new TemporaryFolder();
 
     @After
 
