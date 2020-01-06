@@ -192,7 +192,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         ArrayList<ParseTree> s = new ArrayList<>();
         String string = "";
         ArrayList<String> bqArgs = new ArrayList<>();
-        ArrayList<Boolean> globbArray;
         boolean arg = false;
         boolean integrate = false;
         boolean globb = false;

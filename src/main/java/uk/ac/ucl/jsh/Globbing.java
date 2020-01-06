@@ -35,7 +35,7 @@ public class Globbing {
                                             .filter(f -> f.matches(updateArg))
                                             .collect(Collectors.toList());
 
-                    fileNames.forEach((w -> updatedArgsList.add(w)));
+                    fileNames.forEach(w -> updatedArgsList.add(w));
                     if(fileNames.isEmpty()){
                         updatedArgsList.add(arg);
                     }

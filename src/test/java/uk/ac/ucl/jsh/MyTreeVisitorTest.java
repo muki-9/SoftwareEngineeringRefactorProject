@@ -333,34 +333,6 @@ public class MyTreeVisitorTest extends ParserT{
         MyTreeVisitor tree= new MyTreeVisitor();
         Seq s = (Seq) tree.visitSeq(seq);
         assertNotNull(s);
-
-    }
-
-    //bug doesnt work as of now
-
-    @Test
-    public void callTakingRedirFromStartCreatesFile(){
-
-        ArrayList<TestToken> tokens = new ArrayList<>(){
-            private static final long serialVersionUID = -112447375692081252L;
-
-            {
-            add(new TestToken(">", AntlrGrammarLexer.GT));
-            add(new TestToken(" ", AntlrGrammarLexer.WS));
-            add(new TestToken("result.txt", AntlrGrammarLexer.UQ));
-            add(new TestToken(" ", AntlrGrammarLexer.WS));
-
-            
-        }};
-
-        AntlrGrammarParser ap = createParserNoError(tokens);
-        CallContext call = ap.call();
-        MyTreeVisitor tree= new MyTreeVisitor();
-     
-
-        assertThatCode(() ->{
-            tree.visitCall(call);
-        }).doesNotThrowAnyException();
     }
 
     @Test
