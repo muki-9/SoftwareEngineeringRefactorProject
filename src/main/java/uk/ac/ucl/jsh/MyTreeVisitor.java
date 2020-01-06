@@ -306,7 +306,6 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             Path p = Paths.get(Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs());
   
             is =getISFromFile(p);
-            System.out.println(is);
 
         }
         if(lastOccGT !=  -1){
