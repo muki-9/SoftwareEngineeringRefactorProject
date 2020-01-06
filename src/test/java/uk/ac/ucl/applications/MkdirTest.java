@@ -97,31 +97,6 @@ public class MkdirTest{
             testMkdir.exec(testArray, null, out, null );
         }).isInstanceOf(RuntimeException.class)
         .hasMessage("mkdir: no filename given");
-
-
     }
-//works for everything ive tried.. check if necessary
-
-
-    // @Test
-
-    // public void mkdirShouldNotCreateDirIfNotPossible() throws IOException {
-
-    //     testArray.add("()()(cdcd))");
-
-    //     Scanner scn = new Scanner(in);
-
-    //     testMkdir.exec(testArray, null, out, null );
-
-    //     String line = scn.nextLine();
-    //     assertThat(line).isEqualTo("Folder created sucessfully");
-    //     scn.close();
-
-
-
-    // }
-
-
-
 }
 

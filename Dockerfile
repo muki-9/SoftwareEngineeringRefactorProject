@@ -22,6 +22,8 @@ COPY coverage /jsh/coverage
 RUN chmod +x /jsh/coverage
 COPY Dockerfile /jsh/Dockerfile
 RUN chmod +x /jsh/Dockerfile
+COPY . /jsh
+RUN chmod +x /jsh
 
 RUN cd /jsh && mvn package
 

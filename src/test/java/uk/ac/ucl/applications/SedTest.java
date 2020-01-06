@@ -230,23 +230,7 @@ public class SedTest{
         })
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("sed: regex in incorrect form");
-
     }
-
-    // @Test
-    // public void sedThrowsExceptionIfFileUnreadable() throws IOException {
-
-    //     File unreadable = new File(createTempFile());
-    //     unreadable.setReadable(false);
-    //     testArray.add("s/a/b/");
-    //     testArray.add(unreadable.getName());
-    //     assertThatThrownBy(() -> {
-    //         testSed.exec(testArray, null, out, null);
-    //     })
-    //     .isInstanceOf(RuntimeException.class)
-    //     .hasMessageContaining("sed: cannot open " + unreadable.getName());
-        
-    // }
 
     @Test
     public void sedThrowsExceptionIfDir() throws IOException {
@@ -280,7 +264,6 @@ public class SedTest{
     }
 
     private void writeNewStringToFile(File filename) throws IOException{
-
         PrintWriter out1 = new PrintWriter(filename);
         for(int i =0; i<3; i++){
             out1.write("Repeat"+ i);

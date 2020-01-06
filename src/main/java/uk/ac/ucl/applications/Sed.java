@@ -58,7 +58,7 @@ public class Sed implements Application {
     private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
 
-        if((args.size() == 1 && input == null ) || args.size() > 2 || args.size() < 1) {
+        if (args.size() == 1 && input == null || args.size() > 2 || args.size() < 1) {
             throw new RuntimeException("sed: wrong arguments");
         }
 

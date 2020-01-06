@@ -79,7 +79,7 @@ public class Head implements Application {
 
     */
     public void checkArgs(ArrayList<String> args, InputStream input){
-        if(((args.isEmpty() || args.size() == 2) && input == null)|| args.size() > 3){
+        if ((args.isEmpty() || args.size() == 2) && input == null || args.size() > 3) {
             throw new RuntimeException("head: wrong arguments");   
         }
 

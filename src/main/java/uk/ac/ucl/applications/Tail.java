@@ -84,7 +84,7 @@ public class Tail implements Application {
 
     */
     private void checkArgs(ArrayList<String> args, InputStream input) {
-        if (((args.isEmpty() || args.size() == 2) && input == null) || args.size() > 3) {
+        if ((args.isEmpty() || args.size() == 2) && input == null || args.size() > 3) {
             throw new RuntimeException("tail: wrong arguments");   
         }
 

@@ -16,10 +16,6 @@ public class DoubleQuotedTest extends ParserT{
     public void testDQ(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 1L;
 
             {
@@ -43,12 +39,6 @@ public class DoubleQuotedTest extends ParserT{
         assertThat(dq.DQ(0)).hasToString("\"");
         assertThat(dq.NL()).isEmpty();
         assertThat(dq.NL(0)).isNull();
-        // assertThat(dq.DQC().get(0)).hasToString("this is space:");
-        // assertThat(dq.DQC(0)).hasToString("this is space:");
-
-
-
-
     }
 
     @Test
@@ -57,15 +47,10 @@ public class DoubleQuotedTest extends ParserT{
 
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 1L;
 
             {
 
-            // add(new TestToken("\"", AntlrGrammarLexer.DQ));
             add(new TestToken("this is test:", AntlrGrammarLexer.DQ));
 
         }};
@@ -82,10 +67,6 @@ public class DoubleQuotedTest extends ParserT{
     public void testDQContxWithEnterExitRules(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 1L;
 
             {

@@ -36,7 +36,9 @@ public class MyTreeVisitorTest extends ParserT{
     @AfterClass
     public static void tear(){
         File f = new File("randomfile.txt");
+        File f2 = new File("result.txt");
         f.delete();
+        f2.delete();
     }
 
     @Test
@@ -44,9 +46,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testRedirectionWithLT(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -68,9 +67,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testRedirectionWithGT(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -93,9 +89,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testRedirectionShouldThrowExceptionIfWrongInput(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -122,9 +115,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testRedirectionShouldThrowExceptionIfTooManyInputs(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -153,9 +143,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testBackQuote(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -176,34 +163,11 @@ public class MyTreeVisitorTest extends ParserT{
 
     }
 
-    // @Test
-
-    // public void testBackquotedShouldThrowExceptionIfWrongInput(){
-
-    //     ArrayList<TestToken> tokens = new ArrayList<>(){
-    //         /**
-    //         *
-    //         */
-    //         private static final long serialVersionUID = -112447375692081252L;
-
-    //         { 
-    //         add(new TestToken("hello world", AntlrGrammarLexer.UQ));
-
-    //     }};
-
-    //     AntlrGrammarParser ap = createParserNoError(tokens);
-    //     BackquotedContext bq = ap.backquoted();
-
-    // }
     @Test
 
     public void testDQ(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 1L;
 
             {
@@ -230,9 +194,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testUnquoted(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -256,10 +217,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testSingleQuote(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 1L;
 
             {
@@ -284,9 +241,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testArgumentWithUnquoted(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -309,9 +263,6 @@ public class MyTreeVisitorTest extends ParserT{
 
     public void testArgumentWithBackquoteAndUnquoted(){
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
             {
                 add(new TestToken("wc", AntlrGrammarLexer.UQ));
@@ -334,9 +285,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testArgumentWithBackQuoted(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             { 
@@ -360,9 +308,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testSeqWithPipe(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             {
@@ -391,83 +336,36 @@ public class MyTreeVisitorTest extends ParserT{
 
     }
 
-    // @Test
-
-    // public void testCallWithRedir() throws IOException {
-
-    //     String file1 = createTempFile();
-
-
-    //     ArrayList<TestToken> tokens = new ArrayList<>(){
-    //         /**
-    //         *
-    //         */
-    //         private static final long serialVersionUID = -112447375692081252L;
-
-    //         {
-    //         add(new TestToken("grep", AntlrGrammarLexer.UQ));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken("\"Interesting string\"", AntlrGrammarLexer.UQ));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken("<", AntlrGrammarLexer.LT));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken(file1, AntlrGrammarLexer.UQ));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken(">", AntlrGrammarLexer.GT));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken("newfile.txt", AntlrGrammarLexer.UQ));
-            
-    //     }};
-
-    //     AntlrGrammarParser ap = createParserNoError(tokens);
-    //     CallContext call = ap.call();
-    //     MyTreeVisitor tree= new MyTreeVisitor();
-    //     Call c = (Call) tree.visitCall(call);
-    //     ArrayList<String> exp = new ArrayList<>();
-    //     exp.add("\"Interesting string\"");
-    //     assertThat(c).returns("grep", Call::getApplication);
-    //     assertThat(c).returns(exp, Call::getArguments);
-        
-        
-    // }
-
     //bug doesnt work as of now
 
-    // @Test
+    @Test
+    public void callTakingRedirFromStartCreatesFile(){
 
-    // public void callTakingRedirFromStartCreatesFile(){
+        ArrayList<TestToken> tokens = new ArrayList<>(){
+            private static final long serialVersionUID = -112447375692081252L;
 
-    //     ArrayList<TestToken> tokens = new ArrayList<>(){
-    //         /**
-    //         *
-    //         */
-    //         private static final long serialVersionUID = -112447375692081252L;
-
-    //         {
-    //         add(new TestToken(">", AntlrGrammarLexer.GT));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
-    //         add(new TestToken("result.txt", AntlrGrammarLexer.UQ));
-    //         add(new TestToken(" ", AntlrGrammarLexer.WS));
+            {
+            add(new TestToken(">", AntlrGrammarLexer.GT));
+            add(new TestToken(" ", AntlrGrammarLexer.WS));
+            add(new TestToken("result.txt", AntlrGrammarLexer.UQ));
+            add(new TestToken(" ", AntlrGrammarLexer.WS));
 
             
-    //     }};
+        }};
 
-    //     AntlrGrammarParser ap = createParserNoError(tokens);
-    //     CallContext call = ap.call();
-    //     MyTreeVisitor tree= new MyTreeVisitor();
+        AntlrGrammarParser ap = createParserNoError(tokens);
+        CallContext call = ap.call();
+        MyTreeVisitor tree= new MyTreeVisitor();
      
 
-    //     assertThatCode(() ->{
-    //         tree.visitCall(call);
-    //     }).doesNotThrowAnyException();
-    // }
+        assertThatCode(() ->{
+            tree.visitCall(call);
+        }).doesNotThrowAnyException();
+    }
 
     @Test
     public void testGTRedir() throws IOException {
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
             {
             add(new TestToken("echo", AntlrGrammarLexer.UQ));
@@ -496,9 +394,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void testCallWithBackQuotes(){
 
           ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             {   add(new TestToken("echo", AntlrGrammarLexer.UQ));
@@ -526,9 +421,6 @@ public class MyTreeVisitorTest extends ParserT{
         writeToFile(file);
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             {
@@ -561,9 +453,6 @@ public class MyTreeVisitorTest extends ParserT{
     public void callShouldThrowErrorIfFileNotPresentForReadLT(){
 
         ArrayList<TestToken> tokens = new ArrayList<>(){
-            /**
-            *
-            */
             private static final long serialVersionUID = -112447375692081252L;
 
             {

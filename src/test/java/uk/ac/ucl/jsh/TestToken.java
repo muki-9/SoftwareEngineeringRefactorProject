@@ -16,61 +16,51 @@ public class TestToken implements Token {
 
     @Override
     public String getText() {
-        // TODO Auto-generated method stub
         return text;
     }
 
     @Override
     public int getType() {
-        // TODO Auto-generated method stub
         return tcod;
     }
 
     @Override
     public int getLine() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getCharPositionInLine() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getChannel() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getTokenIndex() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getStartIndex() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getStopIndex() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public TokenSource getTokenSource() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public CharStream getInputStream() {
-        // TODO Auto-generated method stub
         return null;
     }
     

@@ -380,7 +380,7 @@ public class WcTest{
         PipedInputStream in = new PipedInputStream();
         PipedOutputStream out = new PipedOutputStream(in);
 
-        String originalString = "test line absolute\n2nd line!\nabsent"; //if only print new lie counts then 
+        String originalString = "test line absolute\n2nd line!\nabsent";
         InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
     
         testWc.exec(test, inputStream, out, null);

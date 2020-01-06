@@ -6,9 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import java.util.ArrayList;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import uk.ac.ucl.jsh.AntlrGrammarParser.CallContext;
 
