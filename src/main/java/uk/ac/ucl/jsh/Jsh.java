@@ -52,6 +52,9 @@ public class Jsh {
     public static void setCurrentDirectory(String dir) {
         Jsh.currentDirectory = dir;
     }
+    /*
+    This method is for testing purposes only so Jsh Unit tests can receive the output using its own PrintStream.
+    */
 
     final static void setTestOutput(PrintStream output){
         Jsh.setOutput = output;
@@ -97,21 +100,6 @@ public class Jsh {
         }while(default_constr);
         input.close();
 
-
-        // while (true) {
-        //     String prompt = currentDirectory + "> ";
-        //     System.out.print(prompt);
-        //     try {
-        //         String cmdline = input.nextLine();
-        //         if (blankShell(cmdline)) {
-        //             continue;
-        //         }
-        //         eval(cmdline, System.out);
-        //     } catch (Exception e) {
-        //         System.out.println("jsh: here" + e.getMessage());
-        //     }
-        // }
-
     }
     
     public static void main(String[] args) throws IOException{
@@ -133,26 +121,6 @@ public class Jsh {
             } 
             else {
                 newShell.takesInput();
-                
-                // Scanner input = new Scanner(System.in);
-                // try {
-                //     do {
-                //         String prompt = currentDirectory + "> ";
-                //         System.out.println(prompt);
-              
-                //         try {
-                //             String cmdline = "okay";
-                //             if (blankShell(cmdline)) {
-                //                 continue;
-                //             }
-                //             newShell.eval(cmdline, System.out);
-                //         } catch (Exception e) {
-                //             System.out.println("jsh: " + e.getMessage());
-                //         }
-                //     }while(default_constr);
-                // } finally {
-                //     input.close();
-                // }
  
             }
         }

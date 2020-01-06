@@ -12,10 +12,13 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class JshTest {
     
@@ -34,8 +37,12 @@ public class JshTest {
         out = new PipedOutputStream(input);
         outContent  = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
+        Jsh.setCurrentDirectory(folder.getRoot().toString());
 
     }
+
+    @Rule
+    public TemporaryFolder folder  = new TemporaryFolder(new File(Jsh.getHomeDirectory()));
 
     @After
 
@@ -44,6 +51,9 @@ public class JshTest {
         System.setIn(System.in);
         File delete  = new File("result.txt");
         delete.delete();
+        File delete1  = new File("randomfile.txt");
+        delete1.delete();
+        Jsh.setCurrentDirectory(Jsh.getHomeDirectory());
 
     }
 
@@ -91,6 +101,27 @@ public class JshTest {
         }).doesNotThrowAnyException();
 
     }
+    @Test
+
+    public void testingPipeButWithFileShouldOutputFileAndIgnoreInputS() throws IOException {
+
+        File tmp1 = folder.newFile();
+        File tmp2 = folder.newFile();
+        String[] args = {"-c","grep a " +tmp1.getName() + "| cat " + tmp2.getName()};
+        String expected = "thisiswhatshoulgetOutputedJuiceWrld999";
+        String ignore = "randomwordshere un\n uneccessary";
+        writeToFile(tmp1,ignore);
+        writeToFile(tmp2, expected);
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        assertThat(outContent.toString()).contains(expected).doesNotContain(ignore);
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException(); 
+
+
+
+    }
 
     @Test
     public void testJshDirCorrectWithSymbol() throws IOException {
@@ -104,7 +135,7 @@ public class JshTest {
         System.setOut(new PrintStream(outContent));
         newshell.takesInput();
 
-        assertThat(outContent.toString()).isEqualTo(Jsh.getHomeDirectory()+"> ");
+        assertThat(outContent.toString()).isEqualTo(Jsh.getCurrentDirectory()+"> ");
 
     }
 
@@ -116,12 +147,8 @@ public class JshTest {
         String input = "  ";
         InputStream in = new ByteArrayInputStream(input.getBytes());
         System.setIn(in);
-
-      
         testJsh.takesInput();
-        assertThat(outContent.toString()).isEqualTo(Jsh.getHomeDirectory()+"> ");
-    
-        // scn.close();
+        assertThat(outContent.toString()).isEqualTo(Jsh.getCurrentDirectory()+"> ");
 
     }
 
@@ -157,77 +184,89 @@ public class JshTest {
 
     @Test
 
-    public void testJshWithSeqAndPipe(){
+    public void testJshWithSeqAndPipe() throws IOException {
 
-        testJsh = new Jsh(false);
-
-        String input = "grep a file.txt | cat ; echo foo | cat";
-        InputStream in = new ByteArrayInputStream(input.getBytes());
-        System.setIn(in);
-        assertThatCode(() -> {
-            testJsh.takesInput();
-        }).doesNotThrowAnyException(); //get output??
-    }
-
-    @Test
-
-    public void testJshWithRedirectionGT(){
-
-        testJsh = new Jsh(false);
-
-        String input = "echo foo > file.txt";
-        InputStream in = new ByteArrayInputStream(input.getBytes());
-        System.setIn(in);
-        assertThatCode(() -> {
-            testJsh.takesInput();
-        }).doesNotThrowAnyException(); 
-
-
-    }
-
-    @Test
-
-    public void testJshWithRedirectionLT(){
-        testJsh = new Jsh(false);
-
-        String input = "grep class < pom.xml > result.txt";
-        InputStream in = new ByteArrayInputStream(input.getBytes());
-        System.setIn(in);
-        assertThatCode(() -> {
-            testJsh.takesInput();
-        }).doesNotThrowAnyException(); 
-
-
-    }
-
-    @Test
-
-    public void testJshWithRedirectionCreatesFile(){
-        testJsh = new Jsh(false);
-
-        String input = "> result.txt";
-        InputStream in = new ByteArrayInputStream(input.getBytes());
-        System.setIn(in);
-        assertThatCode(() -> {
-            testJsh.takesInput();
-        }).doesNotThrowAnyException(); 
-
-
-    }
-
-
-    @Test
-
-    public void testJshFromMain(){
-        String[] args = {};
-
-        String input = "pwd";
-        InputStream in = new ByteArrayInputStream(input.getBytes());
-        System.setIn(in);
-
+        File tmp1 = folder.newFile();
+        String[] args = {"-c","grep a " +tmp1.getName() + "| cat ; echo foo | cat" };
+        String expected = "a Lot of sleepLess Nights";
+        writeToFile(tmp1, expected + "\n testing");
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        assertThat(outContent.toString()).contains(expected, "foo").doesNotContain("testing");
         assertThatCode(() -> {
             Jsh.main(args);
-        }).doesNotThrowAnyException();
+        }).doesNotThrowAnyException(); 
+    }
+
+    @Test
+
+    public void testJshWithRedirectionGT() throws IOException {
+
+        String[] args = {"-c","echo foo > randomfile.txt" };
+        String expected = "redirection: file created successfully\n";
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        assertThat(outContent.toString()).contains(expected).doesNotContain("foo");
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException(); 
+
+
+    }
+
+    @Test
+
+    public void testJshWithRedirectionLT() throws IOException {
+
+        File tmp1 = folder.newFile();
+        writeToFile(tmp1, "line1ShouldBeOutputed\nThisLiNeShouldNot\nAnotherline");
+        String[] args = {"-c","grep line < "+tmp1.getName()};
+        String expected = "line1ShouldBeOutputed\nAnotherline";
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        assertThat(outContent.toString()).contains(expected).doesNotContain("ThisLiNeShouldNot\n");
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException(); 
+
+    }
+
+    @Test
+
+    public void testJshWithRedirectionLTAndGTGetsLastOneOfEach() throws IOException {
+
+        File tmp1 = folder.newFile();
+        File tmp2 = folder.newFile();
+        String t1 = "randomwords9898\nrunchmod+x   \n output";
+        String t2 = "thisiswhatshouldbereadjuiceWrld9999RiP";
+        writeToFile(tmp1, t1);
+        writeToFile(tmp2, t2);
+        String[] args = {"-c","<" + tmp1.getName()+ " > randomfile.txt cat < "+tmp2.getName()+ " > result.txt ; cat result.txt"};
+
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        assertThat(outContent.toString()).contains(t2, "redirection: file created successfully").doesNotContain(t1);
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException(); 
+
+    }
+
+    @Test
+
+    public void testJshWithRedirectionCreatesFile() throws IOException {
+        testJsh = new Jsh(false);
+
+        String[] args = {"-c", "> result.txt"};
+
+        Jsh.setTestOutput(System.out);
+        Jsh.main(args);
+        assertThat(outContent.toString()).isEqualTo("redirection: file created successfully\n");
+        assertThatCode(() -> {
+            Jsh.main(args);
+        }).doesNotThrowAnyException(); 
+
+
     }
 
     @Test
@@ -243,6 +282,13 @@ public class JshTest {
         System.setOut(new PrintStream(outContent));
         testJsh.takesInput();
 
-        assertThat(outContent.toString()).isEqualTo(Jsh.getHomeDirectory()+"> jsh: No line found\n");
+        assertThat(outContent.toString()).isEqualTo(Jsh.getCurrentDirectory()+"> jsh: No line found\n");
+    }
+
+    private void writeToFile(File file, String content) throws IOException{
+        PrintWriter writer = new PrintWriter(file);
+        writer.print(content);
+        writer.flush();
+        writer.close();
     }
 }
