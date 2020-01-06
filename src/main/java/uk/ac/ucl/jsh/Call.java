@@ -12,25 +12,10 @@ public class Call implements CommandVisitable {
     private String currArg; //this var is required to concatenate the different strings together after removal of quotations
     private boolean split = false;
     private String symbol;
-    private boolean isRequired = false;
     private InputStream is;
-    private boolean osRequired = false;
     private OutputStream os;
     private Boolean globb;
     private ArrayList<Boolean> gArray;
-
-    /**
-    * Standard constructor required to create instance of an application.
-    *
-    * @param app string, containing name of the applications
-    * @param args arraylist containing string of all arguments supplied to app.
-    *
-    */
-    public Call(String app, ArrayList<String> args,ArrayList<Boolean> gArray) {
-        this.application = app;
-        this.arguments = args;
-        this.gArray = gArray;
-    }
 
     /**
     * Special constructor required to pass string from one method in parse tree visitor to another.
@@ -83,26 +68,6 @@ public class Call implements CommandVisitable {
         this.symbol = symbol;
         this.currArg = redirectionArg;
 	}
-
-	
-    /**
-    * Special constructor required to pass an input stream to the receiving method. The instance variable "isRequired"
-    * is set to true, so in the receiving method a check can be undertaken that lets us know an input stream can be extracted
-    * as well as the other two arguments.
-    *
-    * @param app string, containing name of the applications
-    * @param args arraylist containing string of all arguments supplied to app.
-    * @param is the input stream, likely containing some output from another command
-    *
-    */
-	public Call(String app, ArrayList<String> args, InputStream is, ArrayList<Boolean> gArray) {
-        this.application = app;
-        this.arguments = args;
-        isRequired = true;
-        this.is = is;
-        this.gArray = gArray;
-	}
-
 	
     /**
     * Special constructor required to pass an output stream to the receiving method. The instance variable "osRequired"
@@ -114,14 +79,6 @@ public class Call implements CommandVisitable {
     * @param os an output stream, to which to write an input to.
     *
     */
-	public Call(String app, ArrayList<String> args, OutputStream os, ArrayList<Boolean> gArray) {
-        this.application = app;
-        this.arguments = args;
-        osRequired = true;
-        this.os = os;
-        this.gArray = gArray;
-    }
-
 
     public Call(String app, ArrayList<String>args, OutputStream os, InputStream is, ArrayList<Boolean> gArray){
         this.application = app;
@@ -129,7 +86,6 @@ public class Call implements CommandVisitable {
         this.os = os;
         this.is = is;   
         this.gArray = gArray;
-
     }
     
     /**
@@ -174,16 +130,9 @@ public class Call implements CommandVisitable {
         visitor.visitCall(this);
     }
 
-	public boolean getISRequired() {
-		return isRequired;
-	}
-
 	public InputStream getIS() {
 		return is;
     }
-    public boolean getOSRequired() {
-		return osRequired;
-	}
 
 	public OutputStream getOS() {
 		return os;
