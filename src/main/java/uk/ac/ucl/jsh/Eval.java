@@ -70,10 +70,10 @@ public class Eval implements CommandVisitor {
     */
     @Override
     public void visitCall(Call call) throws IOException {
-        if (call.getISRequired()) {
+        if (call.getIS() != null) {
             isList.add(call.getIS());
         }
-        if (call.getOSRequired()) {
+        if (call.getIS() != null) {
             osList.add(call.getOS());
         }
         InputStream is = isList.get(isList.size()-1);

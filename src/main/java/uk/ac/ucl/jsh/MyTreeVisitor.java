@@ -277,53 +277,55 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     */
     @Override
     public CommandVisitable visitCall(AntlrGrammarParser.CallContext ctx) {
-        List<RedirectionContext> redirections = ctx.redirection();
-        if (redirections.size() == 0) {
-            ArrayList<String> args = getCallArgs(ctx);
-            ArrayList<Boolean> globb = getGlobbArray(ctx);
-            String app = args.get(0);
-            globb.remove(0);
+        List<RedirectionContext> redirections  = ctx.redirection();
+        InputStream is = null;
+        OutputStream os = null; 
+
+        int lastOccLT = -1;
+        int lastOccGT = -1;
+
+        for(int i = 0; i < redirections.size(); i++){
+            Call c = (Call) redirections.get(i).accept(this);
+            Path p = Paths.get(Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs());
+            File file = p.toFile();
+            if(redirections.get(i).getText().contains("<")){
+                if(!Files.exists(p)){
+                    throw new RuntimeException("Redirection: No such file exists");
+                }
+                lastOccLT = i;
+
+            }else{
+                createFile(file);
+                lastOccGT = i;
+            }
+            
+        }
+
+        if(lastOccLT != -1){
+            Call c = (Call) redirections.get(lastOccLT).accept(this);
+            Path p = Paths.get(Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs());
+            is =getISFromFile(p);
+
+
+        }
+        if(lastOccGT !=  -1){
+            Call c = (Call) redirections.get(lastOccGT).accept(this);
+            Path p = Paths.get(Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs());
+            os = getOutputStream(p.toFile());
+
+        }
+
+        ArrayList<String> args = getCallArgs(ctx);
+        ArrayList<Boolean> globb = getGlobbArray(ctx);
+        String app = null;
+        if(args.size() >0){
+            app = args.get(0);
             args.remove(0);
-            return new Call(app, args, globb);
-
+            globb.remove(0);
         }
-        else {
-            Call c = (Call) redirections.get(0).accept(this);
-            String filePath = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs();
-            File file = new File(filePath);
-            OutputStream os;
 
-            if (c.getSymbol().matches(">")) {
-                os = pipeToFile(file);
-                ArrayList<String> args = getCallArgs(ctx);
-                ArrayList<Boolean> globb = getGlobbArray(ctx);
-                String app = null;
-                if (args.size() > 0) {
-                    app = args.get(0);
-                    args.remove(0);
-                }
-                return new Call(app, args, os, globb);
-            }
-            else if (c.getSymbol().matches("<")) {
-                if (file.exists()) {
-                    Path path = Paths.get(filePath);
-                    InputStream is = getISFromFile(path);
-                    ArrayList<String> args = getCallArgs(ctx);
-                    ArrayList<Boolean> globb = getGlobbArray(ctx);
-                    String app = null;
-                    if (args.size() > 0) {
-                        app = args.get(0);
-                        args.remove(0);
-                        globb.remove(0);
-                    }
-                    return new Call(app, args, is, globb);
-                }
-                else {
-                    throw new RuntimeException("redirection: file could not be found");
-                }
-            }
-        }
-        return null;
+        return new Call(app, args, os, is, globb);
+
     }
 
 
@@ -333,7 +335,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
     */
 
 
-    private OutputStream pipeToFile(File file) {
+    private void createFile(File file){
+
         try {
             if (file.createNewFile()) {
                 System.out.println("redirection: file created successfully");
@@ -341,13 +344,20 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         } catch (IOException e) {
             throw new RuntimeException("redirection: file could not be created");
         }
+
+    }
+
+    private OutputStream getOutputStream(File file){
+
         try {
             OutputStream os = new FileOutputStream(file);
             return os;
         } catch (FileNotFoundException e) {
             throw new RuntimeException("redirection: error writing to file");
         }
+
     }
+
 
     /**
      * auxilliary function for call method, reads file given as argument during >

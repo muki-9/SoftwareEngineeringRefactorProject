@@ -121,6 +121,16 @@ public class Call implements CommandVisitable {
         this.os = os;
         this.gArray = gArray;
     }
+
+
+    public Call(String app, ArrayList<String>args, OutputStream os, InputStream is, ArrayList<Boolean> gArray){
+        this.application = app;
+        this.arguments = args; 
+        this.os = os;
+        this.is = is;   
+        this.gArray = gArray;
+
+    }
     
     /**
     * The rest of the methods include getters for all the different instance variables described in the constructors above.

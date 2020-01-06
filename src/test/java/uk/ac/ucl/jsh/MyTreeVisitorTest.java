@@ -581,7 +581,7 @@ public class MyTreeVisitorTest extends ParserT{
         assertThatThrownBy(() ->{
             tree.visitCall(call);
         }).isInstanceOf(RuntimeException.class)
-        .hasMessage("redirection: file could not be found");
+        .hasMessage("Redirection: No such file exists");
     }
 
     private void writeToFile(File file) throws IOException {
