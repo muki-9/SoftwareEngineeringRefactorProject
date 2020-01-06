@@ -270,7 +270,9 @@ public class Wc implements Application {
                 ArrayList<String> words = new ArrayList<>();
 
                 for (int i = 0; i < preWords.length; i++) {
-                    words.add(preWords[i]); 
+                    if (preWords[i].length() > 0) {
+                        words.add(preWords[i]);
+                    }
                 }
                 wordCount += words.size(); 
             }
@@ -292,7 +294,9 @@ public class Wc implements Application {
             ArrayList<String> words = new ArrayList<>();
 
             for (int i = 0; i < preWords.length; i++) {
-                words.add(preWords[i]);
+                if (preWords[i].length() > 0) {
+                    words.add(preWords[i]);
+                }
             }
             wordCount += words.size(); 
         }
