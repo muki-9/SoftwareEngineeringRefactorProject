@@ -22,28 +22,26 @@ public class Globbing {
     public ArrayList<String> globbing(ArrayList<String> args) throws IOException {
 
         ArrayList<String> updatedArgsList = new ArrayList<>();
-        for(int i=0 ; i< args.size(); i++){
+        for (int i = 0 ; i < args.size(); i++) {
             String arg = args.get(i);
             if(arg.contains("*") && globbArray.get(i)){
-
                 int count = 1;
                 count += arg.length() - arg.replace("/", "").length();
                 String updateArg = arg.replace("*", "(.*)");
 
                 try (Stream<Path> list =  Files.walk(currDir, count)) {
 
-                    List<String> fileNames = list.map(x -> x.toString().replace(currentDirectory+"/", ""))
+                    List<String> fileNames = list.map(x -> x.toString().replace(currentDirectory + "/", ""))
                                             .filter(f -> f.matches(updateArg))
                                             .collect(Collectors.toList());
 
                     fileNames.forEach((w -> updatedArgsList.add(w)));
                 }
-        }else{
-            updatedArgsList.add(arg);
-        }
+            }
+            else {
+                updatedArgsList.add(arg);
+            }
         }
         return updatedArgsList;
-
     }
 }
-

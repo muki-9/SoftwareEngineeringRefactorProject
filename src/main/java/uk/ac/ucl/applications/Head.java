@@ -25,72 +25,75 @@ public class Head implements Application {
     private BufferedWriter writer;
 
     @Override
-    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray)
-            throws IOException {
+    public void exec(ArrayList<String> args, InputStream input, OutputStream output, ArrayList<Boolean> globbArray) throws IOException {
         String currentDirectory = Jsh.getCurrentDirectory();
         writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
 
         checkArgs(args, input);
-        String file  = getFile(args);
+        String file = getFile(args);
 
-        if (useIS) {
+        if (!useIS) {
+            File headFile = new File(currentDirectory + File.separator + file);
+            writeOutput(file, headFile, writer, currentDirectory);
+        }
+        else {
             String line = new String(input.readAllBytes());
             String[] lines = line.split(System.getProperty("line.separator"));
 
-            if(lines.length <= headLines){
+            if (lines.length <= headLines) {
                 headLines = lines.length;
             }
+
             for (int i = 0; i < headLines; i++) {
                 writer.write(lines[i] + System.getProperty("line.separator"));
                 writer.flush();
             }
-
-        }else{
-           
-            File headFile = new File(currentDirectory + File.separator + file);
-            writeOutput(file, headFile, writer, currentDirectory);
-            }
+        }
     }
 
     public String getFile(ArrayList<String> args){
-
-        if(args.size()> 1){
-            if(!args.get(0).equals("-n")){throw new RuntimeException("head: wrong argument: " + args.get(0) );}
-            try{
+        if (args.size() == 1) {
+            return args.get(0);
+        }
+        else if (args.size() > 1) {
+            if (!args.get(0).equals("-n")) {
+                throw new RuntimeException("head: wrong argument: " + args.get(0));
+            }
+            try {
                 headLines = Integer.parseInt(args.get(1));  
-            }catch(RuntimeException e){
+            }
+            catch (RuntimeException e) {
                 throw new RuntimeException("head: wrong argument: " + args.get(1));
             }
-            if(args.size() == 3){
+
+            if (args.size() == 3) {
                 return args.get(2);
             }
-           
-        }else if(args.size()==1){
-            return args.get(0);
         }
         return null;
     }
 
-    // /*
+    /*
         
-    //     Method takes in command line arguments and adjusts class state or throws exception depending on arguments using if statements.
+        Method takes in command line arguments and adjusts class state or throws exception depending on arguments using if statements.
 
-    // */
-    
-
+    */
     public void checkArgs(ArrayList<String> args, InputStream input){
-        if(((args.isEmpty() || args.size() ==2)&& input == null)|| args.size() > 3){
+        if(((args.isEmpty() || args.size() == 2) && input == null)|| args.size() > 3){
             throw new RuntimeException("head: wrong arguments");   
         }
 
-        if(args.size() ==2 || args.isEmpty()){
+        if(args.size() == 2 || args.isEmpty()){
             useIS = true;
         }
-
     }
 
-    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory)
-            throws IOException {
+    /*
+    
+        Method checks if file exists - if it does, for loop prints out specified number of lines from top of file.
+     
+    */
+    private void writeOutput(String headArg, File headFile, BufferedWriter writer, String currentDirectory) throws IOException {
         if (!headFile.exists()) {
             throw new RuntimeException("head: " + headArg + " does not exist");
         }

@@ -149,6 +149,7 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
         return new Call(newS, false);
     }
 
+
     /**
     * When at an unquoted node, the child will contain just the raw text we want to extract, this is passed into the
     * Call method and the constructor will make an instance variable in the Call class true. If this instance variable is true
@@ -204,12 +205,14 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                 if (!integrate) {
                     bqArgs = c.getBqArray();
                     arg = true;
-                } else {
+                }
+                else {
                     for (String vals : c.getBqArray()) {
                         string = string.concat(vals);
                     }
                 }
-            } else {
+            }
+            else {
                 globb = c.getGlobb();
                 string = string.concat(c.getCurrArgs());
             }
@@ -283,7 +286,8 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
             args.remove(0);
             return new Call(app, args, globb);
 
-        } else {
+        }
+        else {
             Call c = (Call) redirections.get(0).accept(this);
             String filePath = Jsh.getCurrentDirectory() + System.getProperty("file.separator") + c.getCurrArgs();
             File file = new File(filePath);
@@ -294,25 +298,27 @@ public class MyTreeVisitor extends AntlrGrammarBaseVisitor<CommandVisitable> {
                 ArrayList<String> args = getCallArgs(ctx);
                 ArrayList<Boolean> globb = getGlobbArray(ctx);
                 String app = null;
-                if (args.size()>0) {
+                if (args.size() > 0) {
                     app = args.get(0);
                     args.remove(0);
                 }
                 return new Call(app, args, os, globb);
-            } else if (c.getSymbol().matches("<")) {
+            }
+            else if (c.getSymbol().matches("<")) {
                 if (file.exists()) {
                     Path path = Paths.get(filePath);
                     InputStream is = getISFromFile(path);
                     ArrayList<String> args = getCallArgs(ctx);
                     ArrayList<Boolean> globb = getGlobbArray(ctx);
                     String app = null;
-                    if (args.size()>0) {
+                    if (args.size() > 0) {
                         app = args.get(0);
                         args.remove(0);
                         globb.remove(0);
                     }
                     return new Call(app, args, is, globb);
-                } else {
+                }
+                else {
                     throw new RuntimeException("redirection: file could not be found");
                 }
             }

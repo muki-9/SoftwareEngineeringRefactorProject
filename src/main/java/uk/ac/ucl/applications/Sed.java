@@ -58,29 +58,33 @@ public class Sed implements Application {
     private String[] validateArgs(ArrayList<String> args, InputStream input) {
         String[] s;
 
-        if((args.size() ==1 && input == null )||args.size() > 2 || args.size() < 1){
+        if((args.size() == 1 && input == null ) || args.size() > 2 || args.size() < 1) {
             throw new RuntimeException("sed: wrong arguments");
         }
+
         // use InputStream if replacement given with no file
-        if (args.size() ==1) {
+        if (args.size() == 1) {
             useIS = true;
         }
+
         // splits REPLACEMENT into array by the delimiter used
-        final String replacement  = args.get(0);
+        final String replacement = args.get(0);
         
         char delimiter = replacement.charAt(1);
-        if(args.get(0).chars().filter(num -> num == delimiter).count() !=3){
+        if(args.get(0).chars().filter(num -> num == delimiter).count() != 3){
             throw new RuntimeException("sed: wrong number of delimiters");
         }
+
         s = args.get(0).split(Pattern.quote(Character.toString(delimiter)));
 
         if (!"s".equals(s[0])) {
             throw new RuntimeException("sed: regex in incorrect form, first letter must be an 's'");
         }
 
-        if (replacement.charAt(replacement.length()-1) == 'g') {
-                g = true;
-        }else if(replacement.charAt(replacement.length()-1) != delimiter){
+        if (replacement.charAt(replacement.length() - 1) == 'g') {
+            g = true;
+        }
+        else if (replacement.charAt(replacement.length() - 1) != delimiter) {
             throw new RuntimeException("sed: last char should be delimiter or g");
         }
         return s;

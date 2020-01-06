@@ -315,15 +315,15 @@ public class Wc implements Application {
             }
         }
 
-        if(args.get(0).startsWith("-") && !(args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l"))){
+        if (args.get(0).startsWith("-") && !(args.get(0).equals("-m") || args.get(0).equals("-w") || args.get(0).equals("-l"))) {
             throw new RuntimeException("wc: illegal option given");
         }
 
-        if (args.size() == 1 && args.get(0).startsWith("-")){
-            if(input != null){
+        if (args.size() == 1 && args.get(0).startsWith("-")) {
+            if (input != null) {
                 useInputStream = true;           
             }
-            else{
+            else {
                 throw new RuntimeException("wc: wrong number of arguments");
             }    
         }
